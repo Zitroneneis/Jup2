@@ -45,6 +45,40 @@
     .right-panel h2 {
       margin-top: 0;
     }
+
+        /* Basic styling for the chat panel */
+        #chat-panel {
+      width: 400px;
+      height: 500px;
+      border: 1px solid #ccc;
+      padding: 10px;
+      overflow-y: auto;
+      margin-bottom: 10px;
+      font-family: Arial, sans-serif;
+    }
+    .message {
+      margin: 5px 0;
+    }
+    .user {
+      font-weight: bold;
+    }
+    .bot {
+      font-weight: bold;
+      color: blue;
+    }
+    #chat-form {
+      display: flex;
+    }
+    #chat-input {
+      flex: 1;
+      padding: 8px;
+      font-size: 1em;
+    }
+    #send-button {
+      padding: 8px 12px;
+      font-size: 1em;
+    }
+
   </style>
 </head>
 <body>
@@ -59,7 +93,7 @@
     ></iframe>
     </div>
 
-    <!-- Right Panel: Status / Instructions -->
+    <!-- Right Panel: Status / Instructions and Chatbot -->
     <div class="right-panel">
       <h2>A JupyterLite Notebook Lesson!</h2>
       <p>
@@ -70,6 +104,49 @@
         <li>Follow the instructions in the left-panel.</li>
         <li>Feel free to modify and explore the notebook! </li>
       </ul>
+
+      <div id="chat-panel"></div>
+  <form id="chat-form">
+    <input type="text" id="chat-input" placeholder="Type your message..." required />
+    <button type="submit" id="send-button">Send</button>
+  </form>
+
+  <script>
+    const chatPanel = document.getElementById('chat-panel');
+    const chatForm = document.getElementById('chat-form');
+    const chatInput = document.getElementById('chat-input');
+
+    chatForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const userMessage = chatInput.value.trim();
+      if (!userMessage) return;
+      appendMessage('User', userMessage);
+      chatInput.value = '';
+
+      // Make a call to your backend API (configured to interact with AWS Bedrock)
+      try {
+        const response = await fetch('YOUR_API_GATEWAY_ENDPOINT', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt: userMessage })
+        });
+        const data = await response.json();
+        // Assuming your API returns the chatbot response in data.response
+        appendMessage('Bot', data.response || 'No response from the model.');
+      } catch (error) {
+        console.error('Error communicating with the chatbot API:', error);
+        appendMessage('Bot', 'Sorry, something went wrong.');
+      }
+    });
+
+    function appendMessage(sender, text) {
+      const messageDiv = document.createElement('div');
+      messageDiv.classList.add('message');
+      messageDiv.innerHTML = `<span class="${sender.toLowerCase()}">${sender}:</span> ${text}`;
+      chatPanel.appendChild(messageDiv);
+      chatPanel.scrollTop = chatPanel.scrollHeight;
+    }
+  </script>
     </div>
 
   </div>
