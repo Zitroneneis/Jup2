@@ -46,15 +46,13 @@
       margin-top: 0;
     }
 
-        /* Basic styling for the chat panel */
-        #chat-panel {
-      width: 400px;
-      height: 500px;
+    /* Chat panel styles */
+    #chat-panel {
+      flex: 1;
       border: 1px solid #ccc;
       padding: 10px;
       overflow-y: auto;
       margin-bottom: 10px;
-      font-family: Arial, sans-serif;
     }
     .message {
       margin: 5px 0;
@@ -106,11 +104,14 @@
       </ul>
       <p>Feeling lost? Chat with robot below!</p>
       <p>... May or may not be working...</p>
-      <div id="chat-panel"></div>
-  <form id="chat-form">
-    <input type="text" id="chat-input" placeholder="Type your message..." required />
-    <button type="submit" id="send-button">Send</button>
-  </form>
+
+      <!-- Right panel: Chat interface -->
+    <div id="chat-panel"></div>
+    <form id="chat-form">
+      <input type="text" id="chat-input" placeholder="Type your message..." required />
+      <button type="submit" id="send-button">Send</button>
+    </form>
+  </div>
 
   <script>
     const chatPanel = document.getElementById('chat-panel');
@@ -121,22 +122,26 @@
       event.preventDefault();
       const userMessage = chatInput.value.trim();
       if (!userMessage) return;
-      appendMessage('You', userMessage);
+      appendMessage('User', userMessage);
       chatInput.value = '';
 
-      // Make a call to your backend API (configured to interact with AWS Bedrock)
+      // Call the Perplexity LLM API
       try {
-        const response = await fetch('YOUR_API_GATEWAY_ENDPOINT', {
+        const response = await fetch('NEXT_PUBLIC_PERPLEXITY_API_ENDPOINT', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            // Include your API key as needed:
+            'Authorization': 'Bearer NEXT_PUBLIC_PERPLEXITY_API_KEY'
+          },
           body: JSON.stringify({ prompt: userMessage })
         });
         const data = await response.json();
-        // Assuming your API returns the chatbot response in data.response
-        appendMessage('Bot', data.response || 'No response from the model.');
+        // Adjust according to the Perplexity API response structure
+        appendMessage('Bot', data.answer || 'No response received.');
       } catch (error) {
-        console.error('Error communicating with the Model or API:', error);
-        appendMessage('Bot', 'Sorry, something went wrong.');
+        console.error('Error with Perplexity API:', error);
+        appendMessage('Bot', 'Sorry, there was an error contacting Perplexity.');
       }
     });
 
@@ -148,6 +153,7 @@
       chatPanel.scrollTop = chatPanel.scrollHeight;
     }
   </script>
+
     </div>
 
   </div>
