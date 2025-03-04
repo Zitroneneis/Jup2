@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>Demo: Embedded JupyterLite Notebook</title>
+  <script src="https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js"></script>
   <style>
     /* Basic reset and styling to ensure panels appear side by side */
     html, body {
@@ -52,7 +53,7 @@
     <!-- Main Panel: Embedded Notebook -->
     <div class="main-panel">
       <iframe
-      src="./lite/lab/index.html?path=DemoBook.ipynb"
+      src="https://jupyterlite.github.io/demo/?path=DemoBook.ipynb"
       title="JupyterLite Notebook"
       style="width: 100%; height: 100%; border: none;"
     ></iframe>
