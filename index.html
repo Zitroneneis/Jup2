@@ -127,12 +127,13 @@
 
       // Call the Perplexity LLM API
       try {
-        const response = await fetch('https://api.perplexity.ai/chat/completions', {
+        const response = await fetch('<MIGRATING TO NEXT ROUTER>', {
           method: 'POST',
           headers: {
+            'accept: application/json',
             'Content-Type': 'application/json',
             // Include your API key as needed:
-            'Authorization': 'Bearer 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'
+            'Authorization': 'Bearer <MIGRATE TO NEXT ROUTER>>'
           },
           body: JSON.stringify({ prompt: userMessage })
         });
