@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Demo: Embedded JupyterLite Notebook</title>
+  <style>
+    /* Basic reset and styling to ensure panels appear side by side */
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      box-sizing: border-box;
+      font-family: sans-serif;
+    }
+
+    .container {
+      display: flex;
+      height: 100vh; /* Fill the viewport height */
+      width: 100%;
+    }
+
+    /* Left panel with embedded notebook */
+    .main-panel {
+      flex: 3; /* 3/4 of the space */
+      border-right: 1px solid #ccc;
+      overflow: hidden; /* If needed */
+    }
+
+    /* The iframe is set to fill the main panel */
+    .main-panel iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    /* Right panel for instructions or status info */
+    .right-panel {
+      flex: 1; /* 1/4 of the space */
+      padding: 1em;
+      background-color: #f9f9f9;
+    }
+
+    .right-panel h2 {
+      margin-top: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- Main Panel: Embedded Notebook -->
+    <div class="main-panel">
+      <!-- Update the src to point to wherever your JupyterLite instance is hosted.
+           If you built JupyterLite locally under a "lite" folder, you might use:
+           src="./lite/index.html?path=notebooks/ExampleNotebook.ipynb"
+      -->
+      <iframe src="./lite/index.html?path=notebooks/DemoBook.ipynb"></iframe>
+    </div>
+
+    <!-- Right Panel: Status / Instructions -->
+    <div class="right-panel">
+      <h2>Status & Instructions</h2>
+      <p>
+        Welcome to our demo website embedding a JupyterLite notebook. Here’s how to get started:
+      </p>
+      <ul>
+        <li>Use the left panel to run Python code directly in the browser (via WebAssembly!).</li>
+        <li>No server needed—everything executes client-side.</li>
+        <li>Feel free to modify and explore the notebook. </li>
+      </ul>
+    </div>
+
+  </div>
+</body>
+</html>
