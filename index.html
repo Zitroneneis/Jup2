@@ -122,17 +122,17 @@
       event.preventDefault();
       const userMessage = chatInput.value.trim();
       if (!userMessage) return;
-      appendMessage('User', userMessage);
+      appendMessage('You', userMessage);
       chatInput.value = '';
 
       // Call the Perplexity LLM API
       try {
-        const response = await fetch('NEXT_PUBLIC_PERPLEXITY_API_ENDPOINT', {
+        const response = await fetch('https://api.perplexity.ai', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             // Include your API key as needed:
-            'Authorization': 'Bearer NEXT_PUBLIC_PERPLEXITY_API_KEY'
+            'Authorization': 'Bearer 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'
           },
           body: JSON.stringify({ prompt: userMessage })
         });
