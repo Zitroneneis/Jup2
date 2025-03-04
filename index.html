@@ -127,7 +127,7 @@
 
       // Call the Perplexity LLM API
       try {
-        const response = await fetch('https://api.perplexity.ai', {
+        const response = await fetch('https://api.perplexity.ai/chat/completions', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -140,8 +140,8 @@
         // Adjust according to the Perplexity API response structure
         appendMessage('Bot', data.answer || 'No response received.');
       } catch (error) {
-        console.error('Error with Perplexity API:', error);
-        appendMessage('Bot', 'Sorry, there was an error contacting Perplexity.');
+        console.error('Error with model API:', error);
+        appendMessage('Bot', 'Sorry, there was an error contacting the model.');
       }
     });
 
