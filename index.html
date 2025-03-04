@@ -51,23 +51,19 @@
 
     <!-- Main Panel: Embedded Notebook -->
     <div class="main-panel">
-      <!-- Update the src to point to wherever your JupyterLite instance is hosted.
-           If you built JupyterLite locally under a "lite" folder, you might use:
-           src="./lite/index.html?path=notebooks/ExampleNotebook.ipynb"
-      -->
-      <iframe src="./lite/lab/index.html?path=notebooks/DemoBook.ipynb"></iframe>
+      <iframe src="./lite/lab/index.html?path=./DemoBook.ipynb"></iframe>
     </div>
 
     <!-- Right Panel: Status / Instructions -->
     <div class="right-panel">
-      <h2>Status & Instructions</h2>
+      <h2>A JupyterLite Notebook Lesson!</h2>
       <p>
-        Welcome to our demo website embedding a JupyterLite notebook. Here’s how to get started:
+        If the lesson doesn't load automagically, in the Notebook interface, try going to "File" -> "Open from URL..." and copy/pasting:
+        <code>https://joop-xi.vercel.app/DemoBook.ipynb</code>
       </p>
       <ul>
-        <li>Use the left panel to run Python code directly in the browser (via WebAssembly!).</li>
-        <li>No server needed—everything executes client-side.</li>
-        <li>Feel free to modify and explore the notebook. </li>
+        <li>Follow the instructions in the left-panel.</li>
+        <li>Feel free to modify and explore the notebook! </li>
       </ul>
     </div>
 
