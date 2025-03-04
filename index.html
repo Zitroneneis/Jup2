@@ -127,13 +127,12 @@
 
       // Call the Perplexity LLM API
       try {
-        const response = await fetch('<MIGRATING TO NEXT ROUTER>', {
+        const response = await fetch('MIGRATE_TO_NEXTROUTER', {
           method: 'POST',
           headers: {
-            'accept: application/json',
             'Content-Type': 'application/json',
             // Include your API key as needed:
-            'Authorization': 'Bearer <MIGRATE TO NEXT ROUTER>>'
+            'Authorization': 'Bearer MIGRATE_TO_NEXTROUTER'
           },
           body: JSON.stringify({ prompt: userMessage })
         });
