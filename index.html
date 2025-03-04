@@ -121,7 +121,7 @@
       event.preventDefault();
       const userMessage = chatInput.value.trim();
       if (!userMessage) return;
-      appendMessage('User', userMessage);
+      appendMessage('You', userMessage);
       chatInput.value = '';
 
       // Make a call to your backend API (configured to interact with AWS Bedrock)
@@ -135,7 +135,7 @@
         // Assuming your API returns the chatbot response in data.response
         appendMessage('Bot', data.response || 'No response from the model.');
       } catch (error) {
-        console.error('Error communicating with the chatbot API:', error);
+        console.error('Error communicating with the Model or API:', error);
         appendMessage('Bot', 'Sorry, something went wrong.');
       }
     });
