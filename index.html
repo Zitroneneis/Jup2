@@ -24,8 +24,9 @@
     /* Left panel with embedded notebook */
     .main-panel {
       flex: 3; /* 3/4 of the space */
-      border-right: 1px solid #ccc;
+      border-right: none; /* Remove border as resizer will be visible */
       overflow: hidden; /* If needed */
+      min-width: 300px; /* Prevent panel from becoming too small */
     }
 
     /* The iframe is set to fill the main panel */
@@ -35,11 +36,36 @@
       border: none;
     }
 
+    /* Resizer element */
+    .resizer {
+      width: 8px;
+      background-color: #ddd;
+      cursor: col-resize;
+      position: relative;
+    }
+
+    .resizer:hover, .resizer.active {
+      background-color: #aaa;
+    }
+
+    .resizer::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      height: 30px;
+      width: 4px;
+      background-color: #888;
+      border-radius: 2px;
+    }
+
     /* Right panel for instructions or status info */
     .right-panel {
       flex: 1; /* 1/4 of the space */
       padding: 1em;
       background-color: #f9f9f9;
+      min-width: 200px; /* Prevent panel from becoming too small */
     }
 
     .right-panel h2 {
@@ -90,6 +116,9 @@
       style="width: 100%; height: 100%; border: none;"
     ></iframe>
     </div>
+
+    <!-- Resizer element -->
+    <div class="resizer" id="resizer"></div>
 
     <!-- Right Panel: Status / Instructions and Chatbot -->
     <div class="right-panel">
@@ -159,5 +188,66 @@
     </div>
 
   </div>
+    <script>
+    // Existing scripts...
+  
+    // Panel resize functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const resizer = document.getElementById('resizer');
+      const leftPanel = document.querySelector('.main-panel');
+      const rightPanel = document.querySelector('.right-panel');
+      const container = document.querySelector('.container');
+      
+      // Track if the mouse is down
+      let isResizing = false;
+      
+      // Add mouse event listeners
+      resizer.addEventListener('mousedown', function(e) {
+        isResizing = true;
+        resizer.classList.add('active');
+        document.body.style.cursor = 'col-resize';
+        
+        // Prevent text selection during resize
+        document.body.style.userSelect = 'none';
+        e.preventDefault();
+      });
+      
+      document.addEventListener('mousemove', function(e) {
+        if (!isResizing) return;
+        
+        // Calculate container bounds
+        const containerRect = container.getBoundingClientRect();
+        
+        // Calculate new width based on mouse position relative to container
+        const newLeftPanelWidth = e.clientX - containerRect.left;
+        const containerWidth = containerRect.width;
+        
+        // Set minimum widths to ensure panels don't get too small
+        const minLeftWidth = 300;
+        const minRightWidth = 200;
+        
+        if (newLeftPanelWidth < minLeftWidth || 
+            containerWidth - newLeftPanelWidth < minRightWidth) {
+          return;
+        }
+        
+        // Set the flex-basis of both panels
+        const leftPercentage = (newLeftPanelWidth / containerWidth) * 100;
+        const rightPercentage = 100 - leftPercentage;
+        
+        leftPanel.style.flex = `0 0 ${leftPercentage}%`;
+        rightPanel.style.flex = `0 0 ${rightPercentage}%`;
+      });
+      
+      document.addEventListener('mouseup', function() {
+        if (isResizing) {
+          isResizing = false;
+          resizer.classList.remove('active');
+          document.body.style.cursor = 'default';
+          document.body.style.userSelect = '';
+        }
+      });
+    });
+  </script>
 </body>
 </html>
