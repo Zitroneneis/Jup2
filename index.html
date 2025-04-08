@@ -189,8 +189,6 @@
 
   </div>
     <script>
-    // Existing scripts...
-  
     // Panel resize functionality
     document.addEventListener('DOMContentLoaded', function() {
       const resizer = document.getElementById('resizer');
@@ -231,12 +229,17 @@
           return;
         }
         
-        // Set the flex-basis of both panels
+        // Calculate percentages
         const leftPercentage = (newLeftPanelWidth / containerWidth) * 100;
         const rightPercentage = 100 - leftPercentage;
         
-        leftPanel.style.flex = `0 0 ${leftPercentage}%`;
-        rightPanel.style.flex = `0 0 ${rightPercentage}%`;
+        // Use width percentages instead of flex properties
+        leftPanel.style.width = `${leftPercentage}%`;
+        rightPanel.style.width = `${rightPercentage}%`;
+        
+        // Reset flex to auto to prevent conflicts with width
+        leftPanel.style.flex = 'none';
+        rightPanel.style.flex = 'none';
       });
       
       document.addEventListener('mouseup', function() {
@@ -245,6 +248,45 @@
           resizer.classList.remove('active');
           document.body.style.cursor = 'default';
           document.body.style.userSelect = '';
+        }
+      });
+      
+      // Also handle touch events for mobile devices
+      resizer.addEventListener('touchstart', function(e) {
+        isResizing = true;
+        resizer.classList.add('active');
+        e.preventDefault();
+      });
+      
+      document.addEventListener('touchmove', function(e) {
+        if (!isResizing || !e.touches[0]) return;
+        
+        const touch = e.touches[0];
+        const containerRect = container.getBoundingClientRect();
+        const newLeftPanelWidth = touch.clientX - containerRect.left;
+        const containerWidth = containerRect.width;
+        
+        const minLeftWidth = 300;
+        const minRightWidth = 200;
+        
+        if (newLeftPanelWidth < minLeftWidth || 
+            containerWidth - newLeftPanelWidth < minRightWidth) {
+          return;
+        }
+        
+        const leftPercentage = (newLeftPanelWidth / containerWidth) * 100;
+        const rightPercentage = 100 - leftPercentage;
+        
+        leftPanel.style.width = `${leftPercentage}%`;
+        rightPanel.style.width = `${rightPercentage}%`;
+        leftPanel.style.flex = 'none';
+        rightPanel.style.flex = 'none';
+      });
+      
+      document.addEventListener('touchend', function() {
+        if (isResizing) {
+          isResizing = false;
+          resizer.classList.remove('active');
         }
       });
     });
