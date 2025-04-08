@@ -13,6 +13,7 @@
       width: 100%;
       box-sizing: border-box;
       font-family: sans-serif;
+      overflow: hidden; /* Prevent scrollbars when resizing */
     }
 
     .container {
@@ -23,10 +24,10 @@
 
     /* Left panel with embedded notebook */
     .main-panel {
-      flex: 3; /* 3/4 of the space */
-      border-right: none; /* Remove border as resizer will be visible */
+      flex-grow: 1; /* Allow it to grow */
+      flex-basis: 60%; /* Initial width */
+      border-right: 1px solid #ccc;
       overflow: hidden; /* If needed */
-      min-width: 300px; /* Prevent panel from becoming too small */
     }
 
     /* The iframe is set to fill the main panel */
@@ -36,45 +37,33 @@
       border: none;
     }
 
-    /* Resizer element */
-    .resizer {
-      width: 8px;
-      background-color: #ddd;
-      cursor: col-resize;
-      position: relative;
-    }
-
-    .resizer:hover, .resizer.active {
-      background-color: #aaa;
-    }
-
-    .resizer::after {
-      content: "";
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      height: 30px;
-      width: 4px;
-      background-color: #888;
-      border-radius: 2px;
-    }
-
     /* Right panel for instructions or status info */
     .right-panel {
-      flex: 1; /* 1/4 of the space */
+      flex-grow: 1; /* Allow it to grow */
+      flex-basis: 40%; /* Initial width */
       padding: 1em;
       background-color: #f9f9f9;
-      min-width: 200px; /* Prevent panel from becoming too small */
+      overflow: auto; /* Allow scrolling if content overflows */
     }
 
     .right-panel h2 {
       margin-top: 0;
     }
 
+    /* Separator bar styles */
+    .separator {
+      width: 5px;
+      height: 100%;
+      background-color: #ccc;
+      cursor: col-resize;
+      position: relative; /* For potential future handles */
+      -webkit-user-select: none; /* Prevent text selection while dragging */
+      -moz-user-select: none;
+      user-select: none;
+    }
+
     /* Chat panel styles */
     #chat-panel {
-      flex: 1;
       border: 1px solid #ccc;
       padding: 10px;
       overflow-y: auto;
@@ -108,19 +97,16 @@
 <body>
   <div class="container">
 
-    <!-- Main Panel: Embedded Notebook -->
     <div class="main-panel">
       <iframe
-      src="https://jupyterlite.github.io/demo/?path=https://joop-xi.vercel.app/DemoBook.ipynb"
-      title="JupyterLite Notebook"
-      style="width: 100%; height: 100%; border: none;"
-    ></iframe>
+        src="https://jupyterlite.github.io/demo/?path=https://joop-xi.vercel.app/DemoBook.ipynb"
+        title="JupyterLite Notebook"
+        style="width: 100%; height: 100%; border: none;"
+      ></iframe>
     </div>
 
-    <!-- Resizer element -->
-    <div class="resizer" id="resizer"></div>
+    <div class="separator"></div>
 
-    <!-- Right Panel: Status / Instructions and Chatbot -->
     <div class="right-panel">
       <h2>A JupyterLite Notebook Lesson!</h2>
       <p>
@@ -136,18 +122,62 @@
       <p>Feeling lost? Chat with robot below!</p>
       <p>... May or may not be working...</p>
 
-      <!-- Right panel: Chat interface -->
-    <div id="chat-panel"></div>
-    <form id="chat-form">
-      <input type="text" id="chat-input" placeholder="Type your message..." required />
-      <button type="submit" id="send-button">Send</button>
-    </form>
+      <div id="chat-panel"></div>
+      <form id="chat-form">
+        <input type="text" id="chat-input" placeholder="Type your message..." required />
+        <button type="submit" id="send-button">Send</button>
+      </form>
+    </div>
+
   </div>
 
   <script>
     const chatPanel = document.getElementById('chat-panel');
     const chatForm = document.getElementById('chat-form');
     const chatInput = document.getElementById('chat-input');
+    const container = document.querySelector('.container');
+    const mainPanel = document.querySelector('.main-panel');
+    const rightPanel = document.querySelector('.right-panel');
+    const separator = document.querySelector('.separator');
+
+    let isDragging = false;
+    let startX;
+    let mainPanelWidth;
+
+    separator.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      startX = e.clientX;
+      mainPanelWidth = mainPanel.offsetWidth;
+      container.style.cursor = 'col-resize'; // Change cursor during drag
+    });
+
+    document.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+
+      const dx = e.clientX - startX;
+      const newMainWidth = mainPanelWidth + dx;
+
+      // Ensure panels don't collapse completely
+      const minWidth = 50; // Minimum width in pixels
+      if (newMainWidth > minWidth && (container.offsetWidth - newMainWidth) > minWidth) {
+        mainPanel.style.flexBasis = `${newMainWidth}px`;
+        rightPanel.style.flexBasis = `${container.offsetWidth - newMainWidth}px`;
+      }
+    });
+
+    document.addEventListener('mouseup', () => {
+      if (!isDragging) return;
+      isDragging = false;
+      container.style.cursor = 'default'; // Reset cursor
+    });
+
+    // Prevent dragging outside the window
+    document.addEventListener('mouseleave', () => {
+      if (isDragging) {
+        isDragging = false;
+        container.style.cursor = 'default';
+      }
+    });
 
     chatForm.addEventListener('submit', async (event) => {
       event.preventDefault();
@@ -185,111 +215,5 @@
     }
   </script>
 
-    </div>
-
-  </div>
-    <script>
-    // Panel resize functionality
-    document.addEventListener('DOMContentLoaded', function() {
-      const resizer = document.getElementById('resizer');
-      const leftPanel = document.querySelector('.main-panel');
-      const rightPanel = document.querySelector('.right-panel');
-      const container = document.querySelector('.container');
-      
-      // Track if the mouse is down
-      let isResizing = false;
-      
-      // Add mouse event listeners
-      resizer.addEventListener('mousedown', function(e) {
-        isResizing = true;
-        resizer.classList.add('active');
-        document.body.style.cursor = 'col-resize';
-        
-        // Prevent text selection during resize
-        document.body.style.userSelect = 'none';
-        e.preventDefault();
-      });
-      
-      document.addEventListener('mousemove', function(e) {
-        if (!isResizing) return;
-        
-        // Calculate container bounds
-        const containerRect = container.getBoundingClientRect();
-        
-        // Calculate new width based on mouse position relative to container
-        const newLeftPanelWidth = e.clientX - containerRect.left;
-        const containerWidth = containerRect.width;
-        
-        // Set minimum widths to ensure panels don't get too small
-        const minLeftWidth = 300;
-        const minRightWidth = 200;
-        
-        if (newLeftPanelWidth < minLeftWidth || 
-            containerWidth - newLeftPanelWidth < minRightWidth) {
-          return;
-        }
-        
-        // Calculate percentages
-        const leftPercentage = (newLeftPanelWidth / containerWidth) * 100;
-        const rightPercentage = 100 - leftPercentage;
-        
-        // Use width percentages instead of flex properties
-        leftPanel.style.width = `${leftPercentage}%`;
-        rightPanel.style.width = `${rightPercentage}%`;
-        
-        // Reset flex to auto to prevent conflicts with width
-        leftPanel.style.flex = 'none';
-        rightPanel.style.flex = 'none';
-      });
-      
-      document.addEventListener('mouseup', function() {
-        if (isResizing) {
-          isResizing = false;
-          resizer.classList.remove('active');
-          document.body.style.cursor = 'default';
-          document.body.style.userSelect = '';
-        }
-      });
-      
-      // Also handle touch events for mobile devices
-      resizer.addEventListener('touchstart', function(e) {
-        isResizing = true;
-        resizer.classList.add('active');
-        e.preventDefault();
-      });
-      
-      document.addEventListener('touchmove', function(e) {
-        if (!isResizing || !e.touches[0]) return;
-        
-        const touch = e.touches[0];
-        const containerRect = container.getBoundingClientRect();
-        const newLeftPanelWidth = touch.clientX - containerRect.left;
-        const containerWidth = containerRect.width;
-        
-        const minLeftWidth = 300;
-        const minRightWidth = 200;
-        
-        if (newLeftPanelWidth < minLeftWidth || 
-            containerWidth - newLeftPanelWidth < minRightWidth) {
-          return;
-        }
-        
-        const leftPercentage = (newLeftPanelWidth / containerWidth) * 100;
-        const rightPercentage = 100 - leftPercentage;
-        
-        leftPanel.style.width = `${leftPercentage}%`;
-        rightPanel.style.width = `${rightPercentage}%`;
-        leftPanel.style.flex = 'none';
-        rightPanel.style.flex = 'none';
-      });
-      
-      document.addEventListener('touchend', function() {
-        if (isResizing) {
-          isResizing = false;
-          resizer.classList.remove('active');
-        }
-      });
-    });
-  </script>
 </body>
 </html>
