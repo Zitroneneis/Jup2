@@ -1,32 +1,27 @@
+<!-- viewer.html -->
 <!DOCTYPE html>
 <html>
   <body>
-    <button id="start">Start Mirroring</button>
-    <video id="preview" autoplay playsinline style="width:100%"></video>
+    <button id="start">Start Mirroring</button><br />
+    <video id="preview" autoplay playsinline style="width:100%;max-width:800px"></video>
 
     <script>
       const btn = document.getElementById('start');
       const video = document.getElementById('preview');
 
       btn.addEventListener('click', async () => {
-        // hide the button immediately
         btn.style.display = 'none';
 
-        // capture only browser/tab surfaces
         const stream = await navigator.mediaDevices.getDisplayMedia({
           video: {
-            displaySurface: 'browser',   // only browser contexts
-            logicalSurface: true,        // lets it capture the tab’s content
+            displaySurface: 'browser',
+            logicalSurface: true,
             cursor: 'never'
           }
         });
 
-        // show the live mirror
         video.srcObject = stream;
       });
     </script>
-
-    <!-- include Region Capture polyfill if you want element cropping -->
-    <script src="https://unpkg.com/@w3c/mediacapture-region/dist/mediacapture-region.js"></script>
   </body>
 </html>
