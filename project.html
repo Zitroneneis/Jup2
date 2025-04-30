@@ -1,33 +1,32 @@
-<!-- viewer.html (to open on monitor #2) -->
 <!DOCTYPE html>
 <html>
   <body>
-    <button id="start">Start Mirroring</button><br />
+    <button id="start">Start Mirroring</button>
     <video id="preview" autoplay playsinline style="width:100%"></video>
 
     <script>
-      document.getElementById('start').addEventListener('click', async () => {
-        // 1. Capture only browser/tab surfaces
+      const btn = document.getElementById('start');
+      const video = document.getElementById('preview');
+
+      btn.addEventListener('click', async () => {
+        // hide the button immediately
+        btn.style.display = 'none';
+
+        // capture only browser/tab surfaces
         const stream = await navigator.mediaDevices.getDisplayMedia({
           video: {
             displaySurface: 'browser',   // only browser contexts
-            logicalSurface: true,        // “true” lets it capture the tab’s content
+            logicalSurface: true,        // lets it capture the tab’s content
             cursor: 'never'
           }
         });
-        
-        // 2. (Optional) Crop to a specific element or region:
-        //    — Region Capture (Chrome 104+) can crop to an element’s bounding box:
-        //        const target = CropTarget.fromElement(document.querySelector('#app'));
-        //        await stream.getVideoTracks()[0].applyConstraints({
-        //          advanced: [{ restriction: target }]
-        //        });
 
-        // 3. Show it in a video
-        document.getElementById('preview').srcObject = stream;
+        // show the live mirror
+        video.srcObject = stream;
       });
     </script>
+
+    <!-- include Region Capture polyfill if you want element cropping -->
     <script src="https://unpkg.com/@w3c/mediacapture-region/dist/mediacapture-region.js"></script>
-    <!-- mediacapture-region polyfill provides CropTarget/CaptureController in Chrome/Edge -->
   </body>
 </html>
