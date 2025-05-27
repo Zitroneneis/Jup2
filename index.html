@@ -197,6 +197,10 @@
 
     chatForm.addEventListener('submit', async (event) => {
       event.preventDefault();
+      // Google Analytics custom event for chat submit
+      if (typeof gtag === 'function') {
+        gtag('event', 'Chat-button-submitted');
+      }
       const userMessage = chatInput.value.trim();
       if (!userMessage) return;
       appendMessage('You', userMessage);
