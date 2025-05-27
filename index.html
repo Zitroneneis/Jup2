@@ -20,6 +20,8 @@
   <meta charset="UTF-8" />
   <title>Demo: Embedded JupyterLite Notebook</title>
   <script src="https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script> <!-- Added marked.js library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/2.3.6/purify.min.js"></script> <!-- Added DOMPurify library -->
   <style>
     /* Basic reset and styling to ensure panels appear side by side */
     html, body {
@@ -253,7 +255,14 @@
     function appendMessage(sender, text) {
       const messageDiv = document.createElement('div');
       messageDiv.classList.add('message');
-      messageDiv.innerHTML = `<span class="${sender.toLowerCase()}">${sender}:</span> ${text}`;
+      if (sender.toLowerCase() === 'bot') {
+        // Parse Markdown for bot messages
+        // IMPORTANT: For production, ensure you sanitize this HTML to prevent XSS.
+        // You might use a library like DOMPurify: DOMPurify.sanitize(marked.parse(text));
+        messageDiv.innerHTML = `<span class="bot">Bot:</span> ${DOMPurify.sanitize(marked.parse(text))}`;
+      } else {
+        messageDiv.innerHTML = `<span class="${sender.toLowerCase()}">${sender}:</span> ${text}`;
+      }
       chatPanel.appendChild(messageDiv);
       chatPanel.scrollTop = chatPanel.scrollHeight;
     }
