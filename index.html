@@ -206,20 +206,44 @@
       appendMessage('You', userMessage);
       chatInput.value = '';
 
-      // Call the Perplexity LLM API
+      // Call the Google Gemini API via the Vercel proxy
       try {
-        const response = await fetch('MIGRATE_TO_NEXTROUTER', {
+        // const apiKey = 'YOUR_API_KEY'; // <-- IMPORTANT: Replace with your actual API key
+        // const model = 'gemini-1.5-flash'; // Using flash model as requested (approximating "flash 2.0 mini")
+        // const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+
+        const proxyUrl = '/api/gemini-proxy'; // Endpoint for the Vercel serverless function
+
+        const requestBody = {
+          prompt: userMessage // Send only the prompt to the proxy
+          // If you need to maintain chat history, you would modify the proxy and here
+          // to send and receive the full chat history.
+        };
+
+        const response = await fetch(proxyUrl, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            // Include your API key as needed:
-            'Authorization': 'Bearer MIGRATE_TO_NEXTROUTER'
           },
-          body: JSON.stringify({ prompt: userMessage })
+          body: JSON.stringify(requestBody)
         });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error('Error with Gemini API:', errorData);
+          appendMessage('Bot', `Sorry, there was an error with the API: ${errorData.error.message}`);
+          return;
+        }
+
         const data = await response.json();
-        // Adjust according to the Perplexity API response structure
-        appendMessage('Bot', data.answer || 'No response received.');
+        
+        // Extract the text from the response
+        // Adjust based on the actual Gemini API response structure for chat
+        let botResponse = 'No response received.';
+        if (data.candidates && data.candidates.length > 0 && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts.length > 0) {
+          botResponse = data.candidates[0].content.parts[0].text;
+        }
+        appendMessage('Bot', botResponse);
       } catch (error) {
         console.error('Error with model API:', error);
         appendMessage('Bot', 'Sorry, there was an error contacting the model.');
