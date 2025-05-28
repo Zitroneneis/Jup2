@@ -56,8 +56,8 @@
       position: absolute;
       top: 50px;
       right: 50px;
-      width: 400px;
-      height: 600px;
+      width: 400px; /* Default width */
+      height: 620px; /* Default height */
       background-color: #f9f9f9;
       border: 1px solid #ccc;
       box-shadow: 0 4px 8px rgba(0,0,0,0.1);
@@ -66,8 +66,8 @@
       flex-direction: column;
       resize: both; /* Allow user resizing */
       overflow: hidden; /* Content overflow will be handled by internal scroll */
-      min-width: 250px; /* Prevent collapsing too small */
-      min-height: 200px;
+      min-width: 400px; /* Minimum width */
+      min-height: 620px; /* Minimum height */
     }
 
     .dialog-header {
