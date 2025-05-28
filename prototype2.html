@@ -18,12 +18,11 @@
     })(window, document, "clarity", "script", "mk9ddtm32o");
 </script>
   <meta charset="UTF-8" />
-  <title>Demo: Embedded JupyterLite Notebook</title>
+  <title>Demo: Embedded JupyterLite Notebook - Floating Chat</title>
   <script src="https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script> <!-- Added marked.js library -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/2.3.6/purify.min.js"></script> <!-- Added DOMPurify library -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/2.3.6/purify.min.js"></script>
   <style>
-    /* Basic reset and styling to ensure panels appear side by side */
     html, body {
       margin: 0;
       padding: 0;
@@ -31,62 +30,72 @@
       width: 100%;
       box-sizing: border-box;
       font-family: sans-serif;
-      overflow: hidden; /* Prevent scrollbars when resizing */
+      overflow: hidden;
     }
 
     .container {
       display: flex;
-      height: 100vh; /* Fill the viewport height */
+      height: 100vh;
       width: 100%;
     }
 
-    /* Left panel with embedded notebook */
     .main-panel {
-      flex-grow: 1; /* Allow it to grow */
-      flex-basis: 60%; /* Initial width */
-      border-right: 1px solid #ccc;
-      overflow: hidden; /* If needed */
+      flex-grow: 1;
+      border-right: 1px solid #ccc; /* Kept for visual separation if dialog is moved away */
+      overflow: hidden;
     }
 
-    /* The iframe is set to fill the main panel */
     .main-panel iframe {
       width: 100%;
       height: 100%;
       border: none;
     }
 
-    /* Right panel for instructions or status info */
-    .right-panel {
-      flex-grow: 1; /* Allow it to grow */
-      flex-basis: 40%; /* Initial width */
-      padding: 1em;
+    /* Floating Chat Dialog Styles */
+    .floating-chat-dialog {
+      position: absolute;
+      top: 50px;
+      right: 50px;
+      width: 400px;
+      height: 600px;
       background-color: #f9f9f9;
-      overflow: auto; /* Allow scrolling if content overflows */
+      border: 1px solid #ccc;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      resize: both; /* Allow user resizing */
+      overflow: hidden; /* Content overflow will be handled by internal scroll */
+      min-width: 250px; /* Prevent collapsing too small */
+      min-height: 200px;
     }
 
-    .right-panel h2 {
-      margin-top: 0;
+    .dialog-header {
+      padding: 10px;
+      background-color: #eee;
+      cursor: move;
+      border-bottom: 1px solid #ccc;
+      text-align: center;
+      font-weight: bold;
     }
 
-    /* Separator bar styles */
-    .separator {
-      width: 5px;
-      height: 100%;
-      background-color: #ccc;
-      cursor: col-resize;
-      position: relative; /* For potential future handles */
-      -webkit-user-select: none; /* Prevent text selection while dragging */
-      -moz-user-select: none;
-      user-select: none;
+    .dialog-content {
+      padding: 1em;
+      overflow-y: auto; /* Allow scrolling for content within the dialog */
+      flex-grow: 1; /* Make content area take available space */
+      display: flex;
+      flex-direction: column;
     }
 
-    /* Chat panel styles */
     #chat-panel {
       border: 1px solid #ccc;
       padding: 10px;
       overflow-y: auto;
       margin-bottom: 10px;
+      flex-grow: 1; /* Chat panel takes available space in dialog content */
+      min-height: 100px; /* Ensure chat panel has some minimum height */
     }
+
     .message {
       margin: 5px 0;
     }
@@ -109,7 +118,6 @@
       padding: 8px 12px;
       font-size: 1em;
     }
-
   </style>
 </head>
 <body>
@@ -121,8 +129,13 @@
         style="width: 100%; height: 100%; border: none;"
       ></iframe>
     </div>
-    <div class="separator"></div>
-    <div class="right-panel">
+    <!-- Separator removed -->
+  </div>
+
+  <!-- Floating Chat Dialog -->
+  <div class="floating-chat-dialog" id="floatingChatDialog">
+    <div class="dialog-header" id="dialogHeader">Chat / Assistant</div>
+    <div class="dialog-content">
       <h2>A JupyterLite Notebook Lesson!</h2>
       <p>
         If the lesson doesn't load automagically, in the Notebook interface, try going to "File" -> "Open from URL..." and copy/pasting one of the notebooks:<br />
@@ -142,63 +155,60 @@
         <button type="submit" id="send-button">Send</button>
       </form>
     </div>
-
-
-
-
   </div>
 
   <script>
     const chatPanel = document.getElementById('chat-panel');
     const chatForm = document.getElementById('chat-form');
     const chatInput = document.getElementById('chat-input');
-    const container = document.querySelector('.container');
+    // const container = document.querySelector('.container'); // No longer needed for right panel logic
     const mainPanel = document.querySelector('.main-panel');
-    const rightPanel = document.querySelector('.right-panel');
-    const separator = document.querySelector('.separator');
+    // const rightPanel = document.querySelector('.right-panel'); // Replaced by floatingChatDialog
+    // const separator = document.querySelector('.separator'); // Removed
 
-    let isDragging = false;
-    let startX;
-    let mainPanelWidth;
+    const floatingDialog = document.getElementById('floatingChatDialog');
+    const dialogHeader = document.getElementById('dialogHeader');
 
-    separator.addEventListener('mousedown', (e) => {
-      isDragging = true;
-      startX = e.clientX;
-      mainPanelWidth = mainPanel.offsetWidth;
-      container.style.cursor = 'col-resize'; // Change cursor during drag
+    let isDraggingDialog = false;
+    let dialogOffsetX, dialogOffsetY;
+
+    dialogHeader.addEventListener('mousedown', (e) => {
+      isDraggingDialog = true;
+      dialogOffsetX = e.clientX - floatingDialog.offsetLeft;
+      dialogOffsetY = e.clientY - floatingDialog.offsetTop;
+      floatingDialog.style.cursor = 'grabbing';
+      // Prevent text selection while dragging
+      e.preventDefault(); 
     });
 
     document.addEventListener('mousemove', (e) => {
-      if (!isDragging) return;
+      if (!isDraggingDialog) return;
 
-      const dx = e.clientX - startX;
-      const newMainWidth = mainPanelWidth + dx;
+      let newX = e.clientX - dialogOffsetX;
+      let newY = e.clientY - dialogOffsetY;
 
-      // Ensure panels don't collapse completely
-      const minWidth = 50; // Minimum width in pixels
-      if (newMainWidth > minWidth && (container.offsetWidth - newMainWidth) > minWidth) {
-        mainPanel.style.flexBasis = `${newMainWidth}px`;
-        rightPanel.style.flexBasis = `${container.offsetWidth - newMainWidth}px`;
-      }
+      // Constrain dialog within viewport boundaries (optional, but good practice)
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+      
+      newX = Math.max(0, Math.min(newX, viewportWidth - floatingDialog.offsetWidth));
+      newY = Math.max(0, Math.min(newY, viewportHeight - floatingDialog.offsetHeight));
+
+      floatingDialog.style.left = `${newX}px`;
+      floatingDialog.style.top = `${newY}px`;
     });
 
     document.addEventListener('mouseup', () => {
-      if (!isDragging) return;
-      isDragging = false;
-      container.style.cursor = 'default'; // Reset cursor
-    });
-
-    // Prevent dragging outside the window
-    document.addEventListener('mouseleave', () => {
-      if (isDragging) {
-        isDragging = false;
-        container.style.cursor = 'default';
+      if (isDraggingDialog) {
+        isDraggingDialog = false;
+        floatingDialog.style.cursor = 'move';
       }
     });
 
+    // Removed old separator dragging logic
+
     chatForm.addEventListener('submit', async (event) => {
       event.preventDefault();
-      // Google Analytics custom event for chat submit
       if (typeof gtag === 'function') {
         gtag('event', 'Chat-button-submitted');
       }
@@ -207,34 +217,19 @@
       appendMessage('You', userMessage);
       chatInput.value = '';
 
-      // Call the Google Gemini API via the Vercel proxy
       try {
-        // const apiKey = 'YOUR_API_KEY'; // <-- IMPORTANT: Replace with your actual API key
-        // const model = 'gemini-1.5-flash'; // Using flash model as requested (approximating "flash 2.0 mini")
-        // const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-
-        const proxyUrl = '/api/gemini-proxy'; // Endpoint for the Vercel serverless function
-
-        const requestBody = {
-          prompt: userMessage // Send only the prompt to the proxy
-          // If you need to maintain chat history, you would modify the proxy and here
-          // to send and receive the full chat history.
-        };
-
+        const proxyUrl = '/api/gemini-proxy';
+        const requestBody = { prompt: userMessage };
         const response = await fetch(proxyUrl, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(requestBody)
         });
 
         if (!response.ok) {
           const errorData = await response.json();
-          console.error('Error with Gemini API:', errorData);
           const errorMessage = errorData.error?.message || 'Unknown API error';
           appendMessage('Bot', `Sorry, there was an error with the API: ${errorMessage}`);
-          // Google Analytics custom event for chat error
           if (typeof gtag === 'function') {
             gtag('event', 'Chat-response-error', { 'error_message': `API Error: ${errorMessage}` });
           }
@@ -242,27 +237,20 @@
         }
 
         const data = await response.json();
-        
-        // Extract the text from the response
-        // Adjust based on the actual Gemini API response structure for chat
         let botResponse = 'No response received.';
         if (data.candidates && data.candidates.length > 0 && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts.length > 0) {
           botResponse = data.candidates[0].content.parts[0].text;
-          // Google Analytics custom event for valid chat response
           if (typeof gtag === 'function') {
             gtag('event', 'Chat-response-valid');
           }
         } else {
-          // If no valid candidate response, consider it an error or unexpected response
           if (typeof gtag === 'function') {
             gtag('event', 'Chat-response-error', { 'error_message': 'No valid candidate in API response' });
           }
         }
         appendMessage('Bot', botResponse);
       } catch (error) {
-        console.error('Error with model API call:', error);
         appendMessage('Bot', 'Sorry, there was an error contacting the model.');
-        // Google Analytics custom event for chat error
         if (typeof gtag === 'function') {
           gtag('event', 'Chat-response-error', { 'error_message': `Fetch/Network Error: ${error.message}` });
         }
@@ -273,9 +261,6 @@
       const messageDiv = document.createElement('div');
       messageDiv.classList.add('message');
       if (sender.toLowerCase() === 'bot') {
-        // Parse Markdown for bot messages
-        // IMPORTANT: For production, ensure you sanitize this HTML to prevent XSS.
-        // You might use a library like DOMPurify: DOMPurify.sanitize(marked.parse(text));
         messageDiv.innerHTML = `<span class="bot">Bot:</span> ${DOMPurify.sanitize(marked.parse(text))}`;
       } else {
         messageDiv.innerHTML = `<span class="${sender.toLowerCase()}">${sender}:</span> ${text}`;
