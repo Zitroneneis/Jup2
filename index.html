@@ -233,7 +233,12 @@
         if (!response.ok) {
           const errorData = await response.json();
           console.error('Error with Gemini API:', errorData);
-          appendMessage('Bot', `Sorry, there was an error with the API: ${errorData.error.message}`);
+          const errorMessage = errorData.error?.message || 'Unknown API error';
+          appendMessage('Bot', `Sorry, there was an error with the API: ${errorMessage}`);
+          // Google Analytics custom event for chat error
+          if (typeof gtag === 'function') {
+            gtag('event', 'Chat-response-error', { 'error_message': `API Error: ${errorMessage}` });
+          }
           return;
         }
 
@@ -244,11 +249,24 @@
         let botResponse = 'No response received.';
         if (data.candidates && data.candidates.length > 0 && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts.length > 0) {
           botResponse = data.candidates[0].content.parts[0].text;
+          // Google Analytics custom event for valid chat response
+          if (typeof gtag === 'function') {
+            gtag('event', 'Chat-response-valid');
+          }
+        } else {
+          // If no valid candidate response, consider it an error or unexpected response
+          if (typeof gtag === 'function') {
+            gtag('event', 'Chat-response-error', { 'error_message': 'No valid candidate in API response' });
+          }
         }
         appendMessage('Bot', botResponse);
       } catch (error) {
-        console.error('Error with model API:', error);
+        console.error('Error with model API call:', error);
         appendMessage('Bot', 'Sorry, there was an error contacting the model.');
+        // Google Analytics custom event for chat error
+        if (typeof gtag === 'function') {
+          gtag('event', 'Chat-response-error', { 'error_message': `Fetch/Network Error: ${error.message}` });
+        }
       }
     });
 
