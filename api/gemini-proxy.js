@@ -5,9 +5,9 @@ export default async function handler(req, res) {
     return res.status(405).end(`Method ${req.method} Not Allowed`);
   }
 
-  const { prompt } = req.body;
+  const { history } = req.body; // Changed from prompt to history
   const apiKey = process.env.GEMINI_API_KEY;
-  const model = 'gemini-2.0-flash-lite'; // Or another Gemini model
+  const model = 'gemini-1.5-flash-latest'; // Updated model
 
   // Define your system prompt here
   const systemPrompt = `Your  are an AI assistant embedded in a learning platform. Your job is to help high school students and teachers explore ideas through multi-turn conversations, render and format Markdown (including code, lists, tables, and links.
@@ -25,8 +25,8 @@ Key guidelines:
     return res.status(500).json({ error: 'API key not configured.' });
   }
 
-  if (!prompt) {
-    return res.status(400).json({ error: 'Prompt is required.' });
+  if (!history || !Array.isArray(history) || history.length === 0) { // Validate history
+    return res.status(400).json({ error: 'History is required and must be a non-empty array.' });
   }
 
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
@@ -41,9 +41,7 @@ Key guidelines:
         systemInstruction: {
           parts: [{ text: systemPrompt }]
         },
-        contents: [{
-          parts: [{ text: prompt }]
-        }]
+        contents: history // Pass the history array directly
       })
     });
 
@@ -51,7 +49,15 @@ Key guidelines:
 
     if (!geminiResponse.ok) {
       console.error('Error from Gemini API:', data);
-      return res.status(geminiResponse.status).json({ error: data.error || 'Error calling Gemini API' });
+      // Try to provide a more specific error message if available
+      const errorMessage = data?.error?.message || 'Error calling Gemini API';
+      return res.status(geminiResponse.status).json({ error: errorMessage, details: data.error });
+    }
+    
+    // Ensure the response has candidates and parts before sending back
+    if (!data.candidates || !data.candidates[0] || !data.candidates[0].content || !data.candidates[0].content.parts) {
+      console.error('Invalid response structure from Gemini API:', data);
+      return res.status(500).json({ error: 'Invalid response structure from Gemini API' });
     }
 
     res.status(200).json(data);

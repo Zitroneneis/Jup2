@@ -155,6 +155,8 @@
     const rightPanel = document.querySelector('.right-panel');
     const separator = document.querySelector('.separator');
 
+    let chatHistory = []; // Initialize chat history array
+
     let isDragging = false;
     let startX;
     let mainPanelWidth;
@@ -211,6 +213,9 @@
       chatPanel.appendChild(userDiv);
       chatPanel.scrollTop = chatPanel.scrollHeight; // Scroll to bottom
 
+      // Add user message to history
+      chatHistory.push({ role: "user", parts: [{ text: userMessage }] });
+
       // Clear input and disable button
       chatInput.value = '';
       sendButton.disabled = true;
@@ -228,7 +233,7 @@
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ prompt: userMessage }),
+          body: JSON.stringify({ history: chatHistory }), // Send the whole history
         });
 
         const data = await response.json();
@@ -237,23 +242,31 @@
           // Update "..." div with error
           botThinkingDiv.textContent = `Bot: Error - ${data.error || response.statusText || 'An unknown error occurred'}`;
           console.error('Error from API:', data);
+          // Remove the last user message from history if API call failed, as it wasn't processed by the model
+          chatHistory.pop(); 
         } else {
           // Extract text - adjust if your Gemini response structure is different
           const botMessage = data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0] && data.candidates[0].content.parts[0].text;
           
           if (botMessage) {
+            // Add bot message to history
+            chatHistory.push({ role: "model", parts: [{ text: botMessage }] });
             // Update "..." div with actual response
             // Use DOMPurify to sanitize the HTML before rendering
             const sanitizedHtml = DOMPurify.sanitize(marked.parse(botMessage));
             botThinkingDiv.innerHTML = `Bot: ${sanitizedHtml}`; // Use innerHTML for Markdown
           } else {
             botThinkingDiv.textContent = 'Bot: Received a response, but no text was found.';
+             // Remove the last user message from history as the model didn't respond properly
+            chatHistory.pop();
           }
         }
       } catch (error) {
         // Update "..." div with network or other error
         botThinkingDiv.textContent = 'Bot: Error - Could not connect to the API.';
         console.error('Failed to fetch from /api/gemini-proxy:', error);
+        // Remove the last user message from history if fetch failed
+        chatHistory.pop();
       } finally {
         sendButton.disabled = false; // Re-enable button
         chatPanel.scrollTop = chatPanel.scrollHeight; // Scroll to bottom again
