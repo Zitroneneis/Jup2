@@ -149,6 +149,7 @@
     const chatPanel = document.getElementById('chat-panel');
     const chatForm = document.getElementById('chat-form');
     const chatInput = document.getElementById('chat-input');
+    const sendButton = document.getElementById('send-button'); // Get the send button
     const container = document.querySelector('.container');
     const mainPanel = document.querySelector('.main-panel');
     const rightPanel = document.querySelector('.right-panel');
@@ -199,70 +200,63 @@
       if (typeof gtag === 'function') {
         gtag('event', 'Chat-button-submitted');
       }
+
       const userMessage = chatInput.value.trim();
       if (!userMessage) return;
-      appendMessage('You', userMessage);
+
+      // Display user message
+      const userDiv = document.createElement('div');
+      userDiv.classList.add('message', 'user');
+      userDiv.textContent = `You: ${userMessage}`;
+      chatPanel.appendChild(userDiv);
+      chatPanel.scrollTop = chatPanel.scrollHeight; // Scroll to bottom
+
+      // Clear input and disable button
       chatInput.value = '';
+      sendButton.disabled = true;
 
-      // Call the Google Gemini API via the Vercel proxy
+      // Display "..." for bot response
+      const botThinkingDiv = document.createElement('div');
+      botThinkingDiv.classList.add('message', 'bot');
+      botThinkingDiv.textContent = 'Bot: ...';
+      chatPanel.appendChild(botThinkingDiv);
+      chatPanel.scrollTop = chatPanel.scrollHeight; // Scroll to bottom
+
       try {
-        // const apiKey = 'YOUR_API_KEY'; // <-- IMPORTANT: Replace with your actual API key
-        // const model = 'gemini-1.5-flash'; // Using flash model as requested (approximating "flash 2.0 mini")
-        // const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-
-        const proxyUrl = '/api/gemini-proxy'; // Endpoint for the Vercel serverless function
-
-        const requestBody = {
-          prompt: userMessage // Send only the prompt to the proxy
-          // If you need to maintain chat history, you would modify the proxy and here
-          // to send and receive the full chat history.
-        };
-
-        const response = await fetch(proxyUrl, {
+        const response = await fetch('/api/gemini-proxy', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(requestBody)
+          body: JSON.stringify({ prompt: userMessage }),
         });
 
-        if (!response.ok) {
-          const errorData = await response.json();
-          console.error('Error with Gemini API:', errorData);
-          const errorMessage = errorData.error?.message || 'Unknown API error';
-          appendMessage('Bot', `Sorry, there was an error with the API: ${errorMessage}`);
-          // Google Analytics custom event for chat error
-          if (typeof gtag === 'function') {
-            gtag('event', 'Chat-response-error', { 'error_message': `API Error: ${errorMessage}` });
-          }
-          return;
-        }
-
         const data = await response.json();
-        
-        // Extract the text from the response
-        // Adjust based on the actual Gemini API response structure for chat
-        let botResponse = 'No response received.';
-        if (data.candidates && data.candidates.length > 0 && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts.length > 0) {
-          botResponse = data.candidates[0].content.parts[0].text;
-          // Google Analytics custom event for valid chat response
-          if (typeof gtag === 'function') {
-            gtag('event', 'Chat-response-valid');
-          }
+
+        if (!response.ok) {
+          // Update "..." div with error
+          botThinkingDiv.textContent = `Bot: Error - ${data.error || response.statusText || 'An unknown error occurred'}`;
+          console.error('Error from API:', data);
         } else {
-          // If no valid candidate response, consider it an error or unexpected response
-          if (typeof gtag === 'function') {
-            gtag('event', 'Chat-response-error', { 'error_message': 'No valid candidate in API response' });
+          // Extract text - adjust if your Gemini response structure is different
+          const botMessage = data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0] && data.candidates[0].content.parts[0].text;
+          
+          if (botMessage) {
+            // Update "..." div with actual response
+            // Use DOMPurify to sanitize the HTML before rendering
+            const sanitizedHtml = DOMPurify.sanitize(marked.parse(botMessage));
+            botThinkingDiv.innerHTML = `Bot: ${sanitizedHtml}`; // Use innerHTML for Markdown
+          } else {
+            botThinkingDiv.textContent = 'Bot: Received a response, but no text was found.';
           }
         }
-        appendMessage('Bot', botResponse);
       } catch (error) {
-        console.error('Error with model API call:', error);
-        appendMessage('Bot', 'Sorry, there was an error contacting the model.');
-        // Google Analytics custom event for chat error
-        if (typeof gtag === 'function') {
-          gtag('event', 'Chat-response-error', { 'error_message': `Fetch/Network Error: ${error.message}` });
-        }
+        // Update "..." div with network or other error
+        botThinkingDiv.textContent = 'Bot: Error - Could not connect to the API.';
+        console.error('Failed to fetch from /api/gemini-proxy:', error);
+      } finally {
+        sendButton.disabled = false; // Re-enable button
+        chatPanel.scrollTop = chatPanel.scrollHeight; // Scroll to bottom again
       }
     });
 
