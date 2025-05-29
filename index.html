@@ -293,12 +293,12 @@
 
             async function typeLineByLine() {
               for (let i = 0; i < lines.length; i++) {
-                currentDisplayMessage += (i > 0 ? '\\n' : '') + lines[i];
+                currentDisplayMessage += (i > 0 ? '\n' : '') + lines[i];
                 // Parse and sanitize the CUMULATIVE message so Markdown context is preserved
                 const sanitizedPart = DOMPurify.sanitize(marked.parse(currentDisplayMessage));
                 botMessageSpan.innerHTML = sanitizedPart; // Update the content span
                 chatPanel.scrollTop = chatPanel.scrollHeight;
-                await new Promise(resolve => setTimeout(resolve, 200)); // Delay between lines (200ms)
+                await new Promise(resolve => setTimeout(resolve, 150)); // Delay between lines (350ms)
               }
             }
             await typeLineByLine();
