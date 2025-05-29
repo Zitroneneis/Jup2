@@ -172,6 +172,7 @@
     const separator = document.querySelector('.separator');
 
     let chatHistory = []; // Initialize chat history array
+    const TYPING_DELAY_MS = 100; // Delay in milliseconds for typing effect
 
     let isDragging = false;
     let startX;
@@ -302,7 +303,7 @@
                 chatPanel.scrollTop = chatPanel.scrollHeight;
                 
                 // Delay after each part to simulate typing
-                await new Promise(resolve => setTimeout(resolve, 100)); // 100ms per part
+                await new Promise(resolve => setTimeout(resolve, TYPING_DELAY_MS)); // Use the constant for delay
               }
             }
             await typeWordByWord(); // Call the new word-by-word typing function
