@@ -288,20 +288,24 @@
             const botMessageSpan = document.createElement('span'); // Span to hold the message content
             botThinkingDiv.appendChild(botMessageSpan);
 
-            const lines = botMessage.split('\\n');
+            // Split by whitespace (including newlines), keeping them as part of the array
+            const parts = botMessage.split(/(\\s+)/).filter(part => part.length > 0);
             let currentDisplayMessage = '';
 
-            async function typeLineByLine() {
-              for (let i = 0; i < lines.length; i++) {
-                currentDisplayMessage += (i > 0 ? '\n' : '') + lines[i];
+            async function typeWordByWord() { // Renamed function
+              for (let i = 0; i < parts.length; i++) {
+                currentDisplayMessage += parts[i]; // Append current part (word or whitespace/newline)
+                
                 // Parse and sanitize the CUMULATIVE message so Markdown context is preserved
-                const sanitizedPart = DOMPurify.sanitize(marked.parse(currentDisplayMessage));
-                botMessageSpan.innerHTML = sanitizedPart; // Update the content span
+                const sanitizedHtml = DOMPurify.sanitize(marked.parse(currentDisplayMessage));
+                botMessageSpan.innerHTML = sanitizedHtml; // Update the content span
                 chatPanel.scrollTop = chatPanel.scrollHeight;
-                await new Promise(resolve => setTimeout(resolve, 350)); // Delay between lines (350ms)
+                
+                // Delay after each part to simulate typing
+                await new Promise(resolve => setTimeout(resolve, 100)); // 100ms per part
               }
             }
-            await typeLineByLine();
+            await typeWordByWord(); // Call the new word-by-word typing function
 
           } else {
             botThinkingDiv.textContent = 'Bot: Received a response, but no text was found.';
