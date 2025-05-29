@@ -302,7 +302,7 @@
                 chatPanel.scrollTop = chatPanel.scrollHeight;
                 
                 // Delay after each part to simulate typing
-                await new Promise(resolve => setTimeout(resolve, 100)); // 100ms per part
+                await new Promise(resolve => setTimeout(resolve, TYPING_DELAY_MS)); // Simulate typing delay
               }
             }
             await typeWordByWord(); // Call the new word-by-word typing function
