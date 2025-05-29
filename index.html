@@ -276,10 +276,33 @@
           if (botMessage) {
             // Add bot message to history
             chatHistory.push({ role: "model", parts: [{ text: botMessage }] });
-            // Update "..." div with actual response
-            // Use DOMPurify to sanitize the HTML before rendering
-            const sanitizedHtml = DOMPurify.sanitize(marked.parse(botMessage));
-            botThinkingDiv.innerHTML = `Bot: ${sanitizedHtml}`; // Use innerHTML for Markdown
+
+            // Clear Lottie animation and prepare for typing effect
+            botThinkingDiv.innerHTML = ''; // Clear previous content (Lottie)
+
+            const botLabelSpan = document.createElement('span');
+            botLabelSpan.classList.add('bot'); // Apply 'bot' class for styling (bold, blue)
+            botLabelSpan.textContent = 'Bot: ';
+            botThinkingDiv.appendChild(botLabelSpan);
+
+            const botMessageSpan = document.createElement('span'); // Span to hold the message content
+            botThinkingDiv.appendChild(botMessageSpan);
+
+            const lines = botMessage.split('\\n');
+            let currentDisplayMessage = '';
+
+            async function typeLineByLine() {
+              for (let i = 0; i < lines.length; i++) {
+                currentDisplayMessage += (i > 0 ? '\\n' : '') + lines[i];
+                // Parse and sanitize the CUMULATIVE message so Markdown context is preserved
+                const sanitizedPart = DOMPurify.sanitize(marked.parse(currentDisplayMessage));
+                botMessageSpan.innerHTML = sanitizedPart; // Update the content span
+                chatPanel.scrollTop = chatPanel.scrollHeight;
+                await new Promise(resolve => setTimeout(resolve, 200)); // Delay between lines (200ms)
+              }
+            }
+            await typeLineByLine();
+
           } else {
             botThinkingDiv.textContent = 'Bot: Received a response, but no text was found.';
              // Remove the last user message from history as the model didn't respond properly
