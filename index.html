@@ -22,6 +22,8 @@
   <script src="https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script> <!-- Added marked.js library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/2.3.6/purify.min.js"></script> <!-- Added DOMPurify library -->
+  <!-- Lottie animation library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.7.4/lottie.min.js"></script>
   <style>
     /* Basic reset and styling to ensure panels appear side by side */
     html, body {
@@ -89,9 +91,17 @@
     }
     .message {
       margin: 5px 0;
+      width: 100%;
+      display: block;
+    }
+    .message.user {
+      text-align: right; /* Align user messages to the right */
     }
     .user {
       font-weight: bold;
+    }
+    .message.bot {
+      text-align: left; /* Align bot messages to the left */
     }
     .bot {
       font-weight: bold;
@@ -108,6 +118,12 @@
     #send-button {
       padding: 8px 12px;
       font-size: 1em;
+    }
+
+    /* Lottie thinking animation container */
+    .lottie-holder {
+      width: 40px;
+      height: 40px;
     }
 
   </style>
@@ -131,7 +147,7 @@
         Interactve lesson: <code>https://joop-xi.vercel.app/d2.ipynb</code>
       </p>
       <p>Feeling lost? Chat with Gemini Flash 2.0-lite below!<br />
-        Want to try something prettier? try <a href="prototype2.html">prototype2</a></p>
+        Check out <a href="prototype2.html">prototype2</a> for floating chat</p>
 
       <div id="chat-panel"></div>
       <form id="chat-form">
@@ -220,10 +236,19 @@
       chatInput.value = '';
       sendButton.disabled = true;
 
-      // Display "..." for bot response
+      // Display Lottie thinking animation for bot response
       const botThinkingDiv = document.createElement('div');
       botThinkingDiv.classList.add('message', 'bot');
-      botThinkingDiv.textContent = 'Bot: ...';
+      // insert Lottie container
+      botThinkingDiv.innerHTML = '<div class="lottie-holder"></div>';
+      // load and play animation
+      lottie.loadAnimation({
+        container: botThinkingDiv.querySelector('.lottie-holder'),
+        renderer: 'svg',
+        loop: true,
+        autoplay: true,
+        path: '/assets/thinking.lottie'
+      });
       chatPanel.appendChild(botThinkingDiv);
       chatPanel.scrollTop = chatPanel.scrollHeight; // Scroll to bottom
 
