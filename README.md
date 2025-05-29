@@ -1,6 +1,6 @@
 # Jup2: Embedded JupyterLite + Chat Demo
 
-This repository contains a demo platform that embeds JupyterLite notebooks and provides chat interfaces backed by (1) Google Gemini Flash via a serverless proxy and (2) the Perplexity API via a React demo.
+This repository contains a demo platform that embeds JupyterLite notebooks and provides a chat interface backed by Google Gemini Flash via a serverless proxy.
 
 ---
 
@@ -16,8 +16,7 @@ This repository contains a demo platform that embeds JupyterLite notebooks and p
   - [Running Locally](#running-locally)
 - [Usage](#usage)
   - [Main Demo (`index.html`)](#main-demo-indexhtml)
-  - [Floating Chat Prototype (`prototype2.html`)](#floating-chat-prototype-prototype2html)
-  - [Perplexity Chat Demo (`chatdemo.js`)](#perplexity-chat-demo-chatdemoj)
+  - [Floating Chat Prototype (`prototype2.html`)]
 - [API Reference](#api-reference)
 - [Assets](#assets)
 - [Lite Build (`/lite`)](#lite-build-lite)
@@ -32,7 +31,6 @@ Jup2 showcases an interactive learning environment that combines:
 
 - **Embedded JupyterLite** notebooks for teaching and exploration
 - **Chat interface** powered by Google Gemini Flash 2.0 (via `api/gemini-proxy.js`)
-- **Perplexity LLM** React chat demo (`chatdemo.js`)
 - **Floating chat prototype** (`prototype2.html`)
 
 Students and teachers can follow lessons, ask questions in natural language, and receive live feedback or guidance.
@@ -42,7 +40,6 @@ Students and teachers can follow lessons, ask questions in natural language, and
 - **JupyterLite Embedding**: Load any Notebook by URL or via the built-in DemoBook/Lesson files.
 - **Gemini Chat**: Conversational interface with typing animation and stop button; proxy handles API key and request formatting.
 - **Floating Chat**: Standalone floating widget for on-page assistance (`prototype2.html`).
-- **Perplexity Chat Demo**: React component (`chatdemo.js`) connecting to Perplexity API for quick sentiment and answer demos.
 - **Markdown Rendering**: Bot responses are rendered with [marked.js](https://github.com/markedjs/marked) and sanitized by [DOMPurify](https://github.com/cure53/DOMPurify).
 - **Lottie Animations**: Thinking animation during response generation.
 
@@ -53,7 +50,6 @@ Students and teachers can follow lessons, ask questions in natural language, and
 ├─ api/                    # Serverless proxy for Gemini API
 │  └─ gemini-proxy.js      # POST /api/gemini-proxy handler
 ├─ assets/                 # Static assets (animations, icons)
-├─ chatdemo.js             # React Perplexity chat demo
 ├─ index.html              # Main embedded notebook + Gemini chat demo
 ├─ prototype2.html         # Floating chat widget demo
 ├─ project.html            # Static info page
@@ -90,9 +86,7 @@ Create a `.env.local` (for Vercel) or set in your shell:
 
 ```bash
 export GEMINI_API_KEY=your_google_gemini_api_key
-export NEXT_PUBLIC_PERPLEXITY_API_KEY=your_perplexity_key
-export NEXT_PUBLIC_PERPLEXITY_API_ENDPOINT=https://api.perplexity.ai/...
-```
+```  
 
 ### Running Locally
 
@@ -129,13 +123,6 @@ Navigate to `http://localhost:3000` (default) and open `index.html`.
 
 - A standalone chat window that floats above any page.
 - Useful for minimal UI integration.
-
-### Perplexity Chat Demo (`chatdemo.js`)
-
-- React component showing side-by-side instructions and chat.
-- Uses environment variables:
-  - `NEXT_PUBLIC_PERPLEXITY_API_KEY`
-  - `NEXT_PUBLIC_PERPLEXITY_API_ENDPOINT`
 
 ## API Reference
 
