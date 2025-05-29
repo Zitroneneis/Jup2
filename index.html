@@ -302,6 +302,9 @@
               chatInput.disabled = false;
               sendButton.textContent = 'Send';
               sendButton.removeEventListener('click', onStopClick);
+              if (typeof gtag === 'function') {
+                gtag('event', 'STOPPED GENERATING');
+              }
             }
             sendButton.textContent = 'STOP GENERATING';
             sendButton.addEventListener('click', onStopClick);
