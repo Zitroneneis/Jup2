@@ -38,9 +38,9 @@ Key guidelines:
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        systemInstruction: {
+        /* systemInstruction: {
           parts: [{ text: systemPrompt }]
-        },
+        }, */
         contents: history // Pass the history array directly
       })
     });
