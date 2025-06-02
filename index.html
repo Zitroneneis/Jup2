@@ -241,16 +241,8 @@
       // Display Lottie thinking animation for bot response
       const botThinkingDiv = document.createElement('div');
       botThinkingDiv.classList.add('message', 'bot');
-      // insert Lottie container
-      botThinkingDiv.innerHTML = '<div class="lottie-holder"></div>';
-      // load and play animation
-      lottie.loadAnimation({
-        container: botThinkingDiv.querySelector('.lottie-holder'),
-        renderer: 'svg',
-        loop: true,
-        autoplay: true,
-        path: '/assets/thinking.lottie'
-      });
+      // insert GIF container
+      botThinkingDiv.innerHTML = '<img src="assets/thinking.gif" alt="Thinking..." class="thinking-gif" style="width: 40px; height: 40px;" />';
       chatPanel.appendChild(botThinkingDiv);
       chatPanel.scrollTop = chatPanel.scrollHeight; // Scroll to bottom
 
@@ -279,8 +271,8 @@
             // Add bot message to history
             chatHistory.push({ role: "model", parts: [{ text: botMessage }] });
 
-            // Clear Lottie animation and prepare for typing effect
-            botThinkingDiv.innerHTML = ''; // Clear previous content (Lottie)
+            // Clear thinking GIF and prepare for typing effect
+            botThinkingDiv.innerHTML = ''; // Clear previous content (GIF)
 
             const botLabelSpan = document.createElement('span');
             botLabelSpan.classList.add('bot'); // Apply 'bot' class for styling (bold, blue)
