@@ -41,10 +41,7 @@ Key guidelines:
         /* systemInstruction: {
           parts: [{ text: systemPrompt }]
         }, */
-        contents: history, // Pass the history array directly
-        generationConfig: {
-          responseMimeType: "application/json"
-        }
+        contents: history // Pass the history array directly
       })
     });
 
