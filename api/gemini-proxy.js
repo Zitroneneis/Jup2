@@ -7,7 +7,7 @@ export default async function handler(req, res) {
 
   const { history } = req.body; // Changed from prompt to history
   const apiKey = process.env.GEMINI_API_KEY;
-  const model = 'gemini-1.5-flash-latest'; // Updated model
+  const model = 'gemini-2.0-flash-preview-image-generation'; 
 
   // Define your system prompt here
   const systemPrompt = `Your  are an AI assistant embedded in a learning platform. Your job is to help high school students and teachers explore ideas through multi-turn conversations, render and format Markdown (including code, lists, tables, and links.

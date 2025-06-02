@@ -241,16 +241,8 @@
       // Display Lottie thinking animation for bot response
       const botThinkingDiv = document.createElement('div');
       botThinkingDiv.classList.add('message', 'bot');
-      // insert Lottie container
-      botThinkingDiv.innerHTML = '<div class="lottie-holder"></div>';
-      // load and play animation
-      lottie.loadAnimation({
-        container: botThinkingDiv.querySelector('.lottie-holder'),
-        renderer: 'svg',
-        loop: true,
-        autoplay: true,
-        path: '/assets/thinking.lottie'
-      });
+      // insert GIF container
+      botThinkingDiv.innerHTML = '<img src="assets/thinking.gif" alt="Thinking..." class="thinking-gif" style="width: 40px; height: 40px;" />';
       chatPanel.appendChild(botThinkingDiv);
       chatPanel.scrollTop = chatPanel.scrollHeight; // Scroll to bottom
 
@@ -274,13 +266,14 @@
         } else {
           // Extract text - adjust if your Gemini response structure is different
           const botMessage = data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0] && data.candidates[0].content.parts[0].text;
-          
-          if (botMessage) {
-            // Add bot message to history
-            chatHistory.push({ role: "model", parts: [{ text: botMessage }] });
+          const botImageData = data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0] && data.candidates[0].content.parts[0].inlineData;
 
-            // Clear Lottie animation and prepare for typing effect
-            botThinkingDiv.innerHTML = ''; // Clear previous content (Lottie)
+          if (botMessage || botImageData) {
+            // Add bot message to history
+            chatHistory.push({ role: "model", parts: data.candidates[0].content.parts });
+
+            // Clear thinking GIF and prepare for typing effect
+            botThinkingDiv.innerHTML = ''; // Clear previous content (GIF)
 
             const botLabelSpan = document.createElement('span');
             botLabelSpan.classList.add('bot'); // Apply 'bot' class for styling (bold, blue)
@@ -327,7 +320,7 @@
             }, TYPING_DELAY_MS);
 
           } else {
-            botThinkingDiv.textContent = 'Bot: Received a response, but no text was found.';
+            botThinkingDiv.textContent = 'Bot: Received a response, but no text or image was found.';
              // Remove the last user message from history as the model didn't respond properly
             chatHistory.pop();
           }
@@ -344,14 +337,21 @@
       }
     });
 
-    function appendMessage(sender, text) {
+    function appendMessage(sender, text, imageData) {
       const messageDiv = document.createElement('div');
       messageDiv.classList.add('message');
       if (sender.toLowerCase() === 'bot') {
-        // Parse Markdown for bot messages
-        // IMPORTANT: For production, ensure you sanitize this HTML to prevent XSS.
-        // You might use a library like DOMPurify: DOMPurify.sanitize(marked.parse(text));
-        messageDiv.innerHTML = `<span class="bot">Bot:</span> ${DOMPurify.sanitize(marked.parse(text))}`;
+        messageDiv.innerHTML = `<span class="bot">Bot:</span> `;
+        if (text) {
+          messageDiv.innerHTML += DOMPurify.sanitize(marked.parse(text));
+        }
+        if (imageData && imageData.mimeType && imageData.data) {
+          const img = document.createElement('img');
+          img.src = `data:${imageData.mimeType};base64,${imageData.data}`;
+          img.alt = "Generated Image";
+          img.style.maxWidth = "100%";
+          messageDiv.appendChild(img);
+        }
       } else {
         messageDiv.innerHTML = `<span class="${sender.toLowerCase()}">${sender}:</span> ${text}`;
       }
