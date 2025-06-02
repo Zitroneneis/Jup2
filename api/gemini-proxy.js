@@ -41,7 +41,10 @@ Key guidelines:
         /* systemInstruction: {
           parts: [{ text: systemPrompt }]
         }, */
-        contents: history // Pass the history array directly
+        contents: history, // Pass the history array directly
+        generationConfig: {
+          responseModalities: ["TEXT", "IMAGE"]
+        }
       })
     });
 
