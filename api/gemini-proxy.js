@@ -7,10 +7,10 @@ export default async function handler(req, res) {
 
   const { history } = req.body; // Changed from prompt to history
   const apiKey = process.env.GEMINI_API_KEY;
-  const model = 'gemini-2.0-flash-lite'; // Use text-only model 
+  const model = 'gemini-2.0-flash-preview-image-generation'; // Use unified text/image model 
 
   // Define your system prompt here
-  const systemPrompt = `Your  are an AI assistant embedded in a learning platform. Your job is to help high school students and teachers explore ideas through multi-turn conversations, render and format Markdown (including code, lists, tables, and links.
+  const systemPrompt = `You are an AI assistant embedded in a learning platform. Your job is to help high school students and teachers explore ideas through multi-turn conversations, render and format Markdown (including code, lists, tables, and links.
 You operate in a U.S. high school environment and must maintain an appropriate, respectful, and educational tone at all times. If a user requests or ventures into a topic that is not suitable for a school setting - such as explicit content, hate speech, self-harm, or other disallowed subject matter - you must immediately stop generating and reply:
 'I’m sorry, but I can’t discuss that topic. Your teacher may be notified to review this conversation.'
 Key guidelines:
@@ -31,24 +31,6 @@ You have access to an image generation function. Only call it when the user expl
 
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
-  // Define image generation function
-  const imageGenerationTool = {
-    function_declarations: [{
-      name: "generate_image",
-      description: "Generate an image based on a text description. Only use when the user explicitly asks for an image, diagram, or visual content.",
-      parameters: {
-        type: "object",
-        properties: {
-          prompt: {
-            type: "string",
-            description: "A detailed description of the image to generate"
-          }
-        },
-        required: ["prompt"]
-      }
-    }]
-  };
-
   try {
     const geminiResponse = await fetch(url, {
       method: 'POST',
@@ -60,9 +42,9 @@ You have access to an image generation function. Only call it when the user expl
           parts: [{ text: systemPrompt }]
         },
         contents: history,
-        tools: [imageGenerationTool],
         generationConfig: {
-          temperature: 0.7
+          temperature: 0.7,
+          responseModalities: ["TEXT"] // Default to text only
         }
       })
     });
@@ -75,55 +57,42 @@ You have access to an image generation function. Only call it when the user expl
       return res.status(geminiResponse.status).json({ error: errorMessage, details: data.error });
     }
     
-    // Check if the response contains function calls
-    const candidate = data.candidates?.[0];
-    if (candidate?.content?.parts) {
-      const parts = candidate.content.parts;
-      const functionCalls = parts.filter(part => part.functionCall);
-      
-      if (functionCalls.length > 0) {
-        // Handle function calls (image generation)
-        const updatedParts = [];
-        
-        for (const part of parts) {
-          if (part.functionCall && part.functionCall.name === 'generate_image') {
-            // Generate image using imagen
-            const imagePrompt = part.functionCall.args.prompt;
-            try {
-              const imageResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:generateContent?key=${apiKey}`, {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                  contents: [{
-                    parts: [{ text: imagePrompt }]
-                  }],
-                  generationConfig: {
-                    responseModalities: ["IMAGE"]
-                  }
-                })
-              });
-              
-              const imageData = await imageResponse.json();
-              if (imageResponse.ok && imageData.candidates?.[0]?.content?.parts) {
-                // Add the generated image to the response
-                const imageParts = imageData.candidates[0].content.parts.filter(p => p.inlineData);
-                updatedParts.push(...imageParts);
-              }
-            } catch (imageError) {
-              console.error('Error generating image:', imageError);
-              // Add error message instead of image
-              updatedParts.push({ text: `Sorry, I couldn't generate the requested image: ${imageError.message}` });
+    // Check if user is asking for an image and retry with image generation enabled
+    const lastUserMessage = history[history.length - 1];
+    const userText = lastUserMessage?.parts?.[0]?.text?.toLowerCase() || '';
+    const imageKeywords = ['image', 'picture', 'diagram', 'chart', 'illustration', 'draw', 'create a visual', 'show me', 'generate an image'];
+    const isImageRequest = imageKeywords.some(keyword => userText.includes(keyword));
+    
+    // If no image content was generated but user asked for image, retry with image generation
+    const hasImageInResponse = data.candidates?.[0]?.content?.parts?.some(part => sentpart.inlineData);
+    
+    if (isImageRequest && !hasImageInResponse) {
+      try {
+        const imageResponse = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            systemInstruction: {
+              parts: [{ text: systemPrompt }]
+            },
+            contents: history,
+            generationConfig: {
+              temperature: 0.7,
+              responseModalities: ["TEXT", "IMAGE"] // Enable image generation
             }
-          } else {
-            // Keep non-function call parts as-is
-            updatedParts.push(part);
-          }
-        }
+          })
+        });
         
-        // Update the response with generated images
-        data.candidates[0].content.parts = updatedParts;
+        const imageData = await imageResponse.json();
+        if (imageResponse.ok && imageData.candidates?.[0]?.content?.parts) {
+          // Use the response with images
+          return res.status(200).json(imageData);
+        }
+      } catch (imageError) {
+        console.error('Error generating image:', imageError);
+        // Fall back to text-only response
       }
     }
     
