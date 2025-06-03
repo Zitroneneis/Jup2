@@ -10,7 +10,7 @@ export default async function handler(req, res) {
   const model = 'gemini-2.0-flash-preview-image-generation'; // Use unified text/image model 
 
   // Define your system prompt here
-  const systemPrompt = `You are an AI assistant embedded in a learning platform. Your job is to help high school students and teachers explore ideas through multi-turn conversations, render and format Markdown (including code, lists, tables, and links.
+  const systemPrompt = `Your  are an AI assistant embedded in a learning platform. Your job is to help high school students and teachers explore ideas through multi-turn conversations, render and format Markdown (including code, lists, tables, and links.
 You operate in a U.S. high school environment and must maintain an appropriate, respectful, and educational tone at all times. If a user requests or ventures into a topic that is not suitable for a school setting - such as explicit content, hate speech, self-harm, or other disallowed subject matter - you must immediately stop generating and reply:
 'I’m sorry, but I can’t discuss that topic. Your teacher may be notified to review this conversation.'
 Key guidelines:
@@ -64,7 +64,10 @@ You have access to an image generation function. Only call it when the user expl
     const isImageRequest = imageKeywords.some(keyword => userText.includes(keyword));
     
     // If no image content was generated but user asked for image, retry with image generation
-    const hasImageInResponse = data.candidates?.[0]?.content?.parts?.some(part => sentpart.inlineData);
+    const hasImageInResponse = data.candidates?.[0]?.content?.parts?.some(part => part.inlineData);
+    
+    // NOTE: Using gemini-2.0-flash-preview-image-generation for both text and image. Default to text-only responses unless user asks for image.
+    // If user asks for image, retry with responseModalities: ["TEXT", "IMAGE"]
     
     if (isImageRequest && !hasImageInResponse) {
       try {
