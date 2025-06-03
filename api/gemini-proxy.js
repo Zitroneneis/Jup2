@@ -38,9 +38,9 @@ You have access to an image generation function. Only call it when the user expl
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        systemInstruction: {
-          parts: [{ text: systemPrompt }]
-        },
+        // systemInstruction: {
+        //   parts: [{ text: systemPrompt }]
+        // },
         contents: history,
         generationConfig: {
           temperature: 0.7,
@@ -77,9 +77,9 @@ You have access to an image generation function. Only call it when the user expl
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            systemInstruction: {
-              parts: [{ text: systemPrompt }]
-            },
+            // systemInstruction: {
+            //   parts: [{ text: systemPrompt }]
+            // },
             contents: history,
             generationConfig: {
               temperature: 0.7,
