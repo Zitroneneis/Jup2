@@ -7,7 +7,7 @@ export default async function handler(req, res) {
 
   const { history } = req.body; // Changed from prompt to history
   const apiKey = process.env.GEMINI_API_KEY;
-  const model = 'gemini-2.0-flash-preview-image-generation'; 
+  const model = 'gemini-2.0-flash-lite'; // Use text-only model 
 
   // Define your system prompt here
   const systemPrompt = `Your  are an AI assistant embedded in a learning platform. Your job is to help high school students and teachers explore ideas through multi-turn conversations, render and format Markdown (including code, lists, tables, and links.
@@ -19,7 +19,7 @@ Key guidelines:
 - When in doubt, err on the side of caution and refuse.  
 - Support teachers by producing concise summaries of sessions and flagging any potential issues.  
 - Use clear, friendly, and encouraging language.  
-- Respect user privacy: do not share personal data or outside chat history.`;
+You have access to an image generation function. Only call it when the user explicitly asks for an image, diagram, or visual content. Do not generate images unless specifically requested.`;
 
   if (!apiKey) {
     return res.status(500).json({ error: 'API key not configured.' });
@@ -31,6 +31,24 @@ Key guidelines:
 
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
+  // Define image generation function
+  const imageGenerationTool = {
+    function_declarations: [{
+      name: "generate_image",
+      description: "Generate an image based on a text description. Only use when the user explicitly asks for an image, diagram, or visual content.",
+      parameters: {
+        type: "object",
+        properties: {
+          prompt: {
+            type: "string",
+            description: "A detailed description of the image to generate"
+          }
+        },
+        required: ["prompt"]
+      }
+    }]
+  };
+
   try {
     const geminiResponse = await fetch(url, {
       method: 'POST',
@@ -38,12 +56,13 @@ Key guidelines:
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        /* systemInstruction: {
+        systemInstruction: {
           parts: [{ text: systemPrompt }]
-        }, */
-        contents: history, // Pass the history array directly
+        },
+        contents: history,
+        tools: [imageGenerationTool],
         generationConfig: {
-          responseModalities: ["TEXT", "IMAGE"]
+          temperature: 0.7
         }
       })
     });
@@ -52,9 +71,60 @@ Key guidelines:
 
     if (!geminiResponse.ok) {
       console.error('Error from Gemini API:', data);
-      // Try to provide a more specific error message if available
       const errorMessage = data?.error?.message || 'Error calling Gemini API';
       return res.status(geminiResponse.status).json({ error: errorMessage, details: data.error });
+    }
+    
+    // Check if the response contains function calls
+    const candidate = data.candidates?.[0];
+    if (candidate?.content?.parts) {
+      const parts = candidate.content.parts;
+      const functionCalls = parts.filter(part => part.functionCall);
+      
+      if (functionCalls.length > 0) {
+        // Handle function calls (image generation)
+        const updatedParts = [];
+        
+        for (const part of parts) {
+          if (part.functionCall && part.functionCall.name === 'generate_image') {
+            // Generate image using imagen
+            const imagePrompt = part.functionCall.args.prompt;
+            try {
+              const imageResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-001:generateContent?key=${apiKey}`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  contents: [{
+                    parts: [{ text: imagePrompt }]
+                  }],
+                  generationConfig: {
+                    responseModalities: ["IMAGE"]
+                  }
+                })
+              });
+              
+              const imageData = await imageResponse.json();
+              if (imageResponse.ok && imageData.candidates?.[0]?.content?.parts) {
+                // Add the generated image to the response
+                const imageParts = imageData.candidates[0].content.parts.filter(p => p.inlineData);
+                updatedParts.push(...imageParts);
+              }
+            } catch (imageError) {
+              console.error('Error generating image:', imageError);
+              // Add error message instead of image
+              updatedParts.push({ text: `Sorry, I couldn't generate the requested image: ${imageError.message}` });
+            }
+          } else {
+            // Keep non-function call parts as-is
+            updatedParts.push(part);
+          }
+        }
+        
+        // Update the response with generated images
+        data.candidates[0].content.parts = updatedParts;
+      }
     }
     
     // Ensure the response has candidates and parts before sending back

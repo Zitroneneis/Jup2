@@ -146,7 +146,7 @@
         <code>https://joop-xi.vercel.app/DemoBook.ipynb</code><br />
         Interactve lesson: <code>https://joop-xi.vercel.app/d2.ipynb</code>
       </p>
-      <p>Feeling lost? Chat with Gemini Flash 2.0-lite below!<br />
+      <p>Feeling lost? Chat with Gemini Flash 2.0 below! Ask for images and it will generate them on demand.<br />
         Check out <a href="prototype2.html">prototype2</a> for floating chat</p>
 
       <div id="chat-panel"></div>
@@ -326,7 +326,7 @@
             const botMessageSpan = document.createElement('span'); 
             botThinkingDiv.appendChild(botMessageSpan);
 
-            const textDisplayParts = combinedTextContent.split(/(\\s+)/).filter(p => p);
+            const textDisplayParts = combinedTextContent.split(/(\s+)/).filter(p => p);
             let currentDisplayMessage = '';
             let stopRequested = false;
             let typingInterval; 
