@@ -90,7 +90,7 @@ You have access to an image generation function. Only call it when the user expl
             // Generate image using imagen
             const imagePrompt = part.functionCall.args.prompt;
             try {
-              const imageResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-001:generateContent?key=${apiKey}`, {
+              const imageResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:generateContent?key=${apiKey}`, {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
