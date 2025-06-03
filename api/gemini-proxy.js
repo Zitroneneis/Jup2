@@ -43,7 +43,7 @@ Key guidelines:
         }, */
         contents: history, // Pass the history array directly
         generationConfig: {
-          responseModalities: ["TEXT", "IMAGE"]
+          responseModalities: ["TEXT"]
         }
       })
     });
