@@ -5,9 +5,10 @@ export default async function handler(req, res) {
     return res.status(405).end(`Method ${req.method} Not Allowed`);
   }
 
-  const { history } = req.body; // Changed from prompt to history
+  const { history, recaptchaToken } = req.body; // Add recaptchaToken
   const apiKey = process.env.GEMINI_API_KEY;
-  const model = 'gemini-2.0-flash-preview-image-generation'; 
+  const recaptchaSecretKey = process.env.RECAPTCHA_SECRET_KEY; // Add secret key
+  const model = 'gemini-2.0-flash-preview-image-generation'; // Use unified text/image model 
 
   // Define your system prompt here
   const systemPrompt = `Your  are an AI assistant embedded in a learning platform. Your job is to help high school students and teachers explore ideas through multi-turn conversations, render and format Markdown (including code, lists, tables, and links.
@@ -19,7 +20,7 @@ Key guidelines:
 - When in doubt, err on the side of caution and refuse.  
 - Support teachers by producing concise summaries of sessions and flagging any potential issues.  
 - Use clear, friendly, and encouraging language.  
-- Respect user privacy: do not share personal data or outside chat history.`;
+You have access to an image generation function. Only call it when the user explicitly asks for an image, diagram, or visual content. Do not generate images unless specifically requested.`;
 
   if (!apiKey) {
     return res.status(500).json({ error: 'API key not configured.' });
@@ -31,19 +32,45 @@ Key guidelines:
 
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
+  // Verify reCAPTCHA token
+  if (!recaptchaToken) {
+    return res.status(400).json({ error: 'reCAPTCHA token is missing.' });
+  }
   try {
+    const recaptchaVerifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${recaptchaSecretKey}&response=${recaptchaToken}`;
+    const recaptchaRes = await fetch(recaptchaVerifyUrl, { method: 'POST' });
+    const recaptchaData = await recaptchaRes.json();
+    if (!recaptchaData.success || recaptchaData.score < 0.5) { // Check for success and score
+      console.error('reCAPTCHA verification failed:', recaptchaData);
+      return res.status(403).json({ error: 'reCAPTCHA verification failed.' });
+    }
+  } catch (error) {
+    console.error('Error verifying reCAPTCHA:', error);
+    return res.status(500).json({ error: 'Error verifying reCAPTCHA.' });
+  }
+
+  // Check if user is asking for an image
+  const lastUserMessage = history[history.length - 1];
+  const userText = lastUserMessage?.parts?.[0]?.text?.toLowerCase() || '';
+  const imageKeywords = ['image', 'picture', 'diagram', 'chart', 'illustration', 'draw', 'create a visual', 'show me', 'generate an image'];
+  const isImageRequest = imageKeywords.some(keyword => userText.includes(keyword));
+
+  try {
+    // The gemini-2.0-flash-preview-image-generation model requires ["TEXT", "IMAGE"] modalities
+    // We'll always use both and let the model decide whether to generate images
     const geminiResponse = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        /* systemInstruction: {
-          parts: [{ text: systemPrompt }]
-        }, */
-        contents: history, // Pass the history array directly
+        // systemInstruction: {
+        //   parts: [{ text: systemPrompt }]
+        // },
+        contents: history,
         generationConfig: {
-          responseModalities: ["TEXT", "IMAGE"]
+          temperature: 0.7,
+          responseModalities: ["TEXT", "IMAGE"] // Always use both for this model
         }
       })
     });
@@ -52,7 +79,6 @@ Key guidelines:
 
     if (!geminiResponse.ok) {
       console.error('Error from Gemini API:', data);
-      // Try to provide a more specific error message if available
       const errorMessage = data?.error?.message || 'Error calling Gemini API';
       return res.status(geminiResponse.status).json({ error: errorMessage, details: data.error });
     }

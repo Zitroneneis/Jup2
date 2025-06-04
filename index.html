@@ -22,6 +22,7 @@
   <script src="https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script> <!-- Added marked.js library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/2.3.6/purify.min.js"></script> <!-- Added DOMPurify library -->
+  <script src="https://www.google.com/recaptcha/enterprise.js?render=6LcQhFMrAAAAAMjWClxXSNDpZrFZj3rUrz5UHhWA"></script>
   <!-- Lottie animation library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.7.4/lottie.min.js"></script>
   <style>
@@ -146,7 +147,7 @@
         <code>https://joop-xi.vercel.app/DemoBook.ipynb</code><br />
         Interactve lesson: <code>https://joop-xi.vercel.app/d2.ipynb</code>
       </p>
-      <p>Feeling lost? Chat with Gemini Flash 2.0-lite below!<br />
+      <p>Feeling lost? Chat with Gemini Flash 2.0 below! Ask for images and it will generate them on demand.<br />
         Check out <a href="prototype2.html">prototype2</a> for floating chat</p>
 
       <div id="chat-panel"></div>
@@ -166,6 +167,7 @@
     const chatForm = document.getElementById('chat-form');
     const chatInput = document.getElementById('chat-input');
     const sendButton = document.getElementById('send-button'); // Get the send button
+    const RECAPTCHA_SITE_KEY = '6LcQhFMrAAAAAMjWClxXSNDpZrFZj3rUrz5UHhWA';
     const container = document.querySelector('.container');
     const mainPanel = document.querySelector('.main-panel');
     const rightPanel = document.querySelector('.right-panel');
@@ -217,215 +219,205 @@
 
     chatForm.addEventListener('submit', async (event) => {
       event.preventDefault();
+
       // Google Analytics custom event for chat submit
       if (typeof gtag === 'function') {
         gtag('event', 'Chat-button-submitted');
       }
 
-      let userMessageToProcess;
+      // Add reCAPTCHA verification
+      grecaptcha.enterprise.ready(function() { // Changed to enterprise.ready
+        grecaptcha.enterprise.execute(RECAPTCHA_SITE_KEY, {action: 'submit'}).then(async function(token) { // Changed to enterprise.execute
+          // Add token to your backend request
+          // The existing code for processing the message will be nested here
 
-      if (isRetryMode) {
-        userMessageToProcess = lastUserMessageText;
-        // If retrying, the user's message is already the last in chatHistory.
-        // We also don't want to add it to the display again.
-        isRetryMode = false; // Will be reset to 'Send' on success or set to 'Retry' on new error
-      } else {
-        userMessageToProcess = chatInput.value.trim();
-        if (!userMessageToProcess) return;
-        lastUserMessageText = userMessageToProcess; // Store for potential retry
+          let userMessageToProcess;
 
-        // Display user message
-        const userDiv = document.createElement('div');
-        userDiv.classList.add('message', 'user');
-        userDiv.textContent = `You: ${userMessageToProcess}`;
-        chatPanel.appendChild(userDiv);
-        chatPanel.scrollTop = chatPanel.scrollHeight; // Scroll to bottom
-
-        // Add user message to history
-        chatHistory.push({ role: "user", parts: [{ text: userMessageToProcess }] });
-      }
-
-      // Clear input and lock typing, prepare for bot response
-      chatInput.value = '';
-      chatInput.disabled = true;
-      // sendButton.disabled = false; // Will be handled by STOP GENERATING or error/success logic
-
-      // Display thinking animation for bot response
-      const botThinkingDiv = document.createElement('div');
-      botThinkingDiv.classList.add('message', 'bot');
-      botThinkingDiv.innerHTML = '<img src="assets/thinking.gif" alt="Thinking..." class="thinking-gif" style="width: 40px; height: 40px;" />';
-      chatPanel.appendChild(botThinkingDiv);
-      chatPanel.scrollTop = chatPanel.scrollHeight;
-
-      try {
-        const response = await fetch('/api/gemini-proxy', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ history: chatHistory }), // Send the whole history
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-          const errorMessage = data.error?.message || data.error || response.statusText || 'An unknown error occurred';
-          botThinkingDiv.textContent = `Bot: Error - ${errorMessage}`;
-          console.error('Error from API:', data);
-          // DO NOT pop chatHistory here, keep user message for retry
-
-          sendButton.textContent = 'Retry';
-          isRetryMode = true;
-          chatInput.disabled = false;
-          sendButton.disabled = false;
-          return; // Exit, wait for user to click Retry or type new
-        }
-        
-        // Successful response from API, clear retry mode if it was set
-        isRetryMode = false; 
-        // sendButton.textContent will be handled by the typing effect logic setting it to 'STOP GENERATING' then 'Send'
-
-        const responseParts = data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts;
-
-        if (responseParts && responseParts.length > 0) {
-          chatHistory.push({ role: "model", parts: responseParts });
-
-          botThinkingDiv.innerHTML = ''; // Clear thinking GIF
-
-          const botLabelSpan = document.createElement('span');
-          botLabelSpan.classList.add('bot');
-          botLabelSpan.textContent = 'Bot: ';
-          botThinkingDiv.appendChild(botLabelSpan);
-
-          // Consolidate text and collect image parts
-          let combinedTextContent = '';
-          const imageDatas = [];
-          responseParts.forEach(part => {
-            if (part.text) {
-              combinedTextContent += part.text; // Concatenate all text parts
-            }
-            if (part.inlineData && part.inlineData.mimeType && part.inlineData.data) {
-              imageDatas.push(part.inlineData);
-            }
-          });
-
-          const appendImages = () => {
-            imageDatas.forEach(imageData => {
-              const img = document.createElement('img');
-              img.src = `data:${imageData.mimeType};base64,${imageData.data}`;
-              img.alt = "Generated Image";
-              img.style.maxWidth = "100%";
-              img.style.display = "block"; 
-              img.style.marginTop = "5px"; 
-              botThinkingDiv.appendChild(img); 
-            });
-            chatPanel.scrollTop = chatPanel.scrollHeight;
-          };
-
-          if (combinedTextContent.trim() !== '') {
-            const botMessageSpan = document.createElement('span'); 
-            botThinkingDiv.appendChild(botMessageSpan);
-
-            const textDisplayParts = combinedTextContent.split(/(\\s+)/).filter(p => p);
-            let currentDisplayMessage = '';
-            let stopRequested = false;
-            let typingInterval; 
-
-            function onStopClick() {
-              stopRequested = true;
-              clearInterval(typingInterval); 
-              
-              // chatHistory.pop(); // Model's partial turn is already in history, decide if it should be kept or removed.
-                               // For simplicity, we leave it. If retry happens, it gets overwritten by new model response.
-              botThinkingDiv.remove(); 
-
-              chatInput.disabled = false;
-              sendButton.textContent = 'Send';
-              isRetryMode = false; // Ensure not in retry mode
-              sendButton.removeEventListener('click', onStopClick);
-              if (typeof gtag === 'function') {
-                gtag('event', 'STOPPED GENERATING');
-              }
-            }
-            sendButton.textContent = 'STOP GENERATING';
-            sendButton.disabled = false; // Ensure it's enabled to be clicked
-            sendButton.addEventListener('click', onStopClick);
-            
-            let idx = 0;
-            typingInterval = setInterval(() => {
-              if (stopRequested || idx >= textDisplayParts.length) {
-                clearInterval(typingInterval);
-                if (!stopRequested) {
-                  appendImages(); 
-                  sendButton.textContent = 'Send';
-                  isRetryMode = false;
-                  chatInput.disabled = false;
-                  sendButton.removeEventListener('click', onStopClick);
-                }
-                return;
-              }
-              currentDisplayMessage += textDisplayParts[idx++];
-              const html = DOMPurify.sanitize(marked.parse(currentDisplayMessage));
-              botMessageSpan.innerHTML = html;
-              chatPanel.scrollTop = chatPanel.scrollHeight;
-            }, TYPING_DELAY_MS);
-
-          } else if (imageDatas.length > 0) {
-            appendImages();
-            sendButton.textContent = 'Send'; 
-            isRetryMode = false;
-            chatInput.disabled = false; 
-            sendButton.disabled = false;
+          if (isRetryMode) {
+            userMessageToProcess = lastUserMessageText;
+            // If retrying, the user's message is already the last in chatHistory.
+            // We also don't want to add it to the display again.
+            isRetryMode = false; // Will be reset to 'Send' on success or set to 'Retry' on new error
           } else {
-            const noContentMsg = document.createTextNode('Received a response, but no text or image was found.');
-            botThinkingDiv.appendChild(noContentMsg);
-            // chatHistory.pop(); // Model response was empty, pop it.
-            if(chatHistory[chatHistory.length-1].role === 'model') chatHistory.pop();
+            userMessageToProcess = chatInput.value.trim();
+            if (!userMessageToProcess) return;
+            lastUserMessageText = userMessageToProcess; // Store for potential retry
+
+            // Display user message
+            const userDiv = document.createElement('div');
+            userDiv.classList.add('message', 'user');
+            userDiv.textContent = `You: ${userMessageToProcess}`;
+            chatPanel.appendChild(userDiv);
+            chatPanel.scrollTop = chatPanel.scrollHeight; // Scroll to bottom
+
+            // Add user message to history
+            chatHistory.push({ role: "user", parts: [{ text: userMessageToProcess }] });
           }
 
-        } else {
-          botThinkingDiv.textContent = 'Bot: Received a response, but no content parts were found.';
-          // chatHistory.pop(); // Model response was empty, pop it.
-          if(chatHistory[chatHistory.length-1].role === 'model') chatHistory.pop();
-        }
-      } catch (error) {
-        botThinkingDiv.textContent = 'Bot: Error - Could not connect to the API.';
-        console.error('Failed to fetch from /api/gemini-proxy:', error);
-        // DO NOT pop chatHistory here, keep user message for retry
+          // Clear input and lock typing, prepare for bot response
+          chatInput.value = '';
+          chatInput.disabled = true;
+          // sendButton.disabled = false; // Will be handled by STOP GENERATING or error/success logic
 
-        sendButton.textContent = 'Retry';
-        isRetryMode = true;
-        chatInput.disabled = false;
-        sendButton.disabled = false;
-        return; // Exit
-      } finally {
-        // General cleanup, though most button states are handled in try/catch/success
-        // sendButton.disabled = false; // This might override STOP GENERATING or Retry states if not careful
-        chatPanel.scrollTop = chatPanel.scrollHeight; 
-      }
-    });
+          // Display thinking animation for bot response
+          const botThinkingDiv = document.createElement('div');
+          botThinkingDiv.classList.add('message', 'bot');
+          botThinkingDiv.innerHTML = '<img src="assets/thinking.gif" alt="Thinking..." class="thinking-gif" style="width: 40px; height: 40px;" />';
+          chatPanel.appendChild(botThinkingDiv);
+          chatPanel.scrollTop = chatPanel.scrollHeight;
 
-    function appendMessage(sender, text, imageData) {
-      const messageDiv = document.createElement('div');
-      messageDiv.classList.add('message');
-      if (sender.toLowerCase() === 'bot') {
-        messageDiv.innerHTML = `<span class="bot">Bot:</span> `;
-        if (text) {
-          messageDiv.innerHTML += DOMPurify.sanitize(marked.parse(text));
-        }
-        if (imageData && imageData.mimeType && imageData.data) {
-          const img = document.createElement('img');
-          img.src = `data:${imageData.mimeType};base64,${imageData.data}`;
-          img.alt = "Generated Image";
-          img.style.maxWidth = "100%";
-          messageDiv.appendChild(img);
-        }
-      } else {
-        messageDiv.innerHTML = `<span class="${sender.toLowerCase()}">${sender}:</span> ${text}`;
-      }
-      chatPanel.appendChild(messageDiv);
-      chatPanel.scrollTop = chatPanel.scrollHeight;
-    }
+          try {
+            const response = await fetch('/api/gemini-proxy', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ 
+                history: chatHistory,
+                recaptchaToken: token // Include the reCAPTCHA token
+              }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+              const errorMessage = data.error?.message || data.error || response.statusText || 'An unknown error occurred';
+              botThinkingDiv.textContent = `Bot: Error - ${errorMessage}`;
+              console.error('Error from API:', data);
+              // DO NOT pop chatHistory here, keep user message for retry
+
+              sendButton.textContent = 'Retry';
+              isRetryMode = true;
+              chatInput.disabled = false;
+              sendButton.disabled = false;
+              return; // Exit, wait for user to click Retry or type new
+            }
+            
+            // Successful response from API, clear retry mode if it was set
+            isRetryMode = false; 
+            // sendButton.textContent will be handled by the typing effect logic setting it to 'STOP GENERATING' then 'Send'
+
+            const responseParts = data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts;
+
+            if (responseParts && responseParts.length > 0) {
+              chatHistory.push({ role: "model", parts: responseParts });
+
+              botThinkingDiv.innerHTML = ''; // Clear thinking GIF
+
+              const botLabelSpan = document.createElement('span');
+              botLabelSpan.classList.add('bot');
+              botLabelSpan.textContent = 'Bot: ';
+              botThinkingDiv.appendChild(botLabelSpan);
+
+              // Consolidate text and collect image parts
+              let combinedTextContent = '';
+              const imageDatas = [];
+              responseParts.forEach(part => {
+                if (part.text) {
+                  combinedTextContent += part.text; // Concatenate all text parts
+                }
+                if (part.inlineData && part.inlineData.mimeType && part.inlineData.data) {
+                  imageDatas.push(part.inlineData);
+                }
+              });
+
+              const appendImages = () => {
+                imageDatas.forEach(imageData => {
+                  const img = document.createElement('img');
+                  img.src = `data:${imageData.mimeType};base64,${imageData.data}`;
+                  img.alt = "Generated Image";
+                  img.style.maxWidth = "100%";
+                  img.style.display = "block"; 
+                  img.style.marginTop = "5px"; 
+                  botThinkingDiv.appendChild(img); 
+                });
+                chatPanel.scrollTop = chatPanel.scrollHeight;
+              };
+
+              if (combinedTextContent.trim() !== '') {
+                const botMessageSpan = document.createElement('span'); 
+                botThinkingDiv.appendChild(botMessageSpan);
+
+                const textDisplayParts = combinedTextContent.split(/(\s+)/).filter(p => p);
+                let currentDisplayMessage = '';
+                let stopRequested = false;
+                let typingInterval; 
+
+                function onStopClick() {
+                  stopRequested = true;
+                  clearInterval(typingInterval); 
+                  
+                  // chatHistory.pop(); // Model's partial turn is already in history, decide if it should be kept or removed.
+                                   // For simplicity, we leave it. If retry happens, it gets overwritten by new model response.
+                botThinkingDiv.remove(); 
+
+                  chatInput.disabled = false;
+                  sendButton.textContent = 'Send';
+                  isRetryMode = false; // Ensure not in retry mode
+                  sendButton.removeEventListener('click', onStopClick);
+                  if (typeof gtag === 'function') {
+                    gtag('event', 'STOPPED GENERATING');
+                  }
+                }
+                sendButton.textContent = 'STOP GENERATING';
+                sendButton.disabled = false; // Ensure it's enabled to be clicked
+                sendButton.addEventListener('click', onStopClick);
+                
+                let idx = 0;
+                typingInterval = setInterval(() => {
+                  if (stopRequested || idx >= textDisplayParts.length) {
+                    clearInterval(typingInterval);
+                    if (!stopRequested) {
+                      appendImages(); 
+                      sendButton.textContent = 'Send';
+                      isRetryMode = false;
+                      chatInput.disabled = false;
+                      sendButton.removeEventListener('click', onStopClick);
+                    }
+                    return;
+                  }
+                  currentDisplayMessage += textDisplayParts[idx++];
+                  const html = DOMPurify.sanitize(marked.parse(currentDisplayMessage));
+                  botMessageSpan.innerHTML = html;
+                  chatPanel.scrollTop = chatPanel.scrollHeight;
+                }, TYPING_DELAY_MS);
+
+              } else if (imageDatas.length > 0) {
+                appendImages();
+                sendButton.textContent = 'Send'; 
+                isRetryMode = false;
+                chatInput.disabled = false; 
+                sendButton.disabled = false;
+              } else {
+                const noContentMsg = document.createTextNode('Received a response, but no text or image was found.');
+                botThinkingDiv.appendChild(noContentMsg);
+                // chatHistory.pop(); // Model response was empty, pop it.
+                if(chatHistory[chatHistory.length-1].role === 'model') chatHistory.pop();
+              }
+
+            } else {
+              botThinkingDiv.textContent = 'Bot: Received a response, but no content parts were found.';
+              // chatHistory.pop(); // Model response was empty, pop it.
+              if(chatHistory[chatHistory.length-1].role === 'model') chatHistory.pop();
+            }
+          } catch (error) {
+            botThinkingDiv.textContent = 'Bot: Error - Could not connect to the API.';
+            console.error('Failed to fetch from /api/gemini-proxy:', error);
+            // DO NOT pop chatHistory here, keep user message for retry
+
+            sendButton.textContent = 'Retry';
+            isRetryMode = true;
+            chatInput.disabled = false;
+            sendButton.disabled = false;
+            return; // Exit
+          } finally {
+            // General cleanup, though most button states are handled in try/catch/success
+            // sendButton.disabled = false; // This might override STOP GENERATING or Retry states if not careful
+            chatPanel.scrollTop = chatPanel.scrollHeight; 
+          }
+        }); // Closing parenthesis for grecaptcha.execute().then()
+      }); // Closing parenthesis for grecaptcha.ready()
+    }); // Closing parenthesis for chatForm.addEventListener('submit', ...
   </script>
 <!-- Footer bar-->
  
