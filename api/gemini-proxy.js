@@ -49,7 +49,15 @@ You have access to an image generation function. Only call it when the user expl
     return res.status(500).json({ error: 'Error verifying reCAPTCHA.' });
   }
 
+  // Check if user is asking for an image
+  const lastUserMessage = history[history.length - 1];
+  const userText = lastUserMessage?.parts?.[0]?.text?.toLowerCase() || '';
+  const imageKeywords = ['image', 'picture', 'diagram', 'chart', 'illustration', 'draw', 'create a visual', 'show me', 'generate an image'];
+  const isImageRequest = imageKeywords.some(keyword => userText.includes(keyword));
+
   try {
+    // The gemini-2.0-flash-preview-image-generation model requires ["TEXT", "IMAGE"] modalities
+    // We'll always use both and let the model decide whether to generate images
     const geminiResponse = await fetch(url, {
       method: 'POST',
       headers: {
@@ -62,7 +70,7 @@ You have access to an image generation function. Only call it when the user expl
         contents: history,
         generationConfig: {
           temperature: 0.7,
-          responseModalities: ["TEXT"] // Default to text only
+          responseModalities: ["TEXT", "IMAGE"] // Always use both for this model
         }
       })
     });
@@ -73,48 +81,6 @@ You have access to an image generation function. Only call it when the user expl
       console.error('Error from Gemini API:', data);
       const errorMessage = data?.error?.message || 'Error calling Gemini API';
       return res.status(geminiResponse.status).json({ error: errorMessage, details: data.error });
-    }
-    
-    // Check if user is asking for an image and retry with image generation enabled
-    const lastUserMessage = history[history.length - 1];
-    const userText = lastUserMessage?.parts?.[0]?.text?.toLowerCase() || '';
-    const imageKeywords = ['image', 'picture', 'diagram', 'chart', 'illustration', 'draw', 'create a visual', 'show me', 'generate an image'];
-    const isImageRequest = imageKeywords.some(keyword => userText.includes(keyword));
-    
-    // If no image content was generated but user asked for image, retry with image generation
-    const hasImageInResponse = data.candidates?.[0]?.content?.parts?.some(part => part.inlineData);
-    
-    // NOTE: Using gemini-2.0-flash-preview-image-generation for both text and image. Default to text-only responses unless user asks for image.
-    // If user asks for image, retry with responseModalities: ["TEXT", "IMAGE"]
-    
-    if (isImageRequest && !hasImageInResponse) {
-      try {
-        const imageResponse = await fetch(url, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            // systemInstruction: {
-            //   parts: [{ text: systemPrompt }]
-            // },
-            contents: history,
-            generationConfig: {
-              temperature: 0.7,
-              responseModalities: ["TEXT", "IMAGE"] // Enable image generation
-            }
-          })
-        });
-        
-        const imageData = await imageResponse.json();
-        if (imageResponse.ok && imageData.candidates?.[0]?.content?.parts) {
-          // Use the response with images
-          return res.status(200).json(imageData);
-        }
-      } catch (imageError) {
-        console.error('Error generating image:', imageError);
-        // Fall back to text-only response
-      }
     }
     
     // Ensure the response has candidates and parts before sending back
