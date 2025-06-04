@@ -226,8 +226,8 @@
       }
 
       // Add reCAPTCHA verification
-      grecaptcha.ready(function() {
-        grecaptcha.execute(RECAPTCHA_SITE_KEY, {action: 'submit'}).then(async function(token) {
+      grecaptcha.enterprise.ready(function() { // Changed to enterprise.ready
+        grecaptcha.enterprise.execute(RECAPTCHA_SITE_KEY, {action: 'submit'}).then(async function(token) { // Changed to enterprise.execute
           // Add token to your backend request
           // The existing code for processing the message will be nested here
 
