@@ -272,7 +272,10 @@
               headers: {
                 'Content-Type': 'application/json',
               },
-              body: JSON.stringify({ history: chatHistory }), // Send the whole history
+              body: JSON.stringify({ 
+                history: chatHistory,
+                recaptchaToken: token // Include the reCAPTCHA token
+              }),
             });
 
             const data = await response.json();
