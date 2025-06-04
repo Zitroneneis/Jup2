@@ -5,8 +5,9 @@ export default async function handler(req, res) {
     return res.status(405).end(`Method ${req.method} Not Allowed`);
   }
 
-  const { history } = req.body; // Changed from prompt to history
+  const { history, recaptchaToken } = req.body; // Add recaptchaToken
   const apiKey = process.env.GEMINI_API_KEY;
+  const recaptchaSecretKey = process.env.RECAPTCHA_SECRET_KEY; // Add secret key
   const model = 'gemini-2.0-flash-preview-image-generation'; // Use unified text/image model 
 
   // Define your system prompt here
@@ -30,6 +31,23 @@ You have access to an image generation function. Only call it when the user expl
   }
 
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+
+  // Verify reCAPTCHA token
+  if (!recaptchaToken) {
+    return res.status(400).json({ error: 'reCAPTCHA token is missing.' });
+  }
+  try {
+    const recaptchaVerifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${recaptchaSecretKey}&response=${recaptchaToken}`;
+    const recaptchaRes = await fetch(recaptchaVerifyUrl, { method: 'POST' });
+    const recaptchaData = await recaptchaRes.json();
+    if (!recaptchaData.success || recaptchaData.score < 0.5) { // Check for success and score
+      console.error('reCAPTCHA verification failed:', recaptchaData);
+      return res.status(403).json({ error: 'reCAPTCHA verification failed.' });
+    }
+  } catch (error) {
+    console.error('Error verifying reCAPTCHA:', error);
+    return res.status(500).json({ error: 'Error verifying reCAPTCHA.' });
+  }
 
   try {
     const geminiResponse = await fetch(url, {
