@@ -127,6 +127,77 @@
       height: 40px;
     }
 
+    /* Lightbox styles */
+    .lightbox {
+      display: none;
+      position: fixed;
+      z-index: 9999;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.9);
+      cursor: pointer;
+    }
+
+    .lightbox-content {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      max-width: 95%;
+      max-height: 95%;
+      object-fit: contain;
+    }
+
+    .lightbox-close {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      color: white;
+      font-size: 40px;
+      font-weight: bold;
+      cursor: pointer;
+      z-index: 10000;
+    }
+
+    .lightbox-close:hover {
+      opacity: 0.7;
+    }
+
+    .lightbox-download {
+      position: absolute;
+      top: 20px;
+      right: 80px;
+      color: white;
+      background-color: rgba(0, 0, 0, 0.5);
+      border: 2px solid white;
+      padding: 10px 15px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      z-index: 10000;
+      border-radius: 5px;
+      text-decoration: none;
+      transition: background-color 0.3s ease;
+    }
+
+    .lightbox-download:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+      color: white;
+      text-decoration: none;
+    }
+
+    /* Make generated images clickable */
+    .generated-image {
+      cursor: pointer;
+      transition: opacity 0.3s ease;
+    }
+
+    .generated-image:hover {
+      opacity: 0.8;
+    }
+
   </style>
 </head>
 <body>
@@ -156,10 +227,13 @@
         <button type="submit" id="send-button">Send</button>
       </form>
     </div>
+  </div>
 
-
-
-
+  <!-- Lightbox modal -->
+  <div id="lightbox" class="lightbox">
+    <span class="lightbox-close">&times;</span>
+    <a id="lightbox-download" class="lightbox-download" download="generated-image.png">Download</a>
+    <img class="lightbox-content" id="lightbox-img">
   </div>
 
   <script>
@@ -177,6 +251,46 @@
     const TYPING_DELAY_MS = 15; // Delay in milliseconds for typing effect
     let lastUserMessageText = ''; // To store the last user message for retry
     let isRetryMode = false; // Flag to indicate if the button is in "Retry" mode
+
+    // Lightbox functionality
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightbox-img');
+    const lightboxClose = document.querySelector('.lightbox-close');
+    const lightboxDownload = document.getElementById('lightbox-download');
+
+    function openLightbox(imageSrc) {
+      lightboxImg.src = imageSrc;
+      lightboxDownload.href = imageSrc;
+      
+      // Generate a better filename based on timestamp
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+      lightboxDownload.download = `generated-image-${timestamp}.png`;
+      
+      lightbox.style.display = 'block';
+      document.body.style.overflow = 'hidden'; // Prevent background scrolling
+    }
+
+    function closeLightbox() {
+      lightbox.style.display = 'none';
+      document.body.style.overflow = 'auto'; // Restore scrolling
+    }
+
+    // Close lightbox when clicking the close button
+    lightboxClose.addEventListener('click', closeLightbox);
+
+    // Close lightbox when clicking outside the image
+    lightbox.addEventListener('click', function(e) {
+      if (e.target === lightbox) {
+        closeLightbox();
+      }
+    });
+
+    // Close lightbox with Escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && lightbox.style.display === 'block') {
+        closeLightbox();
+      }
+    });
 
     let isDragging = false;
     let startX;
@@ -326,9 +440,16 @@
                   const img = document.createElement('img');
                   img.src = `data:${imageData.mimeType};base64,${imageData.data}`;
                   img.alt = "Generated Image";
+                  img.className = "generated-image"; // Add class for styling
                   img.style.maxWidth = "100%";
                   img.style.display = "block"; 
                   img.style.marginTop = "5px"; 
+                  
+                  // Add click event for lightbox
+                  img.addEventListener('click', function() {
+                    openLightbox(img.src);
+                  });
+                  
                   botThinkingDiv.appendChild(img); 
                 });
                 chatPanel.scrollTop = chatPanel.scrollHeight;
