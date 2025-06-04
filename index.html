@@ -165,6 +165,29 @@
       opacity: 0.7;
     }
 
+    .lightbox-download {
+      position: absolute;
+      top: 20px;
+      right: 80px;
+      color: white;
+      background-color: rgba(0, 0, 0, 0.5);
+      border: 2px solid white;
+      padding: 10px 15px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      z-index: 10000;
+      border-radius: 5px;
+      text-decoration: none;
+      transition: background-color 0.3s ease;
+    }
+
+    .lightbox-download:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+      color: white;
+      text-decoration: none;
+    }
+
     /* Make generated images clickable */
     .generated-image {
       cursor: pointer;
@@ -209,6 +232,7 @@
   <!-- Lightbox modal -->
   <div id="lightbox" class="lightbox">
     <span class="lightbox-close">&times;</span>
+    <a id="lightbox-download" class="lightbox-download" download="generated-image.png">Download</a>
     <img class="lightbox-content" id="lightbox-img">
   </div>
 
@@ -232,9 +256,16 @@
     const lightbox = document.getElementById('lightbox');
     const lightboxImg = document.getElementById('lightbox-img');
     const lightboxClose = document.querySelector('.lightbox-close');
+    const lightboxDownload = document.getElementById('lightbox-download');
 
     function openLightbox(imageSrc) {
       lightboxImg.src = imageSrc;
+      lightboxDownload.href = imageSrc;
+      
+      // Generate a better filename based on timestamp
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+      lightboxDownload.download = `generated-image-${timestamp}.png`;
+      
       lightbox.style.display = 'block';
       document.body.style.overflow = 'hidden'; // Prevent background scrolling
     }
