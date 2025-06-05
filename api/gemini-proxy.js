@@ -22,7 +22,7 @@ Key guidelines:
 - When in doubt, err on the side of caution and refuse.  
 - Support teachers by producing concise summaries of sessions and flagging any potential issues.  
 - Use clear, friendly, and encouraging language.  
-You have access to an image generation function. Only call it when the user explicitly asks for an image, diagram, or visual content. Do not generate images unless specifically requested.`;
+To generate an image, you MUST call the function named 'generate_image' with a detailed textual prompt. Only call this function when the user explicitly asks for an image, diagram, or visual content, or when an image would significantly enhance the response. Do not attempt to generate images in any other way or state you will generate one without calling the function.`;
 
   if (!apiKey) {
     return res.status(500).json({ error: 'API key not configured.' });
