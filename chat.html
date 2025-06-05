@@ -403,8 +403,8 @@
                 letterAnimationTimeouts = [];
 
                 const minTotalDurationMs = 250;
-                const maxTotalDurationMs = 2500;
-                const idealPerLetterDelayMs = 30; // Adjust for desired typing speed feel
+                const maxTotalDurationMs = 5000; 
+                const idealPerLetterDelayMs = 50; // Changed from 30 to 50
 
                 let actualTotalDurationMs = letterSpans.length * idealPerLetterDelayMs;
                 actualTotalDurationMs = Math.max(minTotalDurationMs, Math.min(maxTotalDurationMs, actualTotalDurationMs));
