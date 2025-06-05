@@ -273,10 +273,39 @@
       border-color: #4CAF50;
     }
 
+    /* Model Selector Styles */
+    .model-selector-container {
+      padding: 0 20px 10px 20px; /* Match chat panel padding */
+      display: flex;
+      align-items: center;
+      background-color: #f9f9f9; /* Match chat form background */
+      border-bottom: 1px solid #e0e0e0; /* Separator line */
+    }
+    .model-selector-container label {
+      margin-right: 10px;
+      font-size: 0.9em;
+      color: #333;
+    }
+    #model-selector {
+      padding: 8px 10px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      font-size: 0.9em;
+      flex-grow: 1;
+    }
+
   </style>
 </head>
 <body>
   <div class="chat-container">
+    <div class="model-selector-container">
+      <label for="model-selector">Model:</label>
+      <select id="model-selector">
+        <option value="gemini-2.0-flash-lite">gemini-2.0-flash-lite (Default)</option>
+        <option value="gemini-2.5-pro-preview-06-05">gemini-2.5-pro-preview-06-05</option>
+        <option value="gemini-2.0-flash-preview-image-generation">gemini-2.0-flash-preview-image-generation</option>
+      </select>
+    </div>
     <div id="chat-panel"></div>
     <form id="chat-form">
       <input type="text" id="chat-input" placeholder="Type your message..." required />
@@ -295,6 +324,7 @@
     const chatInput = document.getElementById('chat-input');
     const sendButton = document.getElementById('send-button');
     const RECAPTCHA_SITE_KEY = '6LcQhFMrAAAAAMjWClxXSNDpZrFZj3rUrz5UHhWA';
+    const modelSelector = document.getElementById('model-selector'); // Get model selector
 
     // Lightbox elements
     const lightboxOverlay = document.getElementById('lightboxOverlay');
@@ -545,10 +575,16 @@
           }
 
           try {
+            const selectedModel = modelSelector.value; // Get selected model
+
             const response = await fetch('/api/gemini-proxy', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ history: chatHistory, recaptchaToken: token }),
+              body: JSON.stringify({ 
+                history: chatHistory, 
+                recaptchaToken: token,
+                model: selectedModel // Send selected model to backend
+              }),
               signal: fetchAbortController.signal
             });
 
@@ -690,7 +726,7 @@
             }
           } catch (error) {
             if (fetchAbortController) fetchAbortController = null; // Ensure cleared if error happened before it was nullified post-await
-            
+                        
             if (error.name === 'AbortError') {
               console.log('Fetch aborted by user action.');
               // UI reset is handled by handleStopAction, which should have been triggered by the button.
