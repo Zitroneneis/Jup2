@@ -201,8 +201,8 @@
 
     .temp-raw-chunk-animated {
       display: inline;
-      opacity: 0;
-      animation: fadeInRawChunk 0.2s ease-out forwards;
+      opacity: 0; /* Start fully transparent, animation will fade it in */
+      animation: wipeAndFadeInFromLeft 0.4s ease-out forwards;
     }
 
     @keyframes fadeInRawChunk {
@@ -213,6 +213,17 @@
       100% {
         opacity: 1;
         transform: translateY(0);
+      }
+    }
+
+    @keyframes wipeAndFadeInFromLeft {
+      0% {
+        clip-path: inset(0 100% 0 0); /* Fully clipped from the right */
+        opacity: 0;
+      }
+      100% {
+        clip-path: inset(0 0 0 0); /* Fully visible */
+        opacity: 1;
       }
     }
   </style>
@@ -372,7 +383,6 @@
                 botMessageSpan.classList.add('bot-typing-content');
                 botContentDiv.appendChild(botMessageSpan);
 
-                let currentDisplayMessage = '';
                 let stopRequested = false;
                 let typingTimeout;
 
@@ -395,20 +405,25 @@
                 sendButton.addEventListener('click', onStopClick);
                 
                 let charIndex = 0;
+                // let currentDisplayMessage = ''; // No longer needed here for intermediate formatting
+
                 function typeNextChunk() {
                   if (stopRequested || charIndex >= combinedTextContent.length) {
                     if (!stopRequested) {
-                      const finalHtml = formatBotMessage(currentDisplayMessage);
-                      botMessageSpan.innerHTML = finalHtml;
+                      // Final render with full markdown parsing and syntax highlighting
+                      // Use combinedTextContent which holds the complete message from the API
+                      const finalHtml = formatBotMessage(combinedTextContent);
+                      botMessageSpan.innerHTML = finalHtml; // Replace all tempChunkSpans with final formatted content
                       applySyntaxHighlighting(botMessageSpan);
-                      appendImages();
+                      
+                      appendImages(); 
                       sendButton.textContent = 'Send';
                       sendButton.classList.remove('stop-generating');
                       isRetryMode = false;
                       chatInput.disabled = false;
                       sendButton.disabled = false;
                       sendButton.removeEventListener('click', onStopClick);
-                      setTimeout(() => chatPanel.scrollTop = chatPanel.scrollHeight, 10);
+                      setTimeout(() => chatPanel.scrollTop = chatPanel.scrollHeight, 10); // Final scroll
                     }
                     return;
                   }
@@ -418,24 +433,18 @@
                   for (let i = 0; i < chunkSize && charIndex < combinedTextContent.length; i++) {
                     newChunk += combinedTextContent[charIndex++];
                   }
-                  currentDisplayMessage += newChunk;
+                  // currentDisplayMessage += newChunk; // Not needed for intermediate formatting
 
                   const tempChunkSpan = document.createElement('span');
                   tempChunkSpan.textContent = newChunk;
                   tempChunkSpan.classList.add('temp-raw-chunk-animated');
-                  botMessageSpan.appendChild(tempChunkSpan);
+                  botMessageSpan.appendChild(tempChunkSpan); // Append the animated chunk directly
 
-                  setTimeout(() => {
-                    if (stopRequested) return;
-                    const scrollPosition = chatPanel.scrollTop;
-                    const wasAtBottom = scrollPosition >= chatPanel.scrollHeight - chatPanel.clientHeight - 20; // Adjusted threshold
-                    const formattedHtml = formatBotMessage(currentDisplayMessage);
-                    botMessageSpan.innerHTML = formattedHtml;
-                    const shouldHighlight = newChunk.includes('```') || newChunk.includes('`') || charIndex >= combinedTextContent.length;
-                    if (shouldHighlight) applySyntaxHighlighting(botMessageSpan);
-                    if (wasAtBottom) chatPanel.scrollTop = chatPanel.scrollHeight;
-                    else chatPanel.scrollTop = scrollPosition;
-                  }, 50);
+                  // Scroll to keep the latest content visible
+                  chatPanel.scrollTop = chatPanel.scrollHeight;
+
+                  // The setTimeout that previously re-rendered the whole message is removed.
+                  // Markdown formatting and syntax highlighting now only happen at the end.
 
                   const randomDelay = Math.floor(Math.random() * (MAX_TYPING_DELAY_MS - MIN_TYPING_DELAY_MS + 1)) + MIN_TYPING_DELAY_MS;
                   typingTimeout = setTimeout(typeNextChunk, randomDelay);
