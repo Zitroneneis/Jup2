@@ -473,6 +473,11 @@
                 function typeNextChunk() {
                   if (stopRequested || charIndex >= combinedTextContent.length) {
                     if (!stopRequested) {
+                      // Final render with full markdown parsing and syntax highlighting
+                      const finalHtml = formatBotMessage(currentDisplayMessage);
+                      botMessageSpan.innerHTML = finalHtml;
+                      applySyntaxHighlighting(botMessageSpan);
+                      
                       appendImages(); 
                       sendButton.textContent = 'Send';
                       isRetryMode = false;
@@ -489,24 +494,23 @@
                   // Random chunk size between MIN_CHUNK_SIZE and MAX_CHUNK_SIZE
                   const chunkSize = Math.floor(Math.random() * (MAX_CHUNK_SIZE - MIN_CHUNK_SIZE + 1)) + MIN_CHUNK_SIZE;
                   
-                  // Add the chunk of characters
+                  // Add the chunk of characters to current message
                   for (let i = 0; i < chunkSize && charIndex < combinedTextContent.length; i++) {
                     currentDisplayMessage += combinedTextContent[charIndex++];
                   }
                   
-                  // Temporarily remove animation class, update content, then add it back for smooth transition
-                  botMessageSpan.classList.remove('fade-in', 'bot-typing-chunk');
+                  // Create a span for just this new chunk with fade-in animation
+                  const chunkSpan = document.createElement('span');
+                  chunkSpan.textContent = combinedTextContent.substring(currentDisplayMessage.length - chunkSize, currentDisplayMessage.length);
+                  chunkSpan.classList.add('bot-typing-chunk');
+                  chunkSpan.style.opacity = '0';
                   
-                  // Configure DOMPurify to allow links and images in Markdown
-                  const html = formatBotMessage(currentDisplayMessage);
-                  botMessageSpan.innerHTML = html;
+                  // Append the new chunk to the message container
+                  botMessageSpan.appendChild(chunkSpan);
                   
-                  // Apply syntax highlighting to code blocks
-                  applySyntaxHighlighting(botMessageSpan);
-                  
-                  // Trigger smooth fade-in animation
+                  // Trigger the fade-in animation for just this chunk
                   requestAnimationFrame(() => {
-                    botMessageSpan.classList.add('fade-in', 'bot-typing-chunk');
+                    chunkSpan.style.opacity = '1';
                   });
                   
                   // Smooth auto-scroll to bottom as content is being typed
