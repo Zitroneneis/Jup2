@@ -178,7 +178,7 @@ To generate an image, you MUST call the function named 'generate_image' with a d
         // The `gemini-2.0-flash-preview-image-generation` model might be able to take a direct text prompt for an image.
         // Or, you might use a dedicated image generation API.
         
-        const imageModelName = 'imagen-3.0-generate-002'; // Changed to imagen-3.0-generate-002
+        const imageModelName = 'gemini-2.0-flash-preview-image-generation'; // Changed model
         const imageUrl = `https://generativelanguage.googleapis.com/v1beta/models/${imageModelName}:generateContent?key=${apiKey}`;
         
         // Construct a simple prompt for the image model
@@ -192,7 +192,7 @@ To generate an image, you MUST call the function named 'generate_image' with a d
             contents: imageGenHistory,
             generationConfig: {
               // Config specific to image generation if needed
-              // responseMimeType: "image/png" // REMOVED - Let model decide or use default for generateContent
+              responseMimeType: "multipart/form-data" // Changed for gemini image model
             }
           })
         });
