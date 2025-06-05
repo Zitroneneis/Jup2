@@ -192,8 +192,7 @@ To generate an image, you MUST call the function named 'generate_image' with a d
             contents: imageGenHistory,
             generationConfig: {
                 // temperature: 0.4, // Optional: you can set other relevant configs
-                responseMimeType: "multipart/form-data", // Explicitly state we can handle multipart
-                responseModalities: ["IMAGE", "TEXT"] // Specify expected modalities
+                responseModalities: ["IMAGE", "TEXT"] // Keep specifying expected modalities
             }
           })
         });
