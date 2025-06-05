@@ -165,24 +165,41 @@
 
     /* Smooth typing effect animations */
     .bot-typing-content {
-      opacity: 0;
-      transition: opacity 2s ease-out; /* Ultra-smooth, long fade-in */
+      opacity: 0; /* Start hidden for initial fade-in */
     }
 
     .bot-typing-content.fade-in {
       opacity: 1;
+      transition: opacity 0.5s ease-out; /* Quicker initial fade for the container */
     }
 
-    /* Removed complex chunk animations for ultra-smooth effect */
+    /* For animating individual raw chunks temporarily before full markdown render */
+    .temp-raw-chunk-animated {
+      display: inline; /* Crucial for text flow */
+      opacity: 0;
+      animation: fadeInRawChunk 0.4s ease-out forwards;
+    }
+
+    @keyframes fadeInRawChunk {
+      0% {
+        opacity: 0;
+      }
+      100% {
+        opacity: 1;
+      }
+    }
+
+    /* Remove or comment out .bot-typing-chunk and @keyframes gentleFadeIn if not used by this strategy */
+    /*
     .bot-typing-chunk {
       opacity: 0;
-      animation: gentleFadeIn 2.5s ease-out forwards; /* Very gentle fade */
+      animation: gentleFadeIn 2.5s ease-out forwards; 
     }
 
     @keyframes gentleFadeIn {
       0% {
         opacity: 0;
-        transform: translateY(2px); /* Minimal movement */
+        transform: translateY(2px); 
       }
       30% {
         opacity: 0.1;
@@ -197,13 +214,15 @@
         transform: translateY(0);
       }
     }
+    */
 
-    /* Subtle glow that builds gradually */
+    /* Subtle glow that builds gradually - this rule was incomplete, removing text-shadow transition for now */
+    /*
     .bot-typing-content.fade-in {
       transition: opacity 2s ease-out, 
                   text-shadow 3s ease-out;
     }
-
+    */
   </style>
 </head>
 <body>
@@ -342,7 +361,7 @@
           } else {
             userMessageToProcess = chatInput.value.trim();
             if (!userMessageToProcess) return;
-            lastUserMessageText = userMessageToProcess; // Store for potential retry
+            lastUserMessageToProcess = userMessageToProcess; // Store for potential retry
 
             // Display user message
             const userDiv = document.createElement('div');
@@ -455,14 +474,19 @@
               };
 
               if (combinedTextContent.trim() !== '') {
-                const botMessageSpan = document.createElement('span'); 
-                botMessageSpan.classList.add('bot-typing-content', 'fade-in'); // Add fade-in class immediately
+                const botMessageSpan = document.createElement('span');
+                botMessageSpan.classList.add('bot-typing-content'); // Initially hidden, will be faded in
                 botThinkingDiv.appendChild(botMessageSpan);
 
                 // Random typing with variable delays and chunk sizes
                 let currentDisplayMessage = '';
                 let stopRequested = false;
-                let typingTimeout; 
+                let typingTimeout;
+
+                // Trigger the initial fade-in for the container
+                requestAnimationFrame(() => {
+                  botMessageSpan.classList.add('fade-in');
+                });
 
                 function onStopClick() {
                   stopRequested = true;
@@ -518,31 +542,45 @@
                   
                   // Add the chunk to current message
                   currentDisplayMessage += newChunk;
+
+                  // --- Strategy: Animate raw chunk, then re-render with markdown ---
                   
-                  // Always render with markdown formatting to prevent layout shifts
-                  // Store scroll position to prevent jumping
-                  const scrollPosition = chatPanel.scrollTop;
-                  const wasAtBottom = scrollPosition >= chatPanel.scrollHeight - chatPanel.clientHeight - 5;
-                  
-                  // Apply progressive markdown formatting consistently
-                  const formattedHtml = formatBotMessage(currentDisplayMessage);
-                  botMessageSpan.innerHTML = formattedHtml;
-                  
-                  // Only apply syntax highlighting occasionally to improve performance
-                  const shouldHighlight = newChunk.includes('```') || newChunk.includes('`') || 
-                                         charIndex >= combinedTextContent.length;
-                  if (shouldHighlight) {
-                    applySyntaxHighlighting(botMessageSpan);
-                  }
-                  
-                  // Restore scroll position if user wasn't at bottom, otherwise scroll to bottom
-                  if (wasAtBottom) {
-                    chatPanel.scrollTop = chatPanel.scrollHeight;
-                  } else {
-                    chatPanel.scrollTop = scrollPosition;
-                  }
-                  
-                  // Random delay between MIN_TYPING_DELAY_MS and MAX_TYPING_DELAY_MS
+                  // 1. Create a temporary span for the raw new chunk and animate it
+                  const tempChunkSpan = document.createElement('span');
+                  tempChunkSpan.textContent = newChunk;
+                  tempChunkSpan.classList.add('temp-raw-chunk-animated');
+                  botMessageSpan.appendChild(tempChunkSpan); // Append to the main span
+
+                  // 2. After a very short delay (enough for animation to start, but before it's too noticeable),
+                  //    re-render the whole message with markdown. This will replace the temp span.
+                  setTimeout(() => {
+                    if (stopRequested) return; // Don't render if stopped
+
+                    const scrollPosition = chatPanel.scrollTop;
+                    const wasAtBottom = scrollPosition >= chatPanel.scrollHeight - chatPanel.clientHeight - 15; // Increased threshold slightly
+
+                    const formattedHtml = formatBotMessage(currentDisplayMessage);
+                    botMessageSpan.innerHTML = formattedHtml; // This replaces the tempChunkSpan
+
+                    const shouldHighlight = newChunk.includes('```') || newChunk.includes('`') ||
+                                           charIndex >= combinedTextContent.length;
+                    if (shouldHighlight) {
+                      applySyntaxHighlighting(botMessageSpan);
+                    }
+
+                    if (wasAtBottom) {
+                      chatPanel.scrollTop = chatPanel.scrollHeight;
+                    } else {
+                      // Maintain scroll position more reliably
+                      const newScrollHeight = chatPanel.scrollHeight;
+                      const newClientHeight = chatPanel.clientHeight;
+                      if (newScrollHeight > newClientHeight) { // Only adjust if there's actually a scrollbar
+                        chatPanel.scrollTop = scrollPosition;
+                      }
+                    }
+                  }, 50); // Short delay - adjust if needed, e.g., 50-100ms
+
+                  // Random delay for the next chunk
                   const randomDelay = Math.floor(Math.random() * (MAX_TYPING_DELAY_MS - MIN_TYPING_DELAY_MS + 1)) + MIN_TYPING_DELAY_MS;
                   
                   typingTimeout = setTimeout(typeNextChunk, randomDelay);
