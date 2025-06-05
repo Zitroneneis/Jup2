@@ -192,7 +192,7 @@ To generate an image, you MUST call the function named 'generate_image' with a d
             contents: imageGenHistory,
             generationConfig: {
               // Config specific to image generation if needed
-              responseMimeType: "image/png" // Requesting PNG
+              // responseMimeType: "image/png" // REMOVED - Let model decide or use default for generateContent
             }
           })
         });
@@ -232,8 +232,15 @@ To generate an image, you MUST call the function named 'generate_image' with a d
 
         // Send the function response back to the original chat model
         const followupRequestBody = {
-            ...requestBody, // Retain original request body context
-            contents: [...history, data.candidates[0].content, toolResponsePart ], // Add model's turn and our tool response
+            ...requestBody, 
+            contents: [
+                ...history, 
+                data.candidates[0].content, // Model's turn with the functionCall
+                { // New "tool" turn, wrapping the toolResponsePart
+                    role: "tool", 
+                    parts: [toolResponsePart] 
+                }
+            ], 
         };
 
         geminiResponse = await fetch(url, {
