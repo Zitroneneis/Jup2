@@ -494,14 +494,18 @@
                   // Random chunk size between MIN_CHUNK_SIZE and MAX_CHUNK_SIZE
                   const chunkSize = Math.floor(Math.random() * (MAX_CHUNK_SIZE - MIN_CHUNK_SIZE + 1)) + MIN_CHUNK_SIZE;
                   
-                  // Add the chunk of characters to current message
+                  // Extract the new chunk of characters
+                  let newChunk = '';
                   for (let i = 0; i < chunkSize && charIndex < combinedTextContent.length; i++) {
-                    currentDisplayMessage += combinedTextContent[charIndex++];
+                    newChunk += combinedTextContent[charIndex++];
                   }
+                  
+                  // Add the chunk to current message
+                  currentDisplayMessage += newChunk;
                   
                   // Create a span for just this new chunk with fade-in animation
                   const chunkSpan = document.createElement('span');
-                  chunkSpan.textContent = combinedTextContent.substring(currentDisplayMessage.length - chunkSize, currentDisplayMessage.length);
+                  chunkSpan.textContent = newChunk;
                   chunkSpan.classList.add('bot-typing-chunk');
                   chunkSpan.style.opacity = '0';
                   
