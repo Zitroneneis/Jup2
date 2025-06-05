@@ -174,7 +174,10 @@
     const separator = document.querySelector('.separator');
 
     let chatHistory = []; // Initialize chat history array
-    const TYPING_DELAY_MS = 10; // Delay in milliseconds for typing effect (slower for letter-by-letter)
+    const MIN_TYPING_DELAY_MS = 2; // Minimum delay between character chunks
+    const MAX_TYPING_DELAY_MS = 20; // Maximum delay between character chunks
+    const MIN_CHUNK_SIZE = 1; // Minimum characters per chunk
+    const MAX_CHUNK_SIZE = 10; // Maximum characters per chunk
     let lastUserMessageText = ''; // To store the last user message for retry
     let isRetryMode = false; // Flag to indicate if the button is in "Retry" mode
 
@@ -338,14 +341,14 @@
                 const botMessageSpan = document.createElement('span'); 
                 botThinkingDiv.appendChild(botMessageSpan);
 
-                // Change from word-by-word to letter-by-letter typing
+                // Random typing with variable delays and chunk sizes
                 let currentDisplayMessage = '';
                 let stopRequested = false;
-                let typingInterval; 
+                let typingTimeout; 
 
                 function onStopClick() {
                   stopRequested = true;
-                  clearInterval(typingInterval); 
+                  clearTimeout(typingTimeout); 
                   
                   // chatHistory.pop(); // Model's partial turn is already in history, decide if it should be kept or removed.
                                    // For simplicity, we leave it. If retry happens, it gets overwritten by new model response.
@@ -364,9 +367,9 @@
                 sendButton.addEventListener('click', onStopClick);
                 
                 let charIndex = 0;
-                typingInterval = setInterval(() => {
+                
+                function typeNextChunk() {
                   if (stopRequested || charIndex >= combinedTextContent.length) {
-                    clearInterval(typingInterval);
                     if (!stopRequested) {
                       appendImages(); 
                       sendButton.textContent = 'Send';
@@ -376,11 +379,27 @@
                     }
                     return;
                   }
-                  currentDisplayMessage += combinedTextContent[charIndex++];
+                  
+                  // Random chunk size between MIN_CHUNK_SIZE and MAX_CHUNK_SIZE
+                  const chunkSize = Math.floor(Math.random() * (MAX_CHUNK_SIZE - MIN_CHUNK_SIZE + 1)) + MIN_CHUNK_SIZE;
+                  
+                  // Add the chunk of characters
+                  for (let i = 0; i < chunkSize && charIndex < combinedTextContent.length; i++) {
+                    currentDisplayMessage += combinedTextContent[charIndex++];
+                  }
+                  
                   const html = DOMPurify.sanitize(marked.parse(currentDisplayMessage));
                   botMessageSpan.innerHTML = html;
                   chatPanel.scrollTop = chatPanel.scrollHeight;
-                }, TYPING_DELAY_MS);
+                  
+                  // Random delay between MIN_TYPING_DELAY_MS and MAX_TYPING_DELAY_MS
+                  const randomDelay = Math.floor(Math.random() * (MAX_TYPING_DELAY_MS - MIN_TYPING_DELAY_MS + 1)) + MIN_TYPING_DELAY_MS;
+                  
+                  typingTimeout = setTimeout(typeNextChunk, randomDelay);
+                }
+                
+                // Start the typing effect
+                typeNextChunk();
 
               } else if (imageDatas.length > 0) {
                 appendImages();
