@@ -367,13 +367,13 @@
       grecaptcha.enterprise.ready(function() {
         grecaptcha.enterprise.execute(RECAPTCHA_SITE_KEY, {action: 'submit'})
           .then(async function(token) {
-            // Function definition MOVED HERE to the top of the .then() scope
+            // Helper functions are defined at the top of this .then() scope
             function wrapTextNodesWithLetterSpans(element) {
               const letters = [];
               Array.from(element.childNodes).forEach(child => {
                 if (child.nodeType === Node.TEXT_NODE) {
                   const text = child.textContent;
-                  if (text.trim() === '') return; // Skip empty or whitespace-only text nodes
+                  if (text.trim() === '') return;
                   const fragment = document.createDocumentFragment();
                   for (let i = 0; i < text.length; i++) {
                     const span = document.createElement('span');
@@ -388,6 +388,33 @@
                 }
               });
               return letters;
+            }
+
+            function addCopyButtonToBotMessage(targetContainer, rawTextToCopy) {
+              if (!rawTextToCopy || rawTextToCopy.trim() === '' || !targetContainer) return;
+              if (targetContainer.querySelector('.copy-button')) return;
+              const button = document.createElement('button');
+              button.innerHTML = '&#x1F4CB; Copy Text';
+              button.className = 'copy-button';
+              button.title = 'Copy message text to clipboard';
+              button.addEventListener('click', (event) => {
+                event.stopPropagation();
+                navigator.clipboard.writeText(rawTextToCopy).then(() => {
+                  button.textContent = 'Copied!';
+                  button.classList.add('copied');
+                  setTimeout(() => {
+                    button.innerHTML = '&#x1F4CB; Copy Text';
+                    button.classList.remove('copied');
+                  }, 2000);
+                }).catch(err => {
+                  console.error('Failed to copy text: ', err);
+                  button.textContent = 'Error copying';
+                  setTimeout(() => {
+                    button.innerHTML = '&#x1F4CB; Copy Text';
+                  }, 2000);
+                });
+              });
+              targetContainer.appendChild(button);
             }
 
             let userMessageToProcess;
@@ -421,8 +448,6 @@
           botMessageSpanForAnimation = null; 
           imageDatasForAnimation = []; 
 
-          // Define appendImages here so it's in scope for handleStopAction and normal flow
-          // It closes over botContentDiv and imageDatasForAnimation
           const appendImages = () => {
             if (!botContentDiv) return;
             imageDatasForAnimation.forEach(imageData => {
@@ -456,30 +481,25 @@
               fetchAbortController.abort(); 
             }
 
-            // If text content was processed and available, display it fully.
             if (combinedTextContentForAnimation && combinedTextContentForAnimation.trim() !== '' && botContentDiv) {
-                if (botMessageSpanForAnimation) { // If animation span exists, just make letters visible
+                if (botMessageSpanForAnimation) {
                     const allLetters = botMessageSpanForAnimation.querySelectorAll('.anim-letter');
                     allLetters.forEach(s => s.style.opacity = '1');
-                    // appendImages() and addCopyButtonToBotMessage() will be called after this block
-                } else { // Animation span doesn't exist, but we have text. Create and show.
-                    botContentDiv.innerHTML = ''; // Clear thinking GIF or any partial content
+                } else { 
+                    botContentDiv.innerHTML = ''; 
                     const tempSpan = document.createElement('span');
-                    tempSpan.classList.add('bot-typing-content', 'fade-in'); // Apply base styles
+                    tempSpan.classList.add('bot-typing-content', 'fade-in'); 
                     botContentDiv.appendChild(tempSpan);
                     tempSpan.innerHTML = formatBotMessage(combinedTextContentForAnimation);
                     applySyntaxHighlighting(tempSpan);
-                    // botMessageSpanForAnimation is not strictly needed to be set here as animation is stopped
                 }
-                appendImages(); // Uses imageDatasForAnimation, defined in the outer scope
-                addCopyButtonToBotMessage(botContentDiv, combinedTextContentForAnimation);
+                appendImages(); 
+                addCopyButtonToBotMessage(botContentDiv, combinedTextContentForAnimation); // Call is here
             } else if (imageDatasForAnimation && imageDatasForAnimation.length > 0 && botContentDiv) {
-                // Only images, no text, but API call might have finished
-                botContentDiv.innerHTML = ''; // Clear thinking GIF
+                botContentDiv.innerHTML = ''; 
                 appendImages();
             } else if (botContentDiv) {
-                // API call was likely aborted before content processing, or no content at all
-                botContentDiv.innerHTML = ''; // Clear thinking GIF
+                botContentDiv.innerHTML = ''; 
             }
 
             chatInput.disabled = false;
@@ -500,6 +520,29 @@
           sendButton.classList.add('stop-generating');
           sendButton.disabled = false; 
           sendButton.addEventListener('click', currentStopButtonHandler);
+
+          // Define wrapTextNodesWithLetterSpans at a higher scope
+          function wrapTextNodesWithLetterSpans(element) {
+            const letters = [];
+            Array.from(element.childNodes).forEach(child => {
+              if (child.nodeType === Node.TEXT_NODE) {
+                const text = child.textContent;
+                if (text.trim() === '') return; // Skip empty or whitespace-only text nodes
+                const fragment = document.createDocumentFragment();
+                for (let i = 0; i < text.length; i++) {
+                  const span = document.createElement('span');
+                  span.className = 'anim-letter';
+                  span.textContent = text[i];
+                  fragment.appendChild(span);
+                  letters.push(span);
+                }
+                child.parentNode.replaceChild(fragment, child);
+              } else if (child.nodeType === Node.ELEMENT_NODE) {
+                letters.push(...wrapTextNodesWithLetterSpans(child));
+              }
+            });
+            return letters;
+          }
 
           try {
             const response = await fetch('/api/gemini-proxy', {
@@ -685,6 +728,12 @@
           sendButton.textContent = 'Send';
           sendButton.classList.remove('stop-generating');
           isRetryMode = false;
+          // Crucially, currentStopButtonHandler should be cleared if it was set, 
+          // as the operation effectively failed before the main logic ran.
+          if (currentStopButtonHandler) {
+              sendButton.removeEventListener('click', currentStopButtonHandler);
+              currentStopButtonHandler = null;
+          }
         });
       });
     });
