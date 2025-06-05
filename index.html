@@ -388,7 +388,13 @@
                     currentDisplayMessage += combinedTextContent[charIndex++];
                   }
                   
-                  const html = DOMPurify.sanitize(marked.parse(currentDisplayMessage));
+                  // Configure DOMPurify to allow links and images in Markdown
+                  const html = DOMPurify.sanitize(marked.parse(currentDisplayMessage), {
+                    ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'code', 'pre', 'blockquote', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'a', 'img', 'table', 'thead', 'tbody', 'tr', 'th', 'td', 'del', 'mark', 'span', 'div'],
+                    ALLOWED_ATTR: ['href', 'title', 'target', 'rel', 'src', 'alt', 'width', 'height', 'class', 'id'],
+                    ALLOW_DATA_ATTR: false,
+                    ADD_ATTR: ['target'],
+                  });
                   botMessageSpan.innerHTML = html;
                   chatPanel.scrollTop = chatPanel.scrollHeight;
                   
