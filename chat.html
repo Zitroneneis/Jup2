@@ -292,7 +292,8 @@
       }
 
       grecaptcha.enterprise.ready(function() {
-        grecaptcha.enterprise.execute(RECAPTCHA_SITE_KEY, {action: 'submit'}).then(async function(token) {
+        grecaptcha.enterprise.execute(RECAPTCHA_SITE_KEY, {action: 'submit'})
+          .then(async function(token) {
           let userMessageToProcess;
 
           if (isRetryMode) {
@@ -326,7 +327,7 @@
 
             if (!response.ok) {
               const errorMessage = data.error?.message || data.error || response.statusText || 'An unknown error occurred';
-              botContentDiv.innerHTML = formatBotMessage(\`Error - \${errorMessage}\`);
+              botContentDiv.innerHTML = formatBotMessage(`Error - ${errorMessage}`);
               applySyntaxHighlighting(botContentDiv);
               console.error('Error from API:', data);
               sendButton.textContent = 'Retry';
@@ -355,7 +356,7 @@
               const appendImages = () => {
                 imageDatas.forEach(imageData => {
                   const img = document.createElement('img');
-                  img.src = \`data:\${imageData.mimeType};base64,\${imageData.data}\`;
+                  img.src = `data:${imageData.mimeType};base64,${imageData.data}`;
                   img.alt = "Generated Image";
                   img.style.maxWidth = "100%";
                   img.style.display = "block";
@@ -380,10 +381,6 @@
                 function onStopClick() {
                   stopRequested = true;
                   clearTimeout(typingTimeout);
-                  // currentBotMessageDiv might have been cleared if error occurred during streaming
-                  // or if message was very short.
-                  // For simplicity, we don't remove the partially streamed message here.
-                  // It will be overwritten or a new message will appear on next send/retry.
                   chatInput.disabled = false;
                   sendButton.textContent = 'Send';
                   sendButton.classList.remove('stop-generating');
@@ -434,7 +431,7 @@
                     const wasAtBottom = scrollPosition >= chatPanel.scrollHeight - chatPanel.clientHeight - 20; // Adjusted threshold
                     const formattedHtml = formatBotMessage(currentDisplayMessage);
                     botMessageSpan.innerHTML = formattedHtml;
-                    const shouldHighlight = newChunk.includes('\`\`\`') || newChunk.includes('\`') || charIndex >= combinedTextContent.length;
+                    const shouldHighlight = newChunk.includes('```') || newChunk.includes('`') || charIndex >= combinedTextContent.length;
                     if (shouldHighlight) applySyntaxHighlighting(botMessageSpan);
                     if (wasAtBottom) chatPanel.scrollTop = chatPanel.scrollHeight;
                     else chatPanel.scrollTop = scrollPosition;
@@ -477,7 +474,7 @@
                  applySyntaxHighlighting(currentBotMessageDiv.querySelector('.message-content'));
             } else {
                 // Fallback if currentBotMessageDiv or its content area isn't available
-                displayMessage('Bot', 'Error - Could not connect to the API.', true);
+                displayMessage('Bot', formatBotMessage('Error - Could not connect to the API.'), true);
             }
             console.error('Failed to fetch from /api/gemini-proxy:', error);
             sendButton.textContent = 'Retry';
@@ -493,6 +490,23 @@
             }
             chatPanel.scrollTop = chatPanel.scrollHeight;
           }
+        })
+        .catch(function(recaptchaError) {
+          console.error('reCAPTCHA execution failed:', recaptchaError);
+          const errorBotMessageDiv = displayMessage('Bot', formatBotMessage('Error: reCAPTCHA verification failed. Please refresh and try again.'), true);
+          if (errorBotMessageDiv) { 
+            const errorBotContentDiv = errorBotMessageDiv.querySelector('.message-content');
+            if (errorBotContentDiv) { 
+                 applySyntaxHighlighting(errorBotContentDiv);
+            }
+          }
+
+          // Reset UI
+          chatInput.disabled = false;
+          sendButton.disabled = false;
+          sendButton.textContent = 'Send';
+          sendButton.classList.remove('stop-generating');
+          isRetryMode = false;
         });
       });
     });
