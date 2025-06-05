@@ -250,12 +250,13 @@ To generate an image, you MUST call the function named 'generate_image' with a d
     
     // Ensure the final response has candidates and parts before sending back
     if (!data.candidates || !data.candidates[0] || !data.candidates[0].content || !data.candidates[0].content.parts) {
-      console.error('Invalid response structure from Gemini API:', data);
+      console.error('Invalid response structure from Gemini API (initial call, no function call):', data);
       return res.status(500).json({ error: 'Invalid response structure from Gemini API' });
     }
 
-    console.log('Final data to client:', JSON.stringify(data, null, 2)); // LOG 3
+    console.log('Final data to client (no function call path):', JSON.stringify(data, null, 2)); 
     res.status(200).json(data);
+
   } catch (error) {
     console.error('Error in proxy function:', error);
     res.status(500).json({ error: 'Internal Server Error' });
