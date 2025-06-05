@@ -189,6 +189,7 @@ To generate an image, you MUST call the function named 'generate_image' with a d
         });
 
         const imageDataResponse = await imageGenResponse.json();
+        console.log('Image generation model response:', JSON.stringify(imageDataResponse, null, 2)); // LOG 1
 
         let toolResponsePart;
         if (imageGenResponse.ok && imageDataResponse.candidates?.[0]?.content?.parts?.[0]?.inlineData) {
@@ -218,6 +219,7 @@ To generate an image, you MUST call the function named 'generate_image' with a d
             }
           };
         }
+        console.log('Constructed toolResponsePart:', JSON.stringify(toolResponsePart, null, 2)); // LOG 2
 
         // Send the function response back to the original chat model
         const followupRequestBody = {
@@ -244,6 +246,7 @@ To generate an image, you MUST call the function named 'generate_image' with a d
       return res.status(500).json({ error: 'Invalid response structure from Gemini API' });
     }
 
+    console.log('Final data to client:', JSON.stringify(data, null, 2)); // LOG 3
     res.status(200).json(data);
   } catch (error) {
     console.error('Error in proxy function:', error);
