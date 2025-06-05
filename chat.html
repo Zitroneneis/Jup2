@@ -189,9 +189,10 @@
     .language-json { border-left: 3px solid #000000; }
 
     .bot-typing-content {
-      opacity: 0;
-      display: inline-block;
-      vertical-align: top;
+      opacity: 0; 
+      display: block; 
+      /* vertical-align: top; Removed as it's not applicable for display:block */
+      white-space: pre-wrap; 
     }
 
     .bot-typing-content.fade-in {
@@ -200,30 +201,23 @@
     }
 
     .temp-raw-chunk-animated {
-      display: inline-block; /* Changed from inline to inline-block */
-      opacity: 0; /* Start fully transparent, animation will fade it in */
-      animation: wipeAndFadeInFromLeft 0.4s ease-out forwards;
+      display: inline-block; 
+      opacity: 0; 
+      white-space: pre-wrap; 
+      animation: slideAndFadeInFromLeft 0.35s ease-out forwards; /* New animation */
     }
 
-    @keyframes fadeInRawChunk {
+    @keyframes slideAndFadeInFromLeft { /* New keyframe definition */
       0% {
         opacity: 0;
-        transform: translateY(3px);
+        transform: translateX(-8px); /* Start slightly to the left */
+      }
+      70% {
+        opacity: 0.8;
       }
       100% {
         opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    @keyframes wipeAndFadeInFromLeft {
-      0% {
-        clip-path: inset(0 100% 0 0); /* Fully clipped from the right */
-        opacity: 0;
-      }
-      100% {
-        clip-path: inset(0 0 0 0); /* Fully visible */
-        opacity: 1;
+        transform: translateX(0);
       }
     }
   </style>
@@ -247,8 +241,8 @@
     let chatHistory = [];
     const MIN_TYPING_DELAY_MS = 40;
     const MAX_TYPING_DELAY_MS = 120;
-    const MIN_CHUNK_SIZE = 1;
-    const MAX_CHUNK_SIZE = 5;
+    const MIN_CHUNK_SIZE = 8;      // Increased from 1
+    const MAX_CHUNK_SIZE = 20;     // Increased from 5
     let lastUserMessageText = '';
     let isRetryMode = false;
     let currentBotMessageDiv = null; // To hold the current bot message div for streaming
@@ -411,9 +405,8 @@
                   if (stopRequested || charIndex >= combinedTextContent.length) {
                     if (!stopRequested) {
                       // Final render with full markdown parsing and syntax highlighting
-                      // Use combinedTextContent which holds the complete message from the API
                       const finalHtml = formatBotMessage(combinedTextContent);
-                      botMessageSpan.innerHTML = finalHtml; // Replace all tempChunkSpans with final formatted content
+                      botMessageSpan.innerHTML = finalHtml; 
                       applySyntaxHighlighting(botMessageSpan);
                       
                       appendImages(); 
@@ -423,28 +416,29 @@
                       chatInput.disabled = false;
                       sendButton.disabled = false;
                       sendButton.removeEventListener('click', onStopClick);
-                      setTimeout(() => chatPanel.scrollTop = chatPanel.scrollHeight, 10); // Final scroll
+                      setTimeout(() => chatPanel.scrollTop = chatPanel.scrollHeight, 10); 
                     }
                     return;
                   }
                   
                   const chunkSize = Math.floor(Math.random() * (MAX_CHUNK_SIZE - MIN_CHUNK_SIZE + 1)) + MIN_CHUNK_SIZE;
-                  let newChunk = '';
+                  let rawChunk = '';
                   for (let i = 0; i < chunkSize && charIndex < combinedTextContent.length; i++) {
-                    newChunk += combinedTextContent[charIndex++];
+                    rawChunk += combinedTextContent[charIndex++];
                   }
-                  // currentDisplayMessage += newChunk; // Not needed for intermediate formatting
+
+                  // Pre-process chunk for immediate space/newline rendering
+                  const processedChunkHtml = rawChunk
+                    .replace(/ /g, '&nbsp;')
+                    .replace(/\n/g, '<br>');
 
                   const tempChunkSpan = document.createElement('span');
-                  tempChunkSpan.textContent = newChunk;
+                  tempChunkSpan.innerHTML = processedChunkHtml; // Use innerHTML with processed chunk
                   tempChunkSpan.classList.add('temp-raw-chunk-animated');
-                  botMessageSpan.appendChild(tempChunkSpan); // Append the animated chunk directly
+                  botMessageSpan.appendChild(tempChunkSpan); 
+                  console.log('Chunk HTML:', tempChunkSpan.outerHTML); // DIAGNOSTIC LOG
 
-                  // Scroll to keep the latest content visible
                   chatPanel.scrollTop = chatPanel.scrollHeight;
-
-                  // The setTimeout that previously re-rendered the whole message is removed.
-                  // Markdown formatting and syntax highlighting now only happen at the end.
 
                   const randomDelay = Math.floor(Math.random() * (MAX_TYPING_DELAY_MS - MIN_TYPING_DELAY_MS + 1)) + MIN_TYPING_DELAY_MS;
                   typingTimeout = setTimeout(typeNextChunk, randomDelay);
