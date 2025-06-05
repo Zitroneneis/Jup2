@@ -390,8 +390,11 @@
 
     chatForm.addEventListener('submit', async (event) => {
       event.preventDefault();
+      const selectedModel = modelSelector.value; // Get selected model early
       if (typeof gtag === 'function') {
-        gtag('event', 'Chat-button-submitted');
+        gtag('event', 'Chat-button-submitted', { // Add event parameters
+          'model_used': selectedModel
+        });
       }
 
       grecaptcha.enterprise.ready(function() {
@@ -542,7 +545,9 @@
               currentStopButtonHandler = null;
             }
             fetchAbortController = null; 
-            if (typeof gtag === 'function') gtag('event', 'Action-Stopped-By-User');
+            if (typeof gtag === 'function') gtag('event', 'Action-Stopped-By-User', {
+              'model_used': modelSelector.value // Add model used to this event too
+            });
           }
 
           currentStopButtonHandler = handleStopAction;
@@ -575,8 +580,6 @@
           }
 
           try {
-            const selectedModel = modelSelector.value; // Get selected model
-
             const response = await fetch('/api/gemini-proxy', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -594,10 +597,19 @@
             if (stopLetterAnimationGlobal && activeFetchController && activeFetchController.signal.aborted) {
               // If STOP was clicked during fetch, handleStopAction already ran or will run due to abort.
               // UI should be reset by it.
+              // gtag event for stop is in handleStopAction
               return; 
             }
 
             const data = await response.json();
+
+            // Log successful API response with model used
+            if (typeof gtag === 'function') {
+                gtag('event', 'Chat-API-response-received', {
+                    'model_used': selectedModel,
+                    'response_ok': response.ok
+                });
+            }
 
             if (!response.ok) {
               const errorMessage = data.error?.message || data.error || response.statusText || 'An unknown error occurred';
@@ -685,6 +697,7 @@
                         if (currentStopButtonHandler) sendButton.removeEventListener('click', currentStopButtonHandler);
                         currentStopButtonHandler = null;
                         letterAnimationTimeouts = [];
+                        // gtag event for natural completion (if desired, can be added here)
                       }
                     }, index * (letterSpans.length > 0 ? (Math.max(250, Math.min(5000, letterSpans.length * 50))) / letterSpans.length : 0) );
                     letterAnimationTimeouts.push(timeoutId);
@@ -729,8 +742,7 @@
                         
             if (error.name === 'AbortError') {
               console.log('Fetch aborted by user action.');
-              // UI reset is handled by handleStopAction, which should have been triggered by the button.
-              // If thinking GIF is still there, ensure it's cleared by handleStopAction.
+              // gtag event for stop is in handleStopAction
             } else {
               if (botContentDiv) botContentDiv.innerHTML = formatBotMessage('Error - Could not connect to the API.');
               if (botContentDiv) applySyntaxHighlighting(botContentDiv);
@@ -751,6 +763,12 @@
         .catch(function(recaptchaError) {
           console.error('reCAPTCHA execution failed:', recaptchaError);
           const errorBotMessageDiv = displayMessage('Bot', formatBotMessage('Error: reCAPTCHA verification failed. Please refresh and try again.'), true);
+          // Log reCAPTCHA failure event with model that would have been used
+          if (typeof gtag === 'function') {
+            gtag('event', 'Chat-reCAPTCHA-failed', {
+              'model_intended': modelSelector.value 
+            });
+          }
           if (errorBotMessageDiv) { 
             const errorBotContentDiv = errorBotMessageDiv.querySelector('.message-content');
             if (errorBotContentDiv) { 

@@ -169,7 +169,7 @@ You have access to an image generation function. Only call it when the user expl
         // The `gemini-2.0-flash-preview-image-generation` model might be able to take a direct text prompt for an image.
         // Or, you might use a dedicated image generation API.
         
-        const imageModelName = 'gemini-2.0-flash-preview-image-generation'; // Or your preferred image model
+        const imageModelName = 'imagen-3.0-generate-002'; // Changed to imagen-3.0-generate-002
         const imageUrl = `https://generativelanguage.googleapis.com/v1beta/models/${imageModelName}:generateContent?key=${apiKey}`;
         
         // Construct a simple prompt for the image model
