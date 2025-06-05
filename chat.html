@@ -200,21 +200,11 @@
       transition: opacity 0.5s ease-out;
     }
 
-    .temp-raw-chunk-animated {
-      display: inline-block; 
-      opacity: 0;           
-      white-space: pre-wrap; 
-      animation: simpleFadeInChunk 0.4s linear forwards; /* Adjusted duration and timing function */
-      outline: 1px solid transparent; 
-    }
+    /* Removed .temp-raw-chunk-animated and @keyframes simpleFadeInChunk */
 
-    @keyframes simpleFadeInChunk { 
-      0% {
-        opacity: 0;
-      }
-      100% {
-        opacity: 1;
-      }
+    .anim-letter {
+      opacity: 0;
+      /* Optional: transition: opacity 0.05s linear; */
     }
   </style>
 </head>
@@ -235,13 +225,12 @@
     const RECAPTCHA_SITE_KEY = '6LcQhFMrAAAAAMjWClxXSNDpZrFZj3rUrz5UHhWA';
 
     let chatHistory = [];
-    const MIN_TYPING_DELAY_MS = 200; // Increased from 40
-    const MAX_TYPING_DELAY_MS = 350; // Increased from 120
-    const MIN_CHUNK_SIZE = 12;     // Increased further
-    const MAX_CHUNK_SIZE = 25;     // Increased further
+    // Removed MIN_TYPING_DELAY_MS, MAX_TYPING_DELAY_MS, MIN_CHUNK_SIZE, MAX_CHUNK_SIZE
     let lastUserMessageText = '';
     let isRetryMode = false;
-    let currentBotMessageDiv = null; // To hold the current bot message div for streaming
+    let currentBotMessageDiv = null;
+    let letterAnimationTimeouts = []; // To store timeout IDs for letter animation
+    let stopLetterAnimationGlobal = false; // Global flag to signal animation stop
 
     function formatBotMessage(text) {
       const html = DOMPurify.sanitize(marked.parse(text), {
@@ -373,72 +362,105 @@
                 botMessageSpan.classList.add('bot-typing-content');
                 botContentDiv.appendChild(botMessageSpan);
 
-                let stopRequested = false;
-                let typingTimeout;
-
+                // Fade in the container for the message
                 requestAnimationFrame(() => botMessageSpan.classList.add('fade-in'));
 
-                function onStopClick() {
-                  stopRequested = true;
-                  clearTimeout(typingTimeout);
+                // Pre-format the entire message
+                const finalHtml = formatBotMessage(combinedTextContent);
+                botMessageSpan.innerHTML = finalHtml;
+                applySyntaxHighlighting(botMessageSpan);
+
+                // --- New Letter-by-Letter Animation Logic ---
+                let currentStopListener = null; // To keep track of the current stop listener
+
+                function wrapTextNodesWithLetterSpans(element) {
+                  const letters = [];
+                  Array.from(element.childNodes).forEach(child => {
+                    if (child.nodeType === Node.TEXT_NODE) {
+                      const text = child.textContent;
+                      if (text.trim() === '') return; // Skip empty or whitespace-only text nodes
+                      const fragment = document.createDocumentFragment();
+                      for (let i = 0; i < text.length; i++) {
+                        const span = document.createElement('span');
+                        span.className = 'anim-letter';
+                        span.textContent = text[i];
+                        // Opacity is set by CSS .anim-letter { opacity: 0; }
+                        fragment.appendChild(span);
+                        letters.push(span);
+                      }
+                      child.parentNode.replaceChild(fragment, child);
+                    } else if (child.nodeType === Node.ELEMENT_NODE) {
+                      letters.push(...wrapTextNodesWithLetterSpans(child));
+                    }
+                  });
+                  return letters;
+                }
+
+                const letterSpans = wrapTextNodesWithLetterSpans(botMessageSpan);
+
+                stopLetterAnimationGlobal = false; // Reset stop flag for new message
+                letterAnimationTimeouts.forEach(clearTimeout); // Clear any old timeouts
+                letterAnimationTimeouts = [];
+
+                const minTotalDurationMs = 250;
+                const maxTotalDurationMs = 2500;
+                const idealPerLetterDelayMs = 30; // Adjust for desired typing speed feel
+
+                let actualTotalDurationMs = letterSpans.length * idealPerLetterDelayMs;
+                actualTotalDurationMs = Math.max(minTotalDurationMs, Math.min(maxTotalDurationMs, actualTotalDurationMs));
+                
+                const delayPerLetter = letterSpans.length > 0 ? actualTotalDurationMs / letterSpans.length : 0;
+
+                function onStopClickLetterAnim() {
+                  stopLetterAnimationGlobal = true;
+                  letterAnimationTimeouts.forEach(clearTimeout);
+                  letterAnimationTimeouts = [];
+                  if (botMessageSpan) {
+                    const allLetters = botMessageSpan.querySelectorAll('.anim-letter');
+                    allLetters.forEach(s => s.style.opacity = '1');
+                  }
+                  appendImages(); // Show images if any when stopped
                   chatInput.disabled = false;
                   sendButton.textContent = 'Send';
                   sendButton.classList.remove('stop-generating');
                   sendButton.disabled = false;
-                  isRetryMode = false; 
-                  sendButton.removeEventListener('click', onStopClick);
+                  isRetryMode = false;
+                  if (currentStopListener) sendButton.removeEventListener('click', currentStopListener);
                   if (typeof gtag === 'function') gtag('event', 'STOPPED GENERATING');
                 }
+                
+                currentStopListener = onStopClickLetterAnim; // Store the current listener
                 sendButton.textContent = 'STOP';
                 sendButton.classList.add('stop-generating');
                 sendButton.disabled = false;
-                sendButton.addEventListener('click', onStopClick);
-                
-                let charIndex = 0;
-                // let currentDisplayMessage = ''; // No longer needed here for intermediate formatting
+                sendButton.addEventListener('click', currentStopListener);
 
-                function typeNextChunk() {
-                  if (stopRequested || charIndex >= combinedTextContent.length) {
-                    if (!stopRequested) {
-                      // Final render with full markdown parsing and syntax highlighting
-                      const finalHtml = formatBotMessage(combinedTextContent);
-                      botMessageSpan.innerHTML = finalHtml; 
-                      applySyntaxHighlighting(botMessageSpan);
-                      
-                      appendImages(); 
-                      sendButton.textContent = 'Send';
-                      sendButton.classList.remove('stop-generating');
-                      isRetryMode = false;
-                      chatInput.disabled = false;
-                      sendButton.disabled = false;
-                      sendButton.removeEventListener('click', onStopClick);
-                      setTimeout(() => chatPanel.scrollTop = chatPanel.scrollHeight, 10); 
-                    }
-                    return;
-                  }
-                  
-                  const chunkSize = Math.floor(Math.random() * (MAX_CHUNK_SIZE - MIN_CHUNK_SIZE + 1)) + MIN_CHUNK_SIZE;
-                  let rawChunk = '';
-                  for (let i = 0; i < chunkSize && charIndex < combinedTextContent.length; i++) {
-                    rawChunk += combinedTextContent[charIndex++];
-                  }
-
-                  // Pre-process chunk for immediate space/newline rendering
-                  const processedChunkHtml = rawChunk
-                    .replace(/ /g, '&nbsp;')
-                    .replace(/\n/g, '<br>');
-
-                  const tempChunkSpan = document.createElement('span');
-                  tempChunkSpan.innerHTML = processedChunkHtml; // Use innerHTML with processed chunk
-                  tempChunkSpan.classList.add('temp-raw-chunk-animated');
-                  botMessageSpan.appendChild(tempChunkSpan); 
-
-                  chatPanel.scrollTop = chatPanel.scrollHeight;
-
-                  const randomDelay = Math.floor(Math.random() * (MAX_TYPING_DELAY_MS - MIN_TYPING_DELAY_MS + 1)) + MIN_TYPING_DELAY_MS;
-                  typingTimeout = setTimeout(typeNextChunk, randomDelay);
+                if (letterSpans.length > 0) {
+                  letterSpans.forEach((span, index) => {
+                    const timeoutId = setTimeout(() => {
+                      if (stopLetterAnimationGlobal) return;
+                      span.style.opacity = '1';
+                      if (index === letterSpans.length - 1) {
+                        // Animation finished naturally
+                        appendImages(); // Append images at the end
+                        sendButton.textContent = 'Send';
+                        sendButton.classList.remove('stop-generating');
+                        chatInput.disabled = false;
+                        sendButton.disabled = false;
+                        if (currentStopListener) sendButton.removeEventListener('click', currentStopListener);
+                        letterAnimationTimeouts = [];
+                      }
+                    }, index * delayPerLetter);
+                    letterAnimationTimeouts.push(timeoutId);
+                  });
+                } else { // No letters to animate (e.g. empty message or only images after formatting)
+                    appendImages();
+                    sendButton.textContent = 'Send';
+                    sendButton.classList.remove('stop-generating');
+                    chatInput.disabled = false;
+                    sendButton.disabled = false;
+                    if (currentStopListener) sendButton.removeEventListener('click', currentStopListener);
                 }
-                typeNextChunk();
 
               } else if (imageDatas.length > 0) {
                 appendImages();
