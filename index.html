@@ -101,15 +101,15 @@
     .message.user {
       text-align: right; /* Align user messages to the right */
     }
-    .user {
+    /* .user {
       font-weight: bold;
-    }
+    } */
     .message.bot {
       text-align: left; /* Align bot messages to the left */
     }
     .bot {
-      font-weight: bold;
-      color: blue;
+      /*font-weight: bold; */
+      color: rgb(47, 47, 47);
     }
     #chat-form {
       display: flex;
@@ -162,6 +162,31 @@
     .language-html { border-left: 4px solid #e34f26; }
     .language-css { border-left: 4px solid #1572b6; }
     .language-json { border-left: 4px solid #000000; }
+
+    /* Smooth typing effect animations */
+    .bot-typing-content {
+      opacity: 0;
+      transition: opacity 0.3s ease-in;
+    }
+
+    .bot-typing-content.fade-in {
+      opacity: 1;
+    }
+
+    .bot-typing-chunk {
+      animation: fadeInChunk 0.4s ease-out forwards;
+    }
+
+    @keyframes fadeInChunk {
+      0% {
+        opacity: 0;
+        transform: translateY(2px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
 
   </style>
 </head>
@@ -415,6 +440,7 @@
 
               if (combinedTextContent.trim() !== '') {
                 const botMessageSpan = document.createElement('span'); 
+                botMessageSpan.classList.add('bot-typing-content');
                 botThinkingDiv.appendChild(botMessageSpan);
 
                 // Random typing with variable delays and chunk sizes
@@ -468,12 +494,20 @@
                     currentDisplayMessage += combinedTextContent[charIndex++];
                   }
                   
+                  // Temporarily remove animation class, update content, then add it back for smooth transition
+                  botMessageSpan.classList.remove('fade-in', 'bot-typing-chunk');
+                  
                   // Configure DOMPurify to allow links and images in Markdown
                   const html = formatBotMessage(currentDisplayMessage);
                   botMessageSpan.innerHTML = html;
                   
                   // Apply syntax highlighting to code blocks
                   applySyntaxHighlighting(botMessageSpan);
+                  
+                  // Trigger smooth fade-in animation
+                  requestAnimationFrame(() => {
+                    botMessageSpan.classList.add('fade-in', 'bot-typing-chunk');
+                  });
                   
                   // Smooth auto-scroll to bottom as content is being typed
                   chatPanel.scrollTop = chatPanel.scrollHeight;
