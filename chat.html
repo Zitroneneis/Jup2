@@ -458,7 +458,7 @@
           } else {
             userMessageToProcess = chatInput.value.trim();
             if (!userMessageToProcess) return;
-            lastUserMessageText = userMessageToProcess;
+            lastUserMessageToProcess = userMessageToProcess;
             displayMessage('User', userMessageToProcess);
             chatHistory.push({ role: "user", parts: [{ text: userMessageToProcess }] });
           }
@@ -491,16 +491,32 @@
               img.style.display = "block"; 
               img.style.marginTop = "10px"; 
               img.classList.add('generated-image');
+
+              // Event listener for opening lightbox
               img.addEventListener('click', () => {
-                if (lightboxImage && lightboxOverlay) { // Null checks added here
+                if (lightboxImage && lightboxOverlay) { 
                     lightboxImage.src = img.src;
                     lightboxOverlay.style.display = 'flex';
+                    if (typeof gtag === 'function') {
+                        gtag('event', 'Lightbox-image-opened', {
+                            'model_used': modelSelector.value // Or derive from message if needed
+                        });
+                    }
                 } else {
                     console.error('Lightbox elements not found when trying to open!');
                 }
               });
+
               botContentDiv.appendChild(img); 
               img.onload = () => chatPanel.scrollTop = chatPanel.scrollHeight;
+
+              // Event for when an image is actually appended/displayed
+              if (typeof gtag === 'function') {
+                gtag('event', 'Image-displayed-to-user', {
+                    'model_used': modelSelector.value, // Or from the message context if available
+                    'image_mime_type': imageData.mimeType
+                });
+              }
             });
             setTimeout(() => chatPanel.scrollTop = chatPanel.scrollHeight, 10);
           };
@@ -607,7 +623,8 @@
             if (typeof gtag === 'function') {
                 gtag('event', 'Chat-API-response-received', {
                     'model_used': selectedModel,
-                    'response_ok': response.ok
+                    'response_ok': response.ok,
+                    'function_call_present': !!(data.candidates?.[0]?.content?.parts?.find(part => part.functionCall)) // Add if function call was in response
                 });
             }
 
@@ -641,7 +658,25 @@
 
               responseParts.forEach(part => {
                 if (part.text) combinedTextContentForAnimation += part.text;
-                if (part.inlineData?.mimeType && part.inlineData?.data) imageDatasForAnimation.push(part.inlineData);
+                if (part.inlineData?.mimeType && part.inlineData?.data) {
+                    imageDatasForAnimation.push(part.inlineData);
+                    // This is where an image is received from the model in the primary response flow
+                    if (typeof gtag === 'function') {
+                        gtag('event', 'Image-received-from-model', {
+                            'model_used': selectedModel,
+                            'image_mime_type': part.inlineData.mimeType
+                        });
+                    }
+                }
+                // Check for function call to log image generation attempt
+                if (part.functionCall && part.functionCall.name === 'generate_image') {
+                    if (typeof gtag === 'function') {
+                        gtag('event', 'Image-generation-tool-called', {
+                            'model_used': selectedModel,
+                            'prompt_length': part.functionCall.args?.prompt?.length || 0
+                        });
+                    }
+                }
               });
 
               // If STOP was clicked just after fetch but before this point, and global flag is set
