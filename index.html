@@ -166,40 +166,42 @@
     /* Smooth typing effect animations */
     .bot-typing-content {
       opacity: 0;
-      transition: opacity 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Much smoother, longer fade-in */
+      transition: opacity 2s ease-out; /* Ultra-smooth, long fade-in */
     }
 
     .bot-typing-content.fade-in {
       opacity: 1;
     }
 
+    /* Removed complex chunk animations for ultra-smooth effect */
     .bot-typing-chunk {
-      animation: fadeInChunk 1.5s cubic-bezier(0.23, 1, 0.32, 1) forwards; /* Ultra-smooth easing */
+      opacity: 0;
+      animation: gentleFadeIn 2.5s ease-out forwards; /* Very gentle fade */
     }
 
-    @keyframes fadeInChunk {
+    @keyframes gentleFadeIn {
       0% {
         opacity: 0;
-        transform: translateY(8px) scale(0.98); /* More gradual entrance */
-        filter: blur(1px);
+        transform: translateY(2px); /* Minimal movement */
       }
-      50% {
-        opacity: 0.3;
-        transform: translateY(4px) scale(0.99);
-        filter: blur(0.5px);
+      30% {
+        opacity: 0.1;
+        transform: translateY(1px);
+      }
+      70% {
+        opacity: 0.7;
+        transform: translateY(0.5px);
       }
       100% {
         opacity: 1;
-        transform: translateY(0) scale(1);
-        filter: blur(0);
+        transform: translateY(0);
       }
     }
 
-    /* Add a subtle glow effect during typing */
+    /* Subtle glow that builds gradually */
     .bot-typing-content.fade-in {
-      text-shadow: 0 0 20px rgba(47, 47, 47, 0.1);
-      transition: opacity 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
-                  text-shadow 2s ease-out;
+      transition: opacity 2s ease-out, 
+                  text-shadow 3s ease-out;
     }
 
   </style>
@@ -249,10 +251,10 @@
     const separator = document.querySelector('.separator');
 
     let chatHistory = []; // Initialize chat history array
-    const MIN_TYPING_DELAY_MS = 25; // Minimum delay between character chunks (slower)
-    const MAX_TYPING_DELAY_MS = 80; // Maximum delay between character chunks (much slower)
+    const MIN_TYPING_DELAY_MS = 40; // Much slower minimum delay for ultra-smooth effect
+    const MAX_TYPING_DELAY_MS = 120; // Much slower maximum delay 
     const MIN_CHUNK_SIZE = 1; // Minimum characters per chunk
-    const MAX_CHUNK_SIZE = 8; // Maximum characters per chunk (smaller chunks for smoother effect)
+    const MAX_CHUNK_SIZE = 5; // Smaller chunks for ultra-smooth flow
     let lastUserMessageText = ''; // To store the last user message for retry
     let isRetryMode = false; // Flag to indicate if the button is in "Retry" mode
 
