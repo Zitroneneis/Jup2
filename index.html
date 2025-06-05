@@ -217,6 +217,27 @@
     let lastUserMessageText = ''; // To store the last user message for retry
     let isRetryMode = false; // Flag to indicate if the button is in "Retry" mode
 
+    // Utility function to format text with markdown and apply syntax highlighting
+    function formatBotMessage(text) {
+      const html = DOMPurify.sanitize(marked.parse(text), {
+        ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'code', 'pre', 'blockquote', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'a', 'img', 'table', 'thead', 'tbody', 'tr', 'th', 'td', 'del', 'mark', 'span', 'div'],
+        ALLOWED_ATTR: ['href', 'title', 'target', 'rel', 'src', 'alt', 'width', 'height', 'class', 'id'],
+        ALLOW_DATA_ATTR: false,
+        ADD_ATTR: ['target'],
+      });
+      return html;
+    }
+
+    // Utility function to apply syntax highlighting to an element
+    function applySyntaxHighlighting(element) {
+      if (typeof Prism !== 'undefined') {
+        const codeBlocks = element.querySelectorAll('pre code');
+        codeBlocks.forEach(block => {
+          Prism.highlightElement(block);
+        });
+      }
+    }
+
     let isDragging = false;
     let startX;
     let mainPanelWidth;
@@ -321,7 +342,18 @@
 
             if (!response.ok) {
               const errorMessage = data.error?.message || data.error || response.statusText || 'An unknown error occurred';
-              botThinkingDiv.textContent = `Bot: Error - ${errorMessage}`;
+              botThinkingDiv.innerHTML = '';
+              
+              const botLabelSpan = document.createElement('span');
+              botLabelSpan.classList.add('bot');
+              botLabelSpan.textContent = 'Bot: ';
+              botThinkingDiv.appendChild(botLabelSpan);
+              
+              const errorSpan = document.createElement('span');
+              errorSpan.innerHTML = formatBotMessage(`Error - ${errorMessage}`);
+              botThinkingDiv.appendChild(errorSpan);
+              applySyntaxHighlighting(botThinkingDiv);
+              
               console.error('Error from API:', data);
               // DO NOT pop chatHistory here, keep user message for retry
 
@@ -437,21 +469,11 @@
                   }
                   
                   // Configure DOMPurify to allow links and images in Markdown
-                  const html = DOMPurify.sanitize(marked.parse(currentDisplayMessage), {
-                    ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'code', 'pre', 'blockquote', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'a', 'img', 'table', 'thead', 'tbody', 'tr', 'th', 'td', 'del', 'mark', 'span', 'div'],
-                    ALLOWED_ATTR: ['href', 'title', 'target', 'rel', 'src', 'alt', 'width', 'height', 'class', 'id'],
-                    ALLOW_DATA_ATTR: false,
-                    ADD_ATTR: ['target'],
-                  });
+                  const html = formatBotMessage(currentDisplayMessage);
                   botMessageSpan.innerHTML = html;
                   
                   // Apply syntax highlighting to code blocks
-                  if (typeof Prism !== 'undefined') {
-                    const codeBlocks = botMessageSpan.querySelectorAll('pre code');
-                    codeBlocks.forEach(block => {
-                      Prism.highlightElement(block);
-                    });
-                  }
+                  applySyntaxHighlighting(botMessageSpan);
                   
                   // Smooth auto-scroll to bottom as content is being typed
                   chatPanel.scrollTop = chatPanel.scrollHeight;
@@ -472,19 +494,51 @@
                 chatInput.disabled = false; 
                 sendButton.disabled = false;
               } else {
-                const noContentMsg = document.createTextNode('Received a response, but no text or image was found.');
-                botThinkingDiv.appendChild(noContentMsg);
+                botThinkingDiv.innerHTML = '';
+                
+                const botLabelSpan = document.createElement('span');
+                botLabelSpan.classList.add('bot');
+                botLabelSpan.textContent = 'Bot: ';
+                botThinkingDiv.appendChild(botLabelSpan);
+                
+                const noContentSpan = document.createElement('span');
+                noContentSpan.innerHTML = formatBotMessage('Received a response, but no text or image was found.');
+                botThinkingDiv.appendChild(noContentSpan);
+                applySyntaxHighlighting(botThinkingDiv);
+                
                 // chatHistory.pop(); // Model response was empty, pop it.
                 if(chatHistory[chatHistory.length-1].role === 'model') chatHistory.pop();
               }
 
             } else {
-              botThinkingDiv.textContent = 'Bot: Received a response, but no content parts were found.';
+              botThinkingDiv.innerHTML = '';
+              
+              const botLabelSpan = document.createElement('span');
+              botLabelSpan.classList.add('bot');
+              botLabelSpan.textContent = 'Bot: ';
+              botThinkingDiv.appendChild(botLabelSpan);
+              
+              const noPartsSpan = document.createElement('span');
+              noPartsSpan.innerHTML = formatBotMessage('Received a response, but no content parts were found.');
+              botThinkingDiv.appendChild(noPartsSpan);
+              applySyntaxHighlighting(botThinkingDiv);
+              
               // chatHistory.pop(); // Model response was empty, pop it.
               if(chatHistory[chatHistory.length-1].role === 'model') chatHistory.pop();
             }
           } catch (error) {
-            botThinkingDiv.textContent = 'Bot: Error - Could not connect to the API.';
+            botThinkingDiv.innerHTML = '';
+            
+            const botLabelSpan = document.createElement('span');
+            botLabelSpan.classList.add('bot');
+            botLabelSpan.textContent = 'Bot: ';
+            botThinkingDiv.appendChild(botLabelSpan);
+            
+            const errorSpan = document.createElement('span');
+            errorSpan.innerHTML = formatBotMessage('Error - Could not connect to the API.');
+            botThinkingDiv.appendChild(errorSpan);
+            applySyntaxHighlighting(botThinkingDiv);
+            
             console.error('Failed to fetch from /api/gemini-proxy:', error);
             // DO NOT pop chatHistory here, keep user message for retry
 
