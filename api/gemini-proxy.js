@@ -202,19 +202,22 @@ To generate an image, you MUST call the function named 'generate_image' with a d
 
         let toolResponsePart;
         let imagePartFromResponse = null;
+        let generatedImageDataForClient = null; // Variable to store successful image data
 
         if (imageGenResponse.ok && imageDataResponse.candidates?.[0]?.content?.parts) {
             imagePartFromResponse = imageDataResponse.candidates[0].content.parts.find(part => part.inlineData);
         }
 
         if (imagePartFromResponse) {
-          // const imagePart = imageDataResponse.candidates[0].content.parts[0]; // Old way
+          generatedImageDataForClient = imagePartFromResponse.inlineData; // Store for later
           toolResponsePart = {
             functionResponse: {
               name: 'generate_image',
               response: {
-                content: `[Image generated for prompt: "${imagePrompt}"]`, 
-                imageData: imagePartFromResponse.inlineData // Use the found image part
+                // Provide a simpler response to the chat model, just confirming success.
+                // The actual image data will be added by the proxy to the final client response.
+                content: `Image for prompt "${imagePrompt}" was successfully generated and is available.`
+                // Removed imageData from here as the chat model isn't re-packaging it.
               }
             }
           };
@@ -251,9 +254,16 @@ To generate an image, you MUST call the function named 'generate_image' with a d
             body: JSON.stringify(followupRequestBody)
         });
         // data = await geminiResponse.json(); // Original line
-        const finalDataAfterImageGen = await geminiResponse.json(); // Capture in new variable
+        const finalDataAfterImageGen = await geminiResponse.json(); 
         console.log('Data from API after sending image tool response:', JSON.stringify(finalDataAfterImageGen, null, 2));
-        data = finalDataAfterImageGen; // CRITICAL: Reassign data to the result of this call
+        
+        // Manually add the image data to the final response if it was generated successfully
+        if (generatedImageDataForClient && finalDataAfterImageGen.candidates?.[0]?.content?.parts) {
+            finalDataAfterImageGen.candidates[0].content.parts.push({ inlineData: generatedImageDataForClient });
+            console.log('Manually added inlineData to final response');
+        }
+
+        data = finalDataAfterImageGen; 
 
         if (!geminiResponse.ok) {
             console.error('Error from Gemini API after sending tool response:', data);
