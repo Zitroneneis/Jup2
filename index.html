@@ -369,8 +369,16 @@
                   img.style.display = "block"; 
                   img.style.marginTop = "5px"; 
                   botThinkingDiv.appendChild(img); 
+                  
+                  // Ensure scroll happens after image loads
+                  img.onload = () => {
+                    chatPanel.scrollTop = chatPanel.scrollHeight;
+                  };
                 });
-                chatPanel.scrollTop = chatPanel.scrollHeight;
+                // Immediate scroll in case images are cached
+                setTimeout(() => {
+                  chatPanel.scrollTop = chatPanel.scrollHeight;
+                }, 10);
               };
 
               if (combinedTextContent.trim() !== '') {
@@ -412,6 +420,10 @@
                       isRetryMode = false;
                       chatInput.disabled = false;
                       sendButton.removeEventListener('click', onStopClick);
+                      // Final scroll to ensure everything is visible
+                      setTimeout(() => {
+                        chatPanel.scrollTop = chatPanel.scrollHeight;
+                      }, 10);
                     }
                     return;
                   }
@@ -441,6 +453,7 @@
                     });
                   }
                   
+                  // Smooth auto-scroll to bottom as content is being typed
                   chatPanel.scrollTop = chatPanel.scrollHeight;
                   
                   // Random delay between MIN_TYPING_DELAY_MS and MAX_TYPING_DELAY_MS
