@@ -190,9 +190,11 @@ To generate an image, you MUST call the function named 'generate_image' with a d
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             contents: imageGenHistory,
+            // Remove generationConfig or ensure it doesn't specify a responseMimeType that causes errors
+            // For a model like gemini-2.0-flash-preview-image-generation, 
+            // it might return inlineData by default if the prompt leads to an image.
             generationConfig: {
-              // Config specific to image generation if needed
-              responseMimeType: "multipart/form-data" // Changed for gemini image model
+                // temperature: 0.4, // Optional: you can set other relevant configs
             }
           })
         });
