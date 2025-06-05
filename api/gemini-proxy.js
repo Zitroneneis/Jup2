@@ -201,23 +201,25 @@ To generate an image, you MUST call the function named 'generate_image' with a d
         console.log('Image generation model response:', JSON.stringify(imageDataResponse, null, 2)); // LOG 1
 
         let toolResponsePart;
-        if (imageGenResponse.ok && imageDataResponse.candidates?.[0]?.content?.parts?.[0]?.inlineData) {
-          const imagePart = imageDataResponse.candidates[0].content.parts[0];
+        let imagePartFromResponse = null;
+
+        if (imageGenResponse.ok && imageDataResponse.candidates?.[0]?.content?.parts) {
+            imagePartFromResponse = imageDataResponse.candidates[0].content.parts.find(part => part.inlineData);
+        }
+
+        if (imagePartFromResponse) {
+          // const imagePart = imageDataResponse.candidates[0].content.parts[0]; // Old way
           toolResponsePart = {
             functionResponse: {
               name: 'generate_image',
               response: {
-                // Pass the image data back to the chat model
-                // The chat model will then formulate a response that includes or references this image.
-                // The client expects inlineData in the final response parts.
-                // This structure might need adjustment based on how the chat model expects tool responses.
-                content: `[Image generated for prompt: "${imagePrompt}"]`, // Placeholder text
-                imageData: imagePart.inlineData // This is what the client expects
+                content: `[Image generated for prompt: "${imagePrompt}"]`, 
+                imageData: imagePartFromResponse.inlineData // Use the found image part
               }
             }
           };
         } else {
-          console.error('Image generation failed:', imageDataResponse);
+          console.error('Image generation failed or no inlineData found:', imageDataResponse);
           toolResponsePart = {
             functionResponse: {
               name: 'generate_image',
