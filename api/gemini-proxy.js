@@ -152,12 +152,16 @@ To generate an image, you MUST call the function named 'generate_image' with a d
           contents: [...history, data.candidates[0].content, toolResponsePart ], // Add model's turn and our tool response
         };
 
-        geminiResponse = await fetch(url, { // Re-use the original model's URL
+        geminiResponse = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(followupRequestBody)
         });
-        data = await geminiResponse.json();
+        // data = await geminiResponse.json(); // Original line
+        const finalDataAfterToolError = await geminiResponse.json(); // Capture in new variable
+        console.log('Data from API after sending tool error response:', JSON.stringify(finalDataAfterToolError, null, 2));
+        data = finalDataAfterToolError; // CRITICAL: Reassign data to the result of this call
+
         if (!geminiResponse.ok) {
             console.error('Error from Gemini API after sending tool error response:', data);
             return res.status(geminiResponse.status).json({ error: data?.error?.message || 'API error after tool response' });
@@ -227,12 +231,16 @@ To generate an image, you MUST call the function named 'generate_image' with a d
             contents: [...history, data.candidates[0].content, toolResponsePart ], // Add model's turn and our tool response
         };
 
-        geminiResponse = await fetch(url, { // Re-use the original model's URL
+        geminiResponse = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(followupRequestBody)
         });
-        data = await geminiResponse.json();
+        // data = await geminiResponse.json(); // Original line
+        const finalDataAfterImageGen = await geminiResponse.json(); // Capture in new variable
+        console.log('Data from API after sending image tool response:', JSON.stringify(finalDataAfterImageGen, null, 2));
+        data = finalDataAfterImageGen; // CRITICAL: Reassign data to the result of this call
+
         if (!geminiResponse.ok) {
             console.error('Error from Gemini API after sending tool response:', data);
             return res.status(geminiResponse.status).json({ error: data?.error?.message || 'API error after tool response' });
