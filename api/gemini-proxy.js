@@ -127,15 +127,10 @@ To generate an image, you MUST call the function named 'generate_image' with a d
     }
 
     // Check for function call
-    console.log('Data before function call check:', JSON.stringify(data, null, 2)); 
-    // let functionCall = data.candidates?.[0]?.content?.parts?.find(part => part.functionCall); // Old way
     const partContainingFunctionCall = data.candidates?.[0]?.content?.parts?.find(part => part.functionCall);
     const actualFunctionCall = partContainingFunctionCall ? partContainingFunctionCall.functionCall : null;
     
-    console.log('Derived actualFunctionCall object:', JSON.stringify(actualFunctionCall, null, 2)); 
-
     if (supportsFunctionCalling && actualFunctionCall && actualFunctionCall.name === 'generate_image') {
-      console.log('Function call received: generate_image', actualFunctionCall.args);
       const imagePrompt = actualFunctionCall.args.prompt;
 
       if (!imagePrompt) {
@@ -164,7 +159,6 @@ To generate an image, you MUST call the function named 'generate_image' with a d
         });
         // data = await geminiResponse.json(); // Original line
         const finalDataAfterToolError = await geminiResponse.json(); // Capture in new variable
-        console.log('Data from API after sending tool error response:', JSON.stringify(finalDataAfterToolError, null, 2));
         data = finalDataAfterToolError; // CRITICAL: Reassign data to the result of this call
 
         if (!geminiResponse.ok) {
@@ -198,8 +192,6 @@ To generate an image, you MUST call the function named 'generate_image' with a d
         });
 
         const imageDataResponse = await imageGenResponse.json();
-        console.log('Image generation model response:', JSON.stringify(imageDataResponse, null, 2)); // LOG 1
-
         let toolResponsePart;
         let imagePartFromResponse = null;
         let generatedImageDataForClient = null; // Variable to store successful image data
@@ -233,7 +225,6 @@ To generate an image, you MUST call the function named 'generate_image' with a d
             }
           };
         }
-        console.log('Constructed toolResponsePart:', JSON.stringify(toolResponsePart, null, 2)); // LOG 2
 
         // Send the function response back to the original chat model
         const followupRequestBody = {
@@ -255,12 +246,10 @@ To generate an image, you MUST call the function named 'generate_image' with a d
         });
         // data = await geminiResponse.json(); // Original line
         const finalDataAfterImageGen = await geminiResponse.json(); 
-        console.log('Data from API after sending image tool response:', JSON.stringify(finalDataAfterImageGen, null, 2));
         
         // Manually add the image data to the final response if it was generated successfully
         if (generatedImageDataForClient && finalDataAfterImageGen.candidates?.[0]?.content?.parts) {
             finalDataAfterImageGen.candidates[0].content.parts.push({ inlineData: generatedImageDataForClient });
-            console.log('Manually added inlineData to final response');
         }
 
         data = finalDataAfterImageGen; 
@@ -278,7 +267,6 @@ To generate an image, you MUST call the function named 'generate_image' with a d
       return res.status(500).json({ error: 'Invalid response structure from Gemini API' });
     }
 
-    console.log('Final data to client (no function call path):', JSON.stringify(data, null, 2)); 
     res.status(200).json(data);
 
   } catch (error) {
