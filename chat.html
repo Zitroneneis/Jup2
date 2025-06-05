@@ -338,7 +338,30 @@
       grecaptcha.enterprise.ready(function() {
         grecaptcha.enterprise.execute(RECAPTCHA_SITE_KEY, {action: 'submit'})
           .then(async function(token) {
-          let userMessageToProcess;
+            // Function definition MOVED HERE to the top of the .then() scope
+            function wrapTextNodesWithLetterSpans(element) {
+              const letters = [];
+              Array.from(element.childNodes).forEach(child => {
+                if (child.nodeType === Node.TEXT_NODE) {
+                  const text = child.textContent;
+                  if (text.trim() === '') return; // Skip empty or whitespace-only text nodes
+                  const fragment = document.createDocumentFragment();
+                  for (let i = 0; i < text.length; i++) {
+                    const span = document.createElement('span');
+                    span.className = 'anim-letter';
+                    span.textContent = text[i];
+                    fragment.appendChild(span);
+                    letters.push(span);
+                  }
+                  child.parentNode.replaceChild(fragment, child);
+                } else if (child.nodeType === Node.ELEMENT_NODE) {
+                  letters.push(...wrapTextNodesWithLetterSpans(child));
+                }
+              });
+              return letters;
+            }
+
+            let userMessageToProcess;
 
           if (isRetryMode) {
             userMessageToProcess = lastUserMessageText;
@@ -507,7 +530,14 @@
                 botMessageSpanForAnimation.innerHTML = finalHtml;
                 applySyntaxHighlighting(botMessageSpanForAnimation);
 
+                // --- New Letter-by-Letter Animation Logic ---
+                // let currentStopListener = null; // Ensure this line is not present if it was part of old logic
+
+                // function wrapTextNodesWithLetterSpans(element) { /* DEFINITION MOVED ABOVE */ }
+
                 const letterSpans = wrapTextNodesWithLetterSpans(botMessageSpanForAnimation);
+
+                stopLetterAnimationGlobal = false; // Reset stop flag for new message
 
                 if (letterSpans.length > 0) {
                   letterSpans.forEach((span, index) => {
