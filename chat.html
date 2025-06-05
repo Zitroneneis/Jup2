@@ -261,6 +261,11 @@
     </form>
   </div>
 
+  <div class="lightbox-overlay" id="lightboxOverlay">
+    <span class="lightbox-close" id="lightboxClose">&times;</span>
+    <img src="" alt="Lightbox Image" class="lightbox-image" id="lightboxImage">
+  </div>
+
   <script>
     const chatPanel = document.getElementById('chat-panel');
     const chatForm = document.getElementById('chat-form');
@@ -405,8 +410,12 @@
               img.style.marginTop = "10px"; 
               img.classList.add('generated-image');
               img.addEventListener('click', () => {
-                lightboxImage.src = img.src;
-                lightboxOverlay.style.display = 'flex';
+                if (lightboxImage && lightboxOverlay) { // Null checks added here
+                    lightboxImage.src = img.src;
+                    lightboxOverlay.style.display = 'flex';
+                } else {
+                    console.error('Lightbox elements not found when trying to open!');
+                }
               });
               botContentDiv.appendChild(img); 
               img.onload = () => chatPanel.scrollTop = chatPanel.scrollHeight;
@@ -637,24 +646,16 @@
     // Lightbox close functionality
     if (lightboxClose) {
       lightboxClose.addEventListener('click', () => {
-        lightboxOverlay.style.display = 'none';
+        if (lightboxOverlay) lightboxOverlay.style.display = 'none';
       });
     }
-
     if (lightboxOverlay) {
       lightboxOverlay.addEventListener('click', (event) => {
-        // Close only if the overlay itself (not the image) is clicked
         if (event.target === lightboxOverlay) {
           lightboxOverlay.style.display = 'none';
         }
       });
     }
   </script>
-
-  <div class="lightbox-overlay" id="lightboxOverlay">
-    <span class="lightbox-close" id="lightboxClose">&times;</span>
-    <img src="" alt="Lightbox Image" class="lightbox-image" id="lightboxImage">
-  </div>
-
 </body>
 </html>
