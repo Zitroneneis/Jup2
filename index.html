@@ -166,7 +166,7 @@
     /* Smooth typing effect animations */
     .bot-typing-content {
       opacity: 0;
-      transition: opacity 0.6s ease-in; /* Slower fade-in transition */
+      transition: opacity 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Much smoother, longer fade-in */
     }
 
     .bot-typing-content.fade-in {
@@ -174,18 +174,32 @@
     }
 
     .bot-typing-chunk {
-      animation: fadeInChunk 0.8s ease-out forwards; /* Slower chunk animation */
+      animation: fadeInChunk 1.5s cubic-bezier(0.23, 1, 0.32, 1) forwards; /* Ultra-smooth easing */
     }
 
     @keyframes fadeInChunk {
       0% {
         opacity: 0;
-        transform: translateY(3px); /* Slightly more pronounced movement */
+        transform: translateY(8px) scale(0.98); /* More gradual entrance */
+        filter: blur(1px);
+      }
+      50% {
+        opacity: 0.3;
+        transform: translateY(4px) scale(0.99);
+        filter: blur(0.5px);
       }
       100% {
         opacity: 1;
-        transform: translateY(0);
+        transform: translateY(0) scale(1);
+        filter: blur(0);
       }
+    }
+
+    /* Add a subtle glow effect during typing */
+    .bot-typing-content.fade-in {
+      text-shadow: 0 0 20px rgba(47, 47, 47, 0.1);
+      transition: opacity 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
+                  text-shadow 2s ease-out;
     }
 
   </style>
