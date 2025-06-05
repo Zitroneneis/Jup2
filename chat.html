@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-W8RMM2QWRV"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-W8RMM2QWRV');
+  </script>
+  <script type="text/javascript">
+      (function(c,l,a,r,i,t,y){
+          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", "mk9ddtm32o");
+  </script>
+  <meta charset="UTF-8" />
+  <title>Chat Interface</title>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/2.3.6/purify.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+  <script src="https://www.google.com/recaptcha/enterprise.js?render=6LcQhFMrAAAAAMjWClxXSNDpZrFZj3rUrz5UHhWA"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.7.4/lottie.min.js"></script>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      box-sizing: border-box;
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      background-color: #f0f2f5; /* Light gray background for a cleaner look */
+    }
+
+    .chat-container {
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1; /* Takes up available space */
+      max-width: 800px; /* Max width for better readability */
+      width: 100%;
+      margin: 20px auto; /* Centering the chat container */
+      background-color: #ffffff; /* White background for the chat area */
+      border-radius: 8px; /* Rounded corners */
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1); /* Subtle shadow */
+      overflow: hidden; /* To contain children elements */
+    }
+
+    #chat-panel {
+      flex-grow: 1;
+      padding: 20px;
+      overflow-y: auto;
+      border-bottom: 1px solid #e0e0e0; /* Separator line */
+    }
+
+    .message {
+      margin-bottom: 15px; /* Increased spacing between messages */
+      display: flex;
+      flex-direction: column;
+    }
+
+    .message-content {
+      padding: 10px 15px;
+      border-radius: 18px; /* More rounded bubbles */
+      max-width: 75%; /* Max width for message bubbles */
+      word-wrap: break-word; /* Ensure long words break */
+    }
+
+    .message.user {
+      align-items: flex-end;
+    }
+
+    .message.user .message-content {
+      background-color: #007bff; /* Blue for user messages */
+      color: white;
+      border-bottom-right-radius: 5px; /* Differentiated corner for user */
+    }
+
+    .message.bot {
+      align-items: flex-start;
+    }
+
+    .message.bot .message-content {
+      background-color: #e9ecef; /* Lighter gray for bot messages */
+      color: #333;
+      border-bottom-left-radius: 5px; /* Differentiated corner for bot */
+    }
+    
+    .message-sender {
+        font-size: 0.8em;
+        color: #666;
+        margin-bottom: 3px;
+        padding: 0 5px;
+    }
+
+    .message.user .message-sender {
+        text-align: right;
+    }
+     .message.bot .message-sender {
+        text-align: left;
+    }
+
+
+    #chat-form {
+      display: flex;
+      padding: 15px;
+      background-color: #f9f9f9; /* Slightly different background for input area */
+    }
+
+    #chat-input {
+      flex: 1;
+      padding: 12px 15px; /* Increased padding */
+      font-size: 1em;
+      border: 1px solid #ccc;
+      border-radius: 20px; /* Rounded input field */
+      margin-right: 10px;
+    }
+
+    #send-button {
+      padding: 12px 20px; /* Increased padding */
+      font-size: 1em;
+      background-color: #007bff; /* Consistent button color */
+      color: white;
+      border: none;
+      border-radius: 20px; /* Rounded button */
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    #send-button:hover {
+      background-color: #0056b3; /* Darker blue on hover */
+    }
+    
+    #send-button:disabled {
+        background-color: #cccccc;
+        cursor: not-allowed;
+    }
+    
+    #send-button.stop-generating {
+        background-color: #dc3545; /* Red for stop generating */
+    }
+    #send-button.stop-generating:hover {
+        background-color: #c82333; /* Darker red on hover */
+    }
+
+
+    .lottie-holder, .thinking-gif {
+      width: 30px; /* Smaller thinking indicator */
+      height: 30px;
+      margin-right: 8px; /* Space it out a bit */
+    }
+
+    code {
+      background-color: #e9ecef; /* Match bot message background */
+      padding: 2px 5px;
+      border-radius: 4px;
+      font-family: 'Courier New', Monaco, monospace;
+      font-size: 0.9em;
+      border: 1px solid #dee2e6; /* Subtle border for code blocks */
+    }
+
+    pre {
+      background-color: #f8f9fa; /* Slightly different background for pre blocks */
+      border: 1px solid #ced4da;
+      border-radius: 5px;
+      padding: 12px;
+      margin: 10px 0;
+      overflow-x: auto;
+      line-height: 1.4;
+    }
+
+    pre code {
+      background-color: transparent;
+      padding: 0;
+      border-radius: 0;
+      border: none; /* No double border */
+      font-size: 0.85em;
+    }
+
+    .language-python { border-left: 3px solid #3776ab; }
+    .language-javascript { border-left: 3px solid #f7df1e; }
+    .language-html { border-left: 3px solid #e34f26; }
+    .language-css { border-left: 3px solid #1572b6; }
+    .language-json { border-left: 3px solid #000000; }
+
+    .bot-typing-content {
+      opacity: 0;
+      display: inline-block;
+      vertical-align: top;
+    }
+
+    .bot-typing-content.fade-in {
+      opacity: 1;
+      transition: opacity 0.5s ease-out;
+    }
+
+    .temp-raw-chunk-animated {
+      display: inline;
+      opacity: 0;
+      animation: fadeInRawChunk 0.2s ease-out forwards;
+    }
+
+    @keyframes fadeInRawChunk {
+      0% {
+        opacity: 0;
+        transform: translateY(3px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <div id="chat-panel"></div>
+    <form id="chat-form">
+      <input type="text" id="chat-input" placeholder="Type your message..." required />
+      <button type="submit" id="send-button">Send</button>
+    </form>
+  </div>
+
+  <script>
+    const chatPanel = document.getElementById('chat-panel');
+    const chatForm = document.getElementById('chat-form');
+    const chatInput = document.getElementById('chat-input');
+    const sendButton = document.getElementById('send-button');
+    const RECAPTCHA_SITE_KEY = '6LcQhFMrAAAAAMjWClxXSNDpZrFZj3rUrz5UHhWA';
+
+    let chatHistory = [];
+    const MIN_TYPING_DELAY_MS = 40;
+    const MAX_TYPING_DELAY_MS = 120;
+    const MIN_CHUNK_SIZE = 1;
+    const MAX_CHUNK_SIZE = 5;
+    let lastUserMessageText = '';
+    let isRetryMode = false;
+    let currentBotMessageDiv = null; // To hold the current bot message div for streaming
+
+    function formatBotMessage(text) {
+      const html = DOMPurify.sanitize(marked.parse(text), {
+        ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'code', 'pre', 'blockquote', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'a', 'img', 'table', 'thead', 'tbody', 'tr', 'th', 'td', 'del', 'mark', 'span', 'div'],
+        ALLOWED_ATTR: ['href', 'title', 'target', 'rel', 'src', 'alt', 'width', 'height', 'class', 'id'],
+        ALLOW_DATA_ATTR: false,
+        ADD_ATTR: ['target'],
+      });
+      return html;
+    }
+
+    function applySyntaxHighlighting(element) {
+      if (typeof Prism !== 'undefined') {
+        const codeBlocks = element.querySelectorAll('pre code');
+        codeBlocks.forEach(block => {
+          Prism.highlightElement(block);
+        });
+      }
+    }
+    
+    function displayMessage(sender, textOrHtml, isHtml = false) {
+        const messageDiv = document.createElement('div');
+        messageDiv.classList.add('message', sender.toLowerCase());
+
+        const senderSpan = document.createElement('div');
+        senderSpan.classList.add('message-sender');
+        senderSpan.textContent = sender === 'User' ? 'You' : 'Bot';
+        messageDiv.appendChild(senderSpan);
+
+        const contentDiv = document.createElement('div');
+        contentDiv.classList.add('message-content');
+        if (isHtml) {
+            contentDiv.innerHTML = textOrHtml;
+        } else {
+            contentDiv.textContent = textOrHtml;
+        }
+        messageDiv.appendChild(contentDiv);
+        
+        chatPanel.appendChild(messageDiv);
+        chatPanel.scrollTop = chatPanel.scrollHeight;
+        return messageDiv; // Return the message div for potential updates (e.g., streaming)
+    }
+
+
+    chatForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (typeof gtag === 'function') {
+        gtag('event', 'Chat-button-submitted');
+      }
+
+      grecaptcha.enterprise.ready(function() {
+        grecaptcha.enterprise.execute(RECAPTCHA_SITE_KEY, {action: 'submit'}).then(async function(token) {
+          let userMessageToProcess;
+
+          if (isRetryMode) {
+            userMessageToProcess = lastUserMessageText;
+            isRetryMode = false; 
+          } else {
+            userMessageToProcess = chatInput.value.trim();
+            if (!userMessageToProcess) return;
+            lastUserMessageText = userMessageToProcess;
+            displayMessage('User', userMessageToProcess);
+            chatHistory.push({ role: "user", parts: [{ text: userMessageToProcess }] });
+          }
+
+          chatInput.value = '';
+          chatInput.disabled = true;
+          sendButton.disabled = true; // Disable send button initially
+
+          // Display thinking animation for bot response
+          currentBotMessageDiv = displayMessage('Bot', '<img src="assets/thinking.gif" alt="Thinking..." class="thinking-gif" />', true);
+          const botContentDiv = currentBotMessageDiv.querySelector('.message-content');
+
+
+          try {
+            const response = await fetch('/api/gemini-proxy', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ history: chatHistory, recaptchaToken: token }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+              const errorMessage = data.error?.message || data.error || response.statusText || 'An unknown error occurred';
+              botContentDiv.innerHTML = formatBotMessage(\`Error - \${errorMessage}\`);
+              applySyntaxHighlighting(botContentDiv);
+              console.error('Error from API:', data);
+              sendButton.textContent = 'Retry';
+              sendButton.classList.remove('stop-generating');
+              isRetryMode = true;
+              chatInput.disabled = false;
+              sendButton.disabled = false;
+              return;
+            }
+            
+            isRetryMode = false;
+
+            const responseParts = data.candidates?.[0]?.content?.parts;
+
+            if (responseParts && responseParts.length > 0) {
+              chatHistory.push({ role: "model", parts: responseParts });
+              botContentDiv.innerHTML = ''; // Clear thinking GIF
+
+              let combinedTextContent = '';
+              const imageDatas = [];
+              responseParts.forEach(part => {
+                if (part.text) combinedTextContent += part.text;
+                if (part.inlineData?.mimeType && part.inlineData?.data) imageDatas.push(part.inlineData);
+              });
+
+              const appendImages = () => {
+                imageDatas.forEach(imageData => {
+                  const img = document.createElement('img');
+                  img.src = \`data:\${imageData.mimeType};base64,\${imageData.data}\`;
+                  img.alt = "Generated Image";
+                  img.style.maxWidth = "100%";
+                  img.style.display = "block";
+                  img.style.marginTop = "10px";
+                  botContentDiv.appendChild(img);
+                  img.onload = () => chatPanel.scrollTop = chatPanel.scrollHeight;
+                });
+                setTimeout(() => chatPanel.scrollTop = chatPanel.scrollHeight, 10);
+              };
+
+              if (combinedTextContent.trim() !== '') {
+                const botMessageSpan = document.createElement('span');
+                botMessageSpan.classList.add('bot-typing-content');
+                botContentDiv.appendChild(botMessageSpan);
+
+                let currentDisplayMessage = '';
+                let stopRequested = false;
+                let typingTimeout;
+
+                requestAnimationFrame(() => botMessageSpan.classList.add('fade-in'));
+
+                function onStopClick() {
+                  stopRequested = true;
+                  clearTimeout(typingTimeout);
+                  // currentBotMessageDiv might have been cleared if error occurred during streaming
+                  // or if message was very short.
+                  // For simplicity, we don't remove the partially streamed message here.
+                  // It will be overwritten or a new message will appear on next send/retry.
+                  chatInput.disabled = false;
+                  sendButton.textContent = 'Send';
+                  sendButton.classList.remove('stop-generating');
+                  sendButton.disabled = false;
+                  isRetryMode = false; 
+                  sendButton.removeEventListener('click', onStopClick);
+                  if (typeof gtag === 'function') gtag('event', 'STOPPED GENERATING');
+                }
+                sendButton.textContent = 'STOP';
+                sendButton.classList.add('stop-generating');
+                sendButton.disabled = false;
+                sendButton.addEventListener('click', onStopClick);
+                
+                let charIndex = 0;
+                function typeNextChunk() {
+                  if (stopRequested || charIndex >= combinedTextContent.length) {
+                    if (!stopRequested) {
+                      const finalHtml = formatBotMessage(currentDisplayMessage);
+                      botMessageSpan.innerHTML = finalHtml;
+                      applySyntaxHighlighting(botMessageSpan);
+                      appendImages();
+                      sendButton.textContent = 'Send';
+                      sendButton.classList.remove('stop-generating');
+                      isRetryMode = false;
+                      chatInput.disabled = false;
+                      sendButton.disabled = false;
+                      sendButton.removeEventListener('click', onStopClick);
+                      setTimeout(() => chatPanel.scrollTop = chatPanel.scrollHeight, 10);
+                    }
+                    return;
+                  }
+                  
+                  const chunkSize = Math.floor(Math.random() * (MAX_CHUNK_SIZE - MIN_CHUNK_SIZE + 1)) + MIN_CHUNK_SIZE;
+                  let newChunk = '';
+                  for (let i = 0; i < chunkSize && charIndex < combinedTextContent.length; i++) {
+                    newChunk += combinedTextContent[charIndex++];
+                  }
+                  currentDisplayMessage += newChunk;
+
+                  const tempChunkSpan = document.createElement('span');
+                  tempChunkSpan.textContent = newChunk;
+                  tempChunkSpan.classList.add('temp-raw-chunk-animated');
+                  botMessageSpan.appendChild(tempChunkSpan);
+
+                  setTimeout(() => {
+                    if (stopRequested) return;
+                    const scrollPosition = chatPanel.scrollTop;
+                    const wasAtBottom = scrollPosition >= chatPanel.scrollHeight - chatPanel.clientHeight - 20; // Adjusted threshold
+                    const formattedHtml = formatBotMessage(currentDisplayMessage);
+                    botMessageSpan.innerHTML = formattedHtml;
+                    const shouldHighlight = newChunk.includes('\`\`\`') || newChunk.includes('\`') || charIndex >= combinedTextContent.length;
+                    if (shouldHighlight) applySyntaxHighlighting(botMessageSpan);
+                    if (wasAtBottom) chatPanel.scrollTop = chatPanel.scrollHeight;
+                    else chatPanel.scrollTop = scrollPosition;
+                  }, 50);
+
+                  const randomDelay = Math.floor(Math.random() * (MAX_TYPING_DELAY_MS - MIN_TYPING_DELAY_MS + 1)) + MIN_TYPING_DELAY_MS;
+                  typingTimeout = setTimeout(typeNextChunk, randomDelay);
+                }
+                typeNextChunk();
+
+              } else if (imageDatas.length > 0) {
+                appendImages();
+                sendButton.textContent = 'Send';
+                sendButton.classList.remove('stop-generating');
+                isRetryMode = false;
+                chatInput.disabled = false;
+                sendButton.disabled = false;
+              } else {
+                botContentDiv.innerHTML = formatBotMessage('Received a response, but no text or image was found.');
+                applySyntaxHighlighting(botContentDiv);
+                if(chatHistory[chatHistory.length-1].role === 'model') chatHistory.pop();
+                sendButton.textContent = 'Send';
+                sendButton.classList.remove('stop-generating');
+                chatInput.disabled = false;
+                sendButton.disabled = false;
+              }
+
+            } else {
+              botContentDiv.innerHTML = formatBotMessage('Received a response, but no content parts were found.');
+              applySyntaxHighlighting(botContentDiv);
+              if(chatHistory[chatHistory.length-1].role === 'model') chatHistory.pop();
+              sendButton.textContent = 'Send';
+              sendButton.classList.remove('stop-generating');
+              chatInput.disabled = false;
+              sendButton.disabled = false;
+            }
+          } catch (error) {
+            if (currentBotMessageDiv && currentBotMessageDiv.querySelector('.message-content')) {
+                 currentBotMessageDiv.querySelector('.message-content').innerHTML = formatBotMessage('Error - Could not connect to the API.');
+                 applySyntaxHighlighting(currentBotMessageDiv.querySelector('.message-content'));
+            } else {
+                // Fallback if currentBotMessageDiv or its content area isn't available
+                displayMessage('Bot', 'Error - Could not connect to the API.', true);
+            }
+            console.error('Failed to fetch from /api/gemini-proxy:', error);
+            sendButton.textContent = 'Retry';
+            sendButton.classList.remove('stop-generating');
+            isRetryMode = true;
+            chatInput.disabled = false;
+            sendButton.disabled = false;
+            return;
+          } finally {
+             // Ensure button is re-enabled if not in STOP or Retry state
+            if (sendButton.textContent !== 'STOP' && sendButton.textContent !== 'Retry') {
+                sendButton.disabled = false;
+            }
+            chatPanel.scrollTop = chatPanel.scrollHeight;
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>
