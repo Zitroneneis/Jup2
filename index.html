@@ -503,19 +503,20 @@
                   // Add the chunk to current message
                   currentDisplayMessage += newChunk;
                   
-                  // Create a span for just this new chunk with fade-in animation
-                  const chunkSpan = document.createElement('span');
-                  chunkSpan.textContent = newChunk;
-                  chunkSpan.classList.add('bot-typing-chunk');
-                  chunkSpan.style.opacity = '0';
+                  // Apply progressive markdown formatting after each chunk
+                  const formattedHtml = formatBotMessage(currentDisplayMessage);
+                  botMessageSpan.innerHTML = formattedHtml;
+                  applySyntaxHighlighting(botMessageSpan);
                   
-                  // Append the new chunk to the message container
-                  botMessageSpan.appendChild(chunkSpan);
-                  
-                  // Trigger the fade-in animation for just this chunk
-                  requestAnimationFrame(() => {
-                    chunkSpan.style.opacity = '1';
-                  });
+                  // Find the last text node or element to apply fade-in animation to new content
+                  const lastElement = botMessageSpan.lastElementChild || botMessageSpan;
+                  if (lastElement && lastElement.nodeType === Node.ELEMENT_NODE) {
+                    lastElement.style.opacity = '0';
+                    lastElement.classList.add('bot-typing-chunk');
+                    requestAnimationFrame(() => {
+                      lastElement.style.opacity = '1';
+                    });
+                  }
                   
                   // Smooth auto-scroll to bottom as content is being typed
                   chatPanel.scrollTop = chatPanel.scrollHeight;
