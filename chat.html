@@ -250,6 +250,29 @@
       transform: scale(1.03);
     }
 
+    /* Copy Button Styles */
+    .copy-button {
+      background-color: #e0e0e0; /* Lighter gray */
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      padding: 4px 8px;
+      font-size: 0.85em;
+      color: #333;
+      cursor: pointer;
+      margin-top: 8px; /* Space above the button */
+      margin-left: 5px; /* Align with sender text a bit */
+      display: inline-block; /* Allow it to sit after text or on its own line */
+      transition: background-color 0.2s, color 0.2s;
+    }
+    .copy-button:hover {
+      background-color: #d0d0d0;
+    }
+    .copy-button.copied {
+      background-color: #4CAF50; /* Green for success */
+      color: white;
+      border-color: #4CAF50;
+    }
+
   </style>
 </head>
 <body>
@@ -288,8 +311,9 @@
 
     let fetchAbortController = null;
     let currentStopButtonHandler = null;
-    let botMessageSpanForAnimation = null; // Holds the span for the current bot message text animation
-    let imageDatasForAnimation = [];     // Holds image data for the current message
+    let botMessageSpanForAnimation = null; 
+    let imageDatasForAnimation = [];     
+    let combinedTextContentForAnimation = ''; // Added to store raw text for copying
 
     function formatBotMessage(text) {
       const html = DOMPurify.sanitize(marked.parse(text), {
@@ -432,12 +456,30 @@
               fetchAbortController.abort(); 
             }
 
-            if (botMessageSpanForAnimation) { // If letter animation had started/was set up
-              const allLetters = botMessageSpanForAnimation.querySelectorAll('.anim-letter');
-              allLetters.forEach(s => s.style.opacity = '1');
-              appendImages(); // Show images if they were processed
+            // If text content was processed and available, display it fully.
+            if (combinedTextContentForAnimation && combinedTextContentForAnimation.trim() !== '' && botContentDiv) {
+                if (botMessageSpanForAnimation) { // If animation span exists, just make letters visible
+                    const allLetters = botMessageSpanForAnimation.querySelectorAll('.anim-letter');
+                    allLetters.forEach(s => s.style.opacity = '1');
+                    // appendImages() and addCopyButtonToBotMessage() will be called after this block
+                } else { // Animation span doesn't exist, but we have text. Create and show.
+                    botContentDiv.innerHTML = ''; // Clear thinking GIF or any partial content
+                    const tempSpan = document.createElement('span');
+                    tempSpan.classList.add('bot-typing-content', 'fade-in'); // Apply base styles
+                    botContentDiv.appendChild(tempSpan);
+                    tempSpan.innerHTML = formatBotMessage(combinedTextContentForAnimation);
+                    applySyntaxHighlighting(tempSpan);
+                    // botMessageSpanForAnimation is not strictly needed to be set here as animation is stopped
+                }
+                appendImages(); // Uses imageDatasForAnimation, defined in the outer scope
+                addCopyButtonToBotMessage(botContentDiv, combinedTextContentForAnimation);
+            } else if (imageDatasForAnimation && imageDatasForAnimation.length > 0 && botContentDiv) {
+                // Only images, no text, but API call might have finished
+                botContentDiv.innerHTML = ''; // Clear thinking GIF
+                appendImages();
             } else if (botContentDiv) {
-              botContentDiv.innerHTML = ''; // Clear thinking GIF if no message span was made
+                // API call was likely aborted before content processing, or no content at all
+                botContentDiv.innerHTML = ''; // Clear thinking GIF
             }
 
             chatInput.disabled = false;
@@ -504,29 +546,30 @@
 
               let combinedTextContent = '';
               imageDatasForAnimation = []; // Clear and populate for current message
+              combinedTextContentForAnimation = ''; // Reset for current message
+
               responseParts.forEach(part => {
-                if (part.text) combinedTextContent += part.text;
+                if (part.text) combinedTextContentForAnimation += part.text;
                 if (part.inlineData?.mimeType && part.inlineData?.data) imageDatasForAnimation.push(part.inlineData);
               });
 
               // If STOP was clicked just after fetch but before this point, and global flag is set
               if (stopLetterAnimationGlobal) {
-                // Display full content immediately if available
-                if (combinedTextContent.trim() !== '' && botContentDiv) {
+                if (combinedTextContentForAnimation.trim() !== '' && botContentDiv) {
                     const tempSpan = document.createElement('span');
                     tempSpan.classList.add('bot-typing-content', 'fade-in');
                     botContentDiv.appendChild(tempSpan);
-                    tempSpan.innerHTML = formatBotMessage(combinedTextContent);
+                    tempSpan.innerHTML = formatBotMessage(combinedTextContentForAnimation); // Use the stored raw text
                     applySyntaxHighlighting(tempSpan);
-                    appendImages(); // Uses imageDatasForAnimation
+                    appendImages(); 
+                    addCopyButtonToBotMessage(botContentDiv, combinedTextContentForAnimation);
                 } else if (imageDatasForAnimation.length > 0) {
                     appendImages();
                 }
-                // UI reset is handled by handleStopAction which should have been called
                 return;
               }
 
-              if (combinedTextContent.trim() !== '') {
+              if (combinedTextContentForAnimation.trim() !== '') {
                 botMessageSpanForAnimation = document.createElement('span');
                 botMessageSpanForAnimation.classList.add('bot-typing-content');
                 if (botContentDiv) botContentDiv.appendChild(botMessageSpanForAnimation);
@@ -535,14 +578,14 @@
                     if(botMessageSpanForAnimation) botMessageSpanForAnimation.classList.add('fade-in');
                 });
 
-                const finalHtml = formatBotMessage(combinedTextContent);
+                const finalHtml = formatBotMessage(combinedTextContentForAnimation); // Use the stored raw text
                 botMessageSpanForAnimation.innerHTML = finalHtml;
                 applySyntaxHighlighting(botMessageSpanForAnimation);
 
                 // --- New Letter-by-Letter Animation Logic ---
                 // let currentStopListener = null; // Ensure this line is not present if it was part of old logic
 
-                // function wrapTextNodesWithLetterSpans(element) { /* DEFINITION MOVED ABOVE */ }
+                // function wrapTextNodesWithLetterSpans() { /* DEFINITION MOVED ABOVE */ }
 
                 const letterSpans = wrapTextNodesWithLetterSpans(botMessageSpanForAnimation);
 
@@ -555,6 +598,7 @@
                       span.style.opacity = '1';
                       if (index === letterSpans.length - 1) {
                         appendImages(); 
+                        addCopyButtonToBotMessage(botContentDiv, combinedTextContentForAnimation); // Add copy button
                         sendButton.textContent = 'Send';
                         sendButton.classList.remove('stop-generating');
                         chatInput.disabled = false;
@@ -568,6 +612,7 @@
                   });
                 } else { // No letters to animate, but there was text content (e.g. only HTML tags after formatting)
                     appendImages();
+                    addCopyButtonToBotMessage(botContentDiv, combinedTextContentForAnimation); // Add copy button
                     sendButton.textContent = 'Send';
                     sendButton.classList.remove('stop-generating');
                     chatInput.disabled = false; sendButton.disabled = false;
@@ -577,6 +622,7 @@
 
               } else if (imageDatasForAnimation.length > 0) {
                 appendImages();
+                // No text, so no copy button for text here
                 sendButton.textContent = 'Send';
                 sendButton.classList.remove('stop-generating');
                 isRetryMode = false; chatInput.disabled = false; sendButton.disabled = false;
