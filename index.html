@@ -245,7 +245,7 @@
     const separator = document.querySelector('.separator');
 
     let chatHistory = []; // Initialize chat history array
-    const TYPING_DELAY_MS = 15; // Delay in milliseconds for typing effect
+    const TYPING_DELAY_MS = 10; // Delay in milliseconds for typing effect (slower for letter-by-letter)
     let lastUserMessageText = ''; // To store the last user message for retry
     let isRetryMode = false; // Flag to indicate if the button is in "Retry" mode
 
@@ -456,7 +456,7 @@
                 const botMessageSpan = document.createElement('span'); 
                 botThinkingDiv.appendChild(botMessageSpan);
 
-                const textDisplayParts = combinedTextContent.split(/(\s+)/).filter(p => p);
+                // For letter-by-letter typing, we'll work with individual characters
                 let currentDisplayMessage = '';
                 let stopRequested = false;
                 let typingInterval; 
@@ -481,9 +481,9 @@
                 sendButton.disabled = false; // Ensure it's enabled to be clicked
                 sendButton.addEventListener('click', onStopClick);
                 
-                let idx = 0;
+                let charIndex = 0;
                 typingInterval = setInterval(() => {
-                  if (stopRequested || idx >= textDisplayParts.length) {
+                  if (stopRequested || charIndex >= combinedTextContent.length) {
                     clearInterval(typingInterval);
                     if (!stopRequested) {
                       appendImages(); 
@@ -494,7 +494,7 @@
                     }
                     return;
                   }
-                  currentDisplayMessage += textDisplayParts[idx++];
+                  currentDisplayMessage += combinedTextContent.charAt(charIndex++);
                   const html = DOMPurify.sanitize(marked.parse(currentDisplayMessage));
                   botMessageSpan.innerHTML = html;
                   chatPanel.scrollTop = chatPanel.scrollHeight;
