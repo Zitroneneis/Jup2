@@ -210,8 +210,8 @@
     const separator = document.querySelector('.separator');
 
     let chatHistory = []; // Initialize chat history array
-    const MIN_TYPING_DELAY_MS = 2; // Minimum delay between character chunks
-    const MAX_TYPING_DELAY_MS = 25; // Maximum delay between character chunks
+    const MIN_TYPING_DELAY_MS = 10; // Minimum delay between character chunks
+    const MAX_TYPING_DELAY_MS = 45; // Maximum delay between character chunks
     const MIN_CHUNK_SIZE = 1; // Minimum characters per chunk
     const MAX_CHUNK_SIZE = 15; // Maximum characters per chunk
     let lastUserMessageText = ''; // To store the last user message for retry
