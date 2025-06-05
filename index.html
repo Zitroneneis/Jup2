@@ -440,7 +440,7 @@
 
               if (combinedTextContent.trim() !== '') {
                 const botMessageSpan = document.createElement('span'); 
-                botMessageSpan.classList.add('bot-typing-content');
+                botMessageSpan.classList.add('bot-typing-content', 'fade-in'); // Add fade-in class immediately
                 botThinkingDiv.appendChild(botMessageSpan);
 
                 // Random typing with variable delays and chunk sizes
