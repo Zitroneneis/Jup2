@@ -202,22 +202,18 @@
 
     .temp-raw-chunk-animated {
       display: inline-block; 
-      opacity: 0; 
+      opacity: 0;           
       white-space: pre-wrap; 
-      animation: slideAndFadeInFromLeft 0.35s ease-out forwards; /* New animation */
+      animation: simpleFadeInChunk 0.4s linear forwards; /* Adjusted duration and timing function */
+      outline: 1px solid transparent; 
     }
 
-    @keyframes slideAndFadeInFromLeft { /* New keyframe definition */
+    @keyframes simpleFadeInChunk { 
       0% {
         opacity: 0;
-        transform: translateX(-8px); /* Start slightly to the left */
-      }
-      70% {
-        opacity: 0.8;
       }
       100% {
         opacity: 1;
-        transform: translateX(0);
       }
     }
   </style>
@@ -239,10 +235,10 @@
     const RECAPTCHA_SITE_KEY = '6LcQhFMrAAAAAMjWClxXSNDpZrFZj3rUrz5UHhWA';
 
     let chatHistory = [];
-    const MIN_TYPING_DELAY_MS = 40;
-    const MAX_TYPING_DELAY_MS = 120;
-    const MIN_CHUNK_SIZE = 8;      // Increased from 1
-    const MAX_CHUNK_SIZE = 20;     // Increased from 5
+    const MIN_TYPING_DELAY_MS = 200; // Increased from 40
+    const MAX_TYPING_DELAY_MS = 350; // Increased from 120
+    const MIN_CHUNK_SIZE = 12;     // Increased further
+    const MAX_CHUNK_SIZE = 25;     // Increased further
     let lastUserMessageText = '';
     let isRetryMode = false;
     let currentBotMessageDiv = null; // To hold the current bot message div for streaming
@@ -436,7 +432,6 @@
                   tempChunkSpan.innerHTML = processedChunkHtml; // Use innerHTML with processed chunk
                   tempChunkSpan.classList.add('temp-raw-chunk-animated');
                   botMessageSpan.appendChild(tempChunkSpan); 
-                  console.log('Chunk HTML:', tempChunkSpan.outerHTML); // DIAGNOSTIC LOG
 
                   chatPanel.scrollTop = chatPanel.scrollHeight;
 
