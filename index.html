@@ -445,7 +445,6 @@
 
                 // Random typing with variable delays and chunk sizes
                 let currentDisplayMessage = '';
-                let lastRenderedLength = 0;
                 let stopRequested = false;
                 let typingTimeout; 
 
@@ -504,27 +503,28 @@
                   // Add the chunk to current message
                   currentDisplayMessage += newChunk;
                   
-                  // Only re-render if we've added significant content or reached markdown boundaries
-                  const shouldRerender = currentDisplayMessage.length - lastRenderedLength > 20 || 
-                                        newChunk.includes('**') || newChunk.includes('`') || 
-                                        newChunk.includes('\n') || newChunk.includes('*') ||
-                                        newChunk.includes('[') || newChunk.includes(']') ||
-                                        charIndex >= combinedTextContent.length;
+                  // Always render with markdown formatting to prevent layout shifts
+                  // Store scroll position to prevent jumping
+                  const scrollPosition = chatPanel.scrollTop;
+                  const wasAtBottom = scrollPosition >= chatPanel.scrollHeight - chatPanel.clientHeight - 5;
                   
-                  if (shouldRerender) {
-                    // Apply progressive markdown formatting
-                    const formattedHtml = formatBotMessage(currentDisplayMessage);
-                    botMessageSpan.innerHTML = formattedHtml;
+                  // Apply progressive markdown formatting consistently
+                  const formattedHtml = formatBotMessage(currentDisplayMessage);
+                  botMessageSpan.innerHTML = formattedHtml;
+                  
+                  // Only apply syntax highlighting occasionally to improve performance
+                  const shouldHighlight = newChunk.includes('```') || newChunk.includes('`') || 
+                                         charIndex >= combinedTextContent.length;
+                  if (shouldHighlight) {
                     applySyntaxHighlighting(botMessageSpan);
-                    lastRenderedLength = currentDisplayMessage.length;
-                  } else {
-                    // Just append the raw text to avoid flickering
-                    const textNode = document.createTextNode(newChunk);
-                    botMessageSpan.appendChild(textNode);
                   }
                   
-                  // Smooth auto-scroll to bottom as content is being typed
-                  chatPanel.scrollTop = chatPanel.scrollHeight;
+                  // Restore scroll position if user wasn't at bottom, otherwise scroll to bottom
+                  if (wasAtBottom) {
+                    chatPanel.scrollTop = chatPanel.scrollHeight;
+                  } else {
+                    chatPanel.scrollTop = scrollPosition;
+                  }
                   
                   // Random delay between MIN_TYPING_DELAY_MS and MAX_TYPING_DELAY_MS
                   const randomDelay = Math.floor(Math.random() * (MAX_TYPING_DELAY_MS - MIN_TYPING_DELAY_MS + 1)) + MIN_TYPING_DELAY_MS;
