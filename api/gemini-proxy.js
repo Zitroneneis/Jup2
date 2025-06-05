@@ -127,11 +127,16 @@ To generate an image, you MUST call the function named 'generate_image' with a d
     }
 
     // Check for function call
-    let functionCall = data.candidates?.[0]?.content?.parts?.find(part => part.functionCall);
+    console.log('Data before function call check:', JSON.stringify(data, null, 2)); 
+    // let functionCall = data.candidates?.[0]?.content?.parts?.find(part => part.functionCall); // Old way
+    const partContainingFunctionCall = data.candidates?.[0]?.content?.parts?.find(part => part.functionCall);
+    const actualFunctionCall = partContainingFunctionCall ? partContainingFunctionCall.functionCall : null;
+    
+    console.log('Derived actualFunctionCall object:', JSON.stringify(actualFunctionCall, null, 2)); 
 
-    if (supportsFunctionCalling && functionCall && functionCall.name === 'generate_image') {
-      console.log('Function call received: generate_image', functionCall.args);
-      const imagePrompt = functionCall.args.prompt;
+    if (supportsFunctionCalling && actualFunctionCall && actualFunctionCall.name === 'generate_image') {
+      console.log('Function call received: generate_image', actualFunctionCall.args);
+      const imagePrompt = actualFunctionCall.args.prompt;
 
       if (!imagePrompt) {
         // Handle missing prompt - send a text response back to the model
