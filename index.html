@@ -166,6 +166,8 @@
     /* Smooth typing effect animations */
     .bot-typing-content {
       opacity: 0; /* Start hidden for initial fade-in */
+      display: inline-block; /* Stabilize layout during updates */
+      vertical-align: top; /* Align with adjacent text like "Bot: " */
     }
 
     .bot-typing-content.fade-in {
@@ -177,15 +179,17 @@
     .temp-raw-chunk-animated {
       display: inline; /* Crucial for text flow */
       opacity: 0;
-      animation: fadeInRawChunk 0.4s ease-out forwards;
+      animation: fadeInRawChunk 0.2s ease-out forwards; /* Shortened duration */
     }
 
     @keyframes fadeInRawChunk {
       0% {
         opacity: 0;
+        transform: translateY(3px); /* Add subtle upward movement */
       }
       100% {
         opacity: 1;
+        transform: translateY(0);
       }
     }
 
