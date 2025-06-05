@@ -22,6 +22,9 @@
   <script src="https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script> <!-- Added marked.js library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/2.3.6/purify.min.js"></script> <!-- Added DOMPurify library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script> <!-- Prism.js for syntax highlighting -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script> <!-- Auto-load language support -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css"> <!-- Prism CSS theme -->
   <script src="https://www.google.com/recaptcha/enterprise.js?render=6LcQhFMrAAAAAMjWClxXSNDpZrFZj3rUrz5UHhWA"></script>
   <!-- Lottie animation library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.7.4/lottie.min.js"></script>
@@ -126,6 +129,39 @@
       width: 40px;
       height: 40px;
     }
+
+    /* Code block and inline code styling */
+    code {
+      background-color: #f4f4f4;
+      padding: 2px 4px;
+      border-radius: 3px;
+      font-family: 'Courier New', Monaco, monospace;
+      font-size: 0.9em;
+    }
+
+    pre {
+      background-color: #f8f8f8;
+      border: 1px solid #e1e1e1;
+      border-radius: 5px;
+      padding: 12px;
+      margin: 10px 0;
+      overflow-x: auto;
+      line-height: 1.4;
+    }
+
+    pre code {
+      background-color: transparent;
+      padding: 0;
+      border-radius: 0;
+      font-size: 0.85em;
+    }
+
+    /* Language-specific code block styling */
+    .language-python { border-left: 4px solid #3776ab; }
+    .language-javascript { border-left: 4px solid #f7df1e; }
+    .language-html { border-left: 4px solid #e34f26; }
+    .language-css { border-left: 4px solid #1572b6; }
+    .language-json { border-left: 4px solid #000000; }
 
   </style>
 </head>
@@ -396,6 +432,15 @@
                     ADD_ATTR: ['target'],
                   });
                   botMessageSpan.innerHTML = html;
+                  
+                  // Apply syntax highlighting to code blocks
+                  if (typeof Prism !== 'undefined') {
+                    const codeBlocks = botMessageSpan.querySelectorAll('pre code');
+                    codeBlocks.forEach(block => {
+                      Prism.highlightElement(block);
+                    });
+                  }
+                  
                   chatPanel.scrollTop = chatPanel.scrollHeight;
                   
                   // Random delay between MIN_TYPING_DELAY_MS and MAX_TYPING_DELAY_MS
