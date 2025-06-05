@@ -166,7 +166,7 @@
     /* Smooth typing effect animations */
     .bot-typing-content {
       opacity: 0;
-      transition: opacity 0.3s ease-in;
+      transition: opacity 0.6s ease-in; /* Slower fade-in transition */
     }
 
     .bot-typing-content.fade-in {
@@ -174,13 +174,13 @@
     }
 
     .bot-typing-chunk {
-      animation: fadeInChunk 0.4s ease-out forwards;
+      animation: fadeInChunk 0.8s ease-out forwards; /* Slower chunk animation */
     }
 
     @keyframes fadeInChunk {
       0% {
         opacity: 0;
-        transform: translateY(2px);
+        transform: translateY(3px); /* Slightly more pronounced movement */
       }
       100% {
         opacity: 1;
@@ -235,10 +235,10 @@
     const separator = document.querySelector('.separator');
 
     let chatHistory = []; // Initialize chat history array
-    const MIN_TYPING_DELAY_MS = 10; // Minimum delay between character chunks
-    const MAX_TYPING_DELAY_MS = 45; // Maximum delay between character chunks
+    const MIN_TYPING_DELAY_MS = 25; // Minimum delay between character chunks (slower)
+    const MAX_TYPING_DELAY_MS = 80; // Maximum delay between character chunks (much slower)
     const MIN_CHUNK_SIZE = 1; // Minimum characters per chunk
-    const MAX_CHUNK_SIZE = 15; // Maximum characters per chunk
+    const MAX_CHUNK_SIZE = 8; // Maximum characters per chunk (smaller chunks for smoother effect)
     let lastUserMessageText = ''; // To store the last user message for retry
     let isRetryMode = false; // Flag to indicate if the button is in "Retry" mode
 
