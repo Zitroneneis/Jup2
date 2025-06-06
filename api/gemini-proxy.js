@@ -5,7 +5,7 @@ export default async function handler(req, res) {
     return res.status(405).end(`Method ${req.method} Not Allowed`);
   }
 
-  const { history, recaptchaToken, model: requestedModel } = req.body; // Add model from request
+  const { history, recaptchaToken, model: requestedModel, generationConfig: frontendGenerationConfig } = req.body; // Add model and generationConfig from request
   const apiKey = process.env.GEMINI_API_KEY;
   const recaptchaSecretKey = process.env.RECAPTCHA_SECRET_KEY; 
   
@@ -76,9 +76,15 @@ export default async function handler(req, res) {
       contents: history,
       generationConfig: {
         temperature: 0.7,
-        // responseMimeType: "text/plain", // Keep as default or remove if causing issues
+        // responseMimeType: "text/plain", // Default, will be overridden if frontendGenerationConfig is present
       }
     };
+
+    // If frontend sends a generationConfig, merge it.
+    // This allows the frontend to specify response_mime_type for specific models.
+    if (frontendGenerationConfig) {
+      requestBody.generationConfig = { ...requestBody.generationConfig, ...frontendGenerationConfig };
+    }
 
     if (systemPrompt) {
         requestBody.systemInstruction = { parts: [{ text: systemPrompt }] };
@@ -94,7 +100,7 @@ export default async function handler(req, res) {
       // For now, we assume it can take text and might return an image part directly.
       // The Vertex AI SDK handles this more gracefully. With direct REST, it's more manual.
       // Let's ensure responseModalities is set if this model requires it.
-      requestBody.generationConfig.responseMimeType = 'multipart/form-data'; // Or as required by the model for mixed output
+      // requestBody.generationConfig.responseMimeType = 'multipart/form-data'; // REMOVED - Frontend will send this if needed via frontendGenerationConfig
       // The API might also expect a specific structure for image prompts if not using function calling.
       // For simplicity, we'll let the model try to generate an image if the user asks for one with this model.
     }

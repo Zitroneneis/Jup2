@@ -596,14 +596,24 @@
           }
 
           try {
+            let requestPayload = {
+              history: chatHistory,
+              recaptchaToken: token,
+              model: selectedModel
+            };
+
+            if (selectedModel === 'gemini-2.0-flash-preview-image-generation') {
+              // Suggest 'application/json' for the image generation model.
+              // This is an allowed MIME type and suitable for function calling.
+              requestPayload.generationConfig = {
+                response_mime_type: 'application/json'
+              };
+            }
+
             const response = await fetch('/api/gemini-proxy', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ 
-                history: chatHistory, 
-                recaptchaToken: token,
-                model: selectedModel // Send selected model to backend
-              }),
+              body: JSON.stringify(requestPayload),
               signal: fetchAbortController.signal
             });
 
