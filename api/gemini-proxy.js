@@ -86,7 +86,8 @@ export default async function handler(req, res) {
       requestBody.generationConfig = { ...requestBody.generationConfig, ...frontendGenerationConfig };
     }
 
-    if (systemPrompt) {
+    // Add systemPrompt only if it exists and the model is not the image generation model
+    if (systemPrompt && modelToUse !== 'gemini-2.0-flash-preview-image-generation') {
         requestBody.systemInstruction = { parts: [{ text: systemPrompt }] };
     }
 
@@ -205,7 +206,7 @@ export default async function handler(req, res) {
               response: {
                 // Provide a simpler response to the chat model, just confirming success.
                 // The actual image data will be added by the proxy to the final client response.
-                content: `Image for prompt "${imagePrompt}" was successfully generated and is available.`
+                content: `Image for prompt \"${imagePrompt}\" was successfully generated and is available.`
                 // Removed imageData from here as the chat model isn't re-packaging it.
               }
             }
@@ -257,17 +258,17 @@ export default async function handler(req, res) {
         }
       }
     } // End of function call handling
-    
     // Ensure the final response has candidates and parts before sending back
     if (!data.candidates || !data.candidates[0] || !data.candidates[0].content || !data.candidates[0].content.parts) {
-      console.error('Invalid response structure from Gemini API (initial call, no function call):', data);
-      return res.status(500).json({ error: 'Invalid response structure from Gemini API' });
+      console.error('Invalid response structure from Gemini API (initial call, no function call):', data);ent.parts) {
+      return res.status(500).json({ error: 'Invalid response structure from Gemini API' });call):', data);
+    } return res.status(500).json({ error: 'Invalid response structure from Gemini API' });
     }
-
     res.status(200).json(data);
-
+    res.status(200).json(data);
   } catch (error) {
     console.error('Error in proxy function:', error);
     res.status(500).json({ error: 'Internal Server Error' });
-  }
+  } res.status(500).json({ error: 'Internal Server Error' });
+} }
 }
