@@ -304,7 +304,9 @@
         <option value="gemini-2.0-flash-lite">gemini-2.0-flash-lite (Default)</option>
         <option value="gemini-2.0-flash">gemini-2.0-flash</option>
         <option value="gemini-1.5-flash">gemini-1.5-flash</option>
-        <option value="gemini-2.5-flash-preview-05-20">gemini-2.5-flash-preview-05-20</option>
+        <option value="gemini-2.5-flash-preview-05-20">Gemini 2.5 Flash (05-20)</option>
+        <!-- <option value="gemini-2.0-pro-preview-image-generation">Gemini 2.0 Pro Preview (Image Gen)</option> -->
+        <option value="perplexity-sonar">Perplexity Sonar</option>
       </select>
     </div>
     <div id="chat-panel"></div>
@@ -597,14 +599,24 @@
           }
 
           try {
+            let requestPayload = {
+              history: chatHistory,
+              recaptchaToken: token,
+              model: selectedModel
+            };
+
+            if (selectedModel === 'gemini-2.0-flash-preview-image-generation') {
+              // Suggest 'application/json' for the image generation model.
+              // This is an allowed MIME type and suitable for function calling.
+              requestPayload.generationConfig = {
+                response_mime_type: 'application/json'
+              };
+            }
+
             const response = await fetch('/api/gemini-proxy', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ 
-                history: chatHistory, 
-                recaptchaToken: token,
-                model: selectedModel // Send selected model to backend
-              }),
+              body: JSON.stringify(requestPayload),
               signal: fetchAbortController.signal
             });
 
