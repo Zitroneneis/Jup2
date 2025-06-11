@@ -69,7 +69,7 @@ export default async function handler(req, res) {
   // Determine if the current model supports function calling for image generation
   // For this example, let's assume gemini-2.0-flash-lite and gemini-2.5-pro-preview-06-05 support it.
   // The gemini-2.0-flash-preview-image-generation model generates images directly.
-  const supportsFunctionCalling = ['gemini-2.0-flash-lite', 'gemini-2.5-pro-preview-06-05'].includes(modelToUse);
+  const supportsFunctionCalling = ['gemini-2.0-flash-lite', 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-2.5-flash-preview-05-20'].includes(modelToUse);
 
   try {
     let requestBody = {
