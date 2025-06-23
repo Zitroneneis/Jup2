@@ -253,14 +253,18 @@
       font-weight: bold;
       font-size: 20px;
       transition: 0.6s ease;
-      border-radius: 0 3px 3px 0;
       user-select: none;
       background-color: rgba(0,0,0,0.3);
     }
 
+    .lightbox-prev {
+      left: 0;
+      border-radius: 3px 0 0 3px;
+    }
+
     .lightbox-next {
       right: 0;
-      border-radius: 3px 0 0 3px;
+      border-radius: 0 3px 3px 0;
     }
 
     .lightbox-prev:hover, .lightbox-next:hover {
@@ -494,6 +498,7 @@
       event.preventDefault();
       const selectedModel = modelSelector.value; // Get selected model early
 
+      
       let userMessageToProcess;
 
       if (isRetryMode) {
@@ -502,7 +507,7 @@
       } else {
         userMessageToProcess = chatInput.value.trim();
         if (!userMessageToProcess) return;
-        lastUserMessageText = userMessageToProcess;
+        lastUserMessageToProcess = userMessageToProcess;
         displayMessage('User', userMessageToProcess);
         chatHistory.push({ role: "user", parts: [{ text: userMessageToProcess }] });
       }
