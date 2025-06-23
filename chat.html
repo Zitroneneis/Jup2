@@ -560,7 +560,7 @@
           } else {
             userMessageToProcess = chatInput.value.trim();
             if (!userMessageToProcess) return;
-            lastUserMessageToProcess = userMessageToProcess;
+            lastUserMessageText = userMessageToProcess;
             displayMessage('User', userMessageToProcess);
             chatHistory.push({ role: "user", parts: [{ text: userMessageToProcess }] });
           }
