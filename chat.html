@@ -242,6 +242,58 @@
       text-shadow: 0 1px 3px rgba(0,0,0,0.3);
     }
 
+    .lightbox-prev, .lightbox-next {
+      cursor: pointer;
+      position: absolute;
+      top: 50%;
+      width: auto;
+      padding: 16px;
+      margin-top: -22px;
+      color: white;
+      font-weight: bold;
+      font-size: 20px;
+      transition: 0.6s ease;
+      border-radius: 0 3px 3px 0;
+      user-select: none;
+      background-color: rgba(0,0,0,0.3);
+    }
+
+    .lightbox-next {
+      right: 0;
+      border-radius: 3px 0 0 3px;
+    }
+
+    .lightbox-prev:hover, .lightbox-next:hover {
+      background-color: rgba(0,0,0,0.8);
+    }
+
+    .filmstrip-container {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 10px;
+      padding: 10px;
+      background-color: rgba(0,0,0,0.5);
+      border-radius: 10px;
+    }
+
+    .filmstrip-image {
+      width: 80px;
+      height: 60px;
+      object-fit: cover;
+      cursor: pointer;
+      border: 2px solid transparent;
+      border-radius: 5px;
+      transition: border-color 0.3s;
+    }
+
+    .filmstrip-image:hover, .filmstrip-image.active {
+      border-color: #fff;
+    }
+
+
     .generated-image {
       cursor: pointer;
       transition: transform 0.2s ease-out;
@@ -319,6 +371,9 @@
   <div class="lightbox-overlay" id="lightboxOverlay">
     <span class="lightbox-close" id="lightboxClose">&times;</span>
     <img src="" alt="Lightbox Image" class="lightbox-image" id="lightboxImage">
+    <a class="lightbox-prev" id="lightboxPrev">&#10094;</a>
+    <a class="lightbox-next" id="lightboxNext">&#10095;</a>
+    <div class="filmstrip-container" id="filmstripContainer"></div>
   </div>
 
   <script>
@@ -333,8 +388,13 @@
     const lightboxOverlay = document.getElementById('lightboxOverlay');
     const lightboxImage = document.getElementById('lightboxImage');
     const lightboxClose = document.getElementById('lightboxClose');
+    const lightboxPrev = document.getElementById('lightboxPrev');
+    const lightboxNext = document.getElementById('lightboxNext');
+    const filmstripContainer = document.getElementById('filmstripContainer');
 
     let chatHistory = [];
+    let sessionImages = [];
+    let currentImageIndex = 0;
     // Removed MIN_TYPING_DELAY_MS, MAX_TYPING_DELAY_MS, MIN_CHUNK_SIZE, MAX_CHUNK_SIZE
     let lastUserMessageText = '';
     let isRetryMode = false;
@@ -347,6 +407,44 @@
     let botMessageSpanForAnimation = null; 
     let imageDatasForAnimation = [];     
     let combinedTextContentForAnimation = ''; // Added to store raw text for copying
+
+    function showLightboxImage(index) {
+        if (index < 0 || index >= sessionImages.length) {
+            console.error("Invalid image index:", index);
+            return;
+        }
+        currentImageIndex = index;
+        lightboxImage.src = sessionImages[currentImageIndex];
+        lightboxOverlay.style.display = 'flex';
+
+        filmstripContainer.innerHTML = '';
+        sessionImages.forEach((src, i) => {
+            const filmstripImg = document.createElement('img');
+            filmstripImg.src = src;
+            filmstripImg.classList.add('filmstrip-image');
+            if (i === currentImageIndex) {
+                filmstripImg.classList.add('active');
+            }
+            filmstripImg.addEventListener('click', () => showLightboxImage(i));
+            filmstripContainer.appendChild(filmstripImg);
+        });
+
+        lightboxPrev.style.display = sessionImages.length > 1 ? 'block' : 'none';
+        lightboxNext.style.display = sessionImages.length > 1 ? 'block' : 'none';
+    }
+
+    function showNextImage() {
+        const newIndex = (currentImageIndex + 1) % sessionImages.length;
+        showLightboxImage(newIndex);
+    }
+
+    function showPrevImage() {
+        const newIndex = (currentImageIndex - 1 + sessionImages.length) % sessionImages.length;
+        showLightboxImage(newIndex);
+    }
+
+    lightboxPrev.addEventListener('click', showPrevImage);
+    lightboxNext.addEventListener('click', showNextImage);
 
     function formatBotMessage(text) {
       const html = DOMPurify.sanitize(marked.parse(text), {
@@ -387,6 +485,19 @@
         
         chatPanel.appendChild(messageDiv);
         chatPanel.scrollTop = chatPanel.scrollHeight;
+
+        // Update filmstrip after bot message is displayed
+        if (sender === 'Bot' && isHtml) {
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(textOrHtml, 'text/html');
+          const images = doc.querySelectorAll('img');
+          imageDatasForAnimation = Array.from(images).map(img => ({
+            mimeType: img.src.split(';')[0].split(':')[1],
+            data: img.src.split(',')[1]
+          }));
+          updateFilmstrip();
+        }
+
         return messageDiv; // Return the message div for potential updates (e.g., streaming)
     }
 
@@ -488,7 +599,14 @@
             if (!botContentDiv) return;
             imageDatasForAnimation.forEach(imageData => {
               const img = document.createElement('img');
-              img.src = `data:${imageData.mimeType};base64,${imageData.data}`;
+              const imgSrc = `data:${imageData.mimeType};base64,${imageData.data}`;
+              img.src = imgSrc;
+
+              if (!sessionImages.includes(imgSrc)) {
+                  sessionImages.push(imgSrc);
+              }
+              const imageIndex = sessionImages.indexOf(imgSrc);
+              
               img.alt = "Generated Image";
               img.style.maxWidth = "100%";
               img.style.display = "block"; 
@@ -497,16 +615,11 @@
 
               // Event listener for opening lightbox
               img.addEventListener('click', () => {
-                if (lightboxImage && lightboxOverlay) { 
-                    lightboxImage.src = img.src;
-                    lightboxOverlay.style.display = 'flex';
-                    if (typeof gtag === 'function') {
-                        gtag('event', 'Lightbox-image-opened', {
-                            'model_used': modelSelector.value // Or derive from message if needed
-                        });
-                    }
-                } else {
-                    console.error('Lightbox elements not found when trying to open!');
+                showLightboxImage(imageIndex);
+                if (typeof gtag === 'function') {
+                    gtag('event', 'Lightbox-image-opened', {
+                        'model_used': modelSelector.value // Or derive from message if needed
+                    });
                 }
               });
 
@@ -755,7 +868,8 @@
                     addCopyButtonToBotMessage(botContentDiv, combinedTextContentForAnimation); // Add copy button
                     sendButton.textContent = 'Send';
                     sendButton.classList.remove('stop-generating');
-                    chatInput.disabled = false; sendButton.disabled = false;
+                    chatInput.disabled = false;
+                    sendButton.disabled = false;
                     if (currentStopButtonHandler) sendButton.removeEventListener('click', currentStopButtonHandler);
                     currentStopButtonHandler = null;
                 }
@@ -853,6 +967,121 @@
         }
       });
     }
+
+    // Lightbox navigation functionality
+    let currentImageIndex = 0;
+    let displayedImageCount = 0;
+
+    function updateFilmstrip() {
+      if (!filmstripContainer || imageDatasForAnimation.length === 0) return;
+
+      // Clear existing thumbnails
+      filmstripContainer.innerHTML = '';
+
+      // Add new thumbnails
+      imageDatasForAnimation.forEach((imageData, index) => {
+        const thumbnail = document.createElement('div');
+        thumbnail.className = 'filmstrip-thumbnail';
+        thumbnail.dataset.index = index;
+
+        const img = document.createElement('img');
+        img.src = `data:${imageData.mimeType};base64,${imageData.data}`;
+        img.alt = "Thumbnail";
+        thumbnail.appendChild(img);
+
+        // Click event to navigate to the corresponding image
+        thumbnail.addEventListener('click', () => {
+          currentImageIndex = index;
+          showImageInLightbox(currentImageIndex);
+        });
+
+        filmstripContainer.appendChild(thumbnail);
+      });
+
+      displayedImageCount = imageDatasForAnimation.length;
+      updateLightboxNavigation();
+    }
+
+    function updateLightboxNavigation() {
+      if (displayedImageCount <= 1) {
+        lightboxPrev.style.display = 'none';
+        lightboxNext.style.display = 'none';
+      } else {
+        lightboxPrev.style.display = 'block';
+        lightboxNext.style.display = 'block';
+      }
+    }
+
+    function showImageInLightbox(index) {
+      if (index < 0 || index >= imageDatasForAnimation.length) return;
+
+      const imageData = imageDatasForAnimation[index];
+      lightboxImage.src = `data:${imageData.mimeType};base64,${imageData.data}`;
+      currentImageIndex = index;
+
+      // Update filmstrip selection
+      const thumbnails = filmstripContainer.querySelectorAll('.filmstrip-thumbnail');
+      thumbnails.forEach((thumb, idx) => {
+        thumb.classList.toggle('selected', idx === currentImageIndex);
+      });
+
+      updateLightboxNavigation();
+    }
+
+    // Lightbox next/prev functionality
+    lightboxNext.addEventListener('click', (event) => {
+      event.stopPropagation();
+      if (currentImageIndex < imageDatasForAnimation.length - 1) {
+        currentImageIndex++;
+        showImageInLightbox(currentImageIndex);
+      }
+    });
+
+    lightboxPrev.addEventListener('click', (event) => {
+      event.stopPropagation();
+      if (currentImageIndex > 0) {
+        currentImageIndex--;
+        showImageInLightbox(currentImageIndex);
+      }
+    });
+
+    // Integrate filmstrip update in the message display logic
+    function displayMessage(sender, textOrHtml, isHtml = false) {
+        const messageDiv = document.createElement('div');
+        messageDiv.classList.add('message', sender.toLowerCase());
+
+        const senderSpan = document.createElement('div');
+        senderSpan.classList.add('message-sender');
+        senderSpan.textContent = sender === 'User' ? 'You' : 'Bot';
+        messageDiv.appendChild(senderSpan);
+
+        const contentDiv = document.createElement('div');
+        contentDiv.classList.add('message-content');
+        if (isHtml) {
+            contentDiv.innerHTML = textOrHtml;
+        } else {
+            contentDiv.textContent = textOrHtml;
+        }
+        messageDiv.appendChild(contentDiv);
+        
+        chatPanel.appendChild(messageDiv);
+        chatPanel.scrollTop = chatPanel.scrollHeight;
+
+        // Update filmstrip after bot message is displayed
+        if (sender === 'Bot' && isHtml) {
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(textOrHtml, 'text/html');
+          const images = doc.querySelectorAll('img');
+          imageDatasForAnimation = Array.from(images).map(img => ({
+            mimeType: img.src.split(';')[0].split(':')[1],
+            data: img.src.split(',')[1]
+          }));
+          updateFilmstrip();
+        }
+
+        return messageDiv; // Return the message div for potential updates (e.g., streaming)
+    }
+
   </script>
 </body>
 </html>
