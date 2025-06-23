@@ -779,29 +779,6 @@
             sendButton.disabled = false; 
             sendButton.addEventListener('click', currentStopButtonHandler);
 
-            // Define wrapTextNodesWithLetterSpans at a higher scope
-            function wrapTextNodesWithLetterSpans() {
-              const letters = [];
-              Array.from(element.childNodes).forEach(child => {
-                if (child.nodeType === Node.TEXT_NODE) {
-                  const text = child.textContent;
-                  if (text.trim() === '') return; // Skip empty or whitespace-only text nodes
-                  const fragment = document.createDocumentFragment();
-                  for (let i = 0; i < text.length; i++) {
-                    const span = document.createElement('span');
-                    span.className = 'anim-letter';
-                    span.textContent = text[i];
-                    fragment.appendChild(span);
-                    letters.push(span);
-                  }
-                  child.parentNode.replaceChild(fragment, child);
-                } else if (child.nodeType === Node.ELEMENT_NODE) {
-                  letters.push(...wrapTextNodesWithLetterSpans(child));
-                }
-              });
-              return letters;
-            }
-
             try {
               let requestPayload = {
                 history: chatHistory,
