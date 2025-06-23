@@ -493,6 +493,24 @@
     chatForm.addEventListener('submit', async (event) => {
       event.preventDefault();
       const selectedModel = modelSelector.value; // Get selected model early
+
+      let userMessageToProcess;
+
+      if (isRetryMode) {
+        userMessageToProcess = lastUserMessageText;
+        isRetryMode = false; 
+      } else {
+        userMessageToProcess = chatInput.value.trim();
+        if (!userMessageToProcess) return;
+        lastUserMessageText = userMessageToProcess;
+        displayMessage('User', userMessageToProcess);
+        chatHistory.push({ role: "user", parts: [{ text: userMessageToProcess }] });
+      }
+
+      chatInput.value = '';
+      chatInput.disabled = true;
+      sendButton.disabled = true; // Initially disable, will be enabled as STOP or after completion
+      
       if (typeof gtag === 'function') {
         gtag('event', 'Chat-button-submitted', { // Add event parameters
           'model_used': selectedModel
@@ -552,393 +570,376 @@
               targetContainer.appendChild(button);
             }
 
-            let userMessageToProcess;
+            currentBotMessageDiv = displayMessage('Bot', '<img src="assets/thinking.gif" alt="Thinking..." class="thinking-gif" />', true);
+            const botContentDiv = currentBotMessageDiv.querySelector('.message-content');
 
-          if (isRetryMode) {
-            userMessageToProcess = lastUserMessageText;
-            isRetryMode = false; 
-          } else {
-            userMessageToProcess = chatInput.value.trim();
-            if (!userMessageToProcess) return;
-            lastUserMessageText = userMessageToProcess;
-            displayMessage('User', userMessageToProcess);
-            chatHistory.push({ role: "user", parts: [{ text: userMessageToProcess }] });
-          }
-
-          chatInput.value = '';
-          chatInput.disabled = true;
-          sendButton.disabled = true; // Initially disable, will be enabled as STOP or after completion
-
-          currentBotMessageDiv = displayMessage('Bot', '<img src="assets/thinking.gif" alt="Thinking..." class="thinking-gif" />', true);
-          const botContentDiv = currentBotMessageDiv.querySelector('.message-content');
-
-          stopLetterAnimationGlobal = false;
-          letterAnimationTimeouts.forEach(clearTimeout);
-          letterAnimationTimeouts = [];
-          if (currentStopButtonHandler) {
-            sendButton.removeEventListener('click', currentStopButtonHandler);
-            currentStopButtonHandler = null;
-          }
-          fetchAbortController = new AbortController();
-          botMessageSpanForAnimation = null; 
-          imageDatasForAnimation = []; 
-
-          const appendImages = () => {
-            if (!botContentDiv) return;
-            imageDatasForAnimation.forEach(imageData => {
-              const img = document.createElement('img');
-              const imgSrc = `data:${imageData.mimeType};base64,${imageData.data}`;
-              img.src = imgSrc;
-
-              if (!sessionImages.includes(imgSrc)) {
-                  sessionImages.push(imgSrc);
-              }
-              const imageIndex = sessionImages.indexOf(imgSrc);
-              
-              img.alt = "Generated Image";
-              img.style.maxWidth = "100%";
-              img.style.display = "block"; 
-              img.style.marginTop = "10px"; 
-              img.classList.add('generated-image');
-
-              // Event listener for opening lightbox
-              img.addEventListener('click', () => {
-                showLightboxImage(imageIndex);
-                if (typeof gtag === 'function') {
-                    gtag('event', 'Lightbox-image-opened', {
-                        'model_used': modelSelector.value // Or derive from message if needed
-                    });
-                }
-              });
-
-              botContentDiv.appendChild(img); 
-              img.onload = () => chatPanel.scrollTop = chatPanel.scrollHeight;
-
-              // Event for when an image is actually appended/displayed
-              if (typeof gtag === 'function') {
-                gtag('event', 'Image-displayed-to-user', {
-                    'model_used': modelSelector.value, // Or from the message context if available
-                    'image_mime_type': imageData.mimeType
-                });
-              }
-            });
-            setTimeout(() => chatPanel.scrollTop = chatPanel.scrollHeight, 10);
-          };
-
-          function handleStopAction() {
-            stopLetterAnimationGlobal = true; 
+            stopLetterAnimationGlobal = false;
             letterAnimationTimeouts.forEach(clearTimeout);
             letterAnimationTimeouts = [];
-
-            if (fetchAbortController) {
-              fetchAbortController.abort(); 
-            }
-
-            if (combinedTextContentForAnimation && combinedTextContentForAnimation.trim() !== '' && botContentDiv) {
-                if (botMessageSpanForAnimation) {
-                    const allLetters = botMessageSpanForAnimation.querySelectorAll('.anim-letter');
-                    allLetters.forEach(s => s.style.opacity = '1');
-                } else { 
-                    botContentDiv.innerHTML = ''; 
-                    const tempSpan = document.createElement('span');
-                    tempSpan.classList.add('bot-typing-content', 'fade-in'); 
-                    botContentDiv.appendChild(tempSpan);
-                    tempSpan.innerHTML = formatBotMessage(combinedTextContentForAnimation);
-                    applySyntaxHighlighting(tempSpan);
-                }
-                appendImages(); 
-                addCopyButtonToBotMessage(botContentDiv, combinedTextContentForAnimation); // Call is here
-            } else if (imageDatasForAnimation && imageDatasForAnimation.length > 0 && botContentDiv) {
-                botContentDiv.innerHTML = ''; 
-                appendImages();
-            } else if (botContentDiv) {
-                botContentDiv.innerHTML = ''; 
-            }
-
-            chatInput.disabled = false;
-            sendButton.textContent = 'Send';
-            sendButton.classList.remove('stop-generating');
-            sendButton.disabled = false;
-            isRetryMode = false;
             if (currentStopButtonHandler) {
               sendButton.removeEventListener('click', currentStopButtonHandler);
               currentStopButtonHandler = null;
             }
-            fetchAbortController = null; 
-            if (typeof gtag === 'function') gtag('event', 'Action-Stopped-By-User', {
-              'model_used': modelSelector.value // Add model used to this event too
-            });
-          }
+            fetchAbortController = new AbortController();
+            botMessageSpanForAnimation = null; 
+            imageDatasForAnimation = []; 
 
-          currentStopButtonHandler = handleStopAction;
-          sendButton.textContent = 'STOP';
-          sendButton.classList.add('stop-generating');
-          sendButton.disabled = false; 
-          sendButton.addEventListener('click', currentStopButtonHandler);
+            const appendImages = () => {
+              if (!botContentDiv) return;
+              imageDatasForAnimation.forEach(imageData => {
+                const img = document.createElement('img');
+                const imgSrc = `data:${imageData.mimeType};base64,${imageData.data}`;
+                img.src = imgSrc;
 
-          // Define wrapTextNodesWithLetterSpans at a higher scope
-          function wrapTextNodesWithLetterSpans(element) {
-            const letters = [];
-            Array.from(element.childNodes).forEach(child => {
-              if (child.nodeType === Node.TEXT_NODE) {
-                const text = child.textContent;
-                if (text.trim() === '') return; // Skip empty or whitespace-only text nodes
-                const fragment = document.createDocumentFragment();
-                for (let i = 0; i < text.length; i++) {
-                  const span = document.createElement('span');
-                  span.className = 'anim-letter';
-                  span.textContent = text[i];
-                  fragment.appendChild(span);
-                  letters.push(span);
+                if (!sessionImages.includes(imgSrc)) {
+                    sessionImages.push(imgSrc);
                 }
-                child.parentNode.replaceChild(fragment, child);
-              } else if (child.nodeType === Node.ELEMENT_NODE) {
-                letters.push(...wrapTextNodesWithLetterSpans(child));
-              }
-            });
-            return letters;
-          }
+                const imageIndex = sessionImages.indexOf(imgSrc);
+                
+                img.alt = "Generated Image";
+                img.style.maxWidth = "100%";
+                img.style.display = "block"; 
+                img.style.marginTop = "10px"; 
+                img.classList.add('generated-image');
 
-          try {
-            let requestPayload = {
-              history: chatHistory,
-              recaptchaToken: token,
-              model: selectedModel
+                // Event listener for opening lightbox
+                img.addEventListener('click', () => {
+                  showLightboxImage(imageIndex);
+                  if (typeof gtag === 'function') {
+                      gtag('event', 'Lightbox-image-opened', {
+                          'model_used': modelSelector.value // Or derive from message if needed
+                      });
+                  }
+                });
+
+                botContentDiv.appendChild(img); 
+                img.onload = () => chatPanel.scrollTop = chatPanel.scrollHeight;
+
+                // Event for when an image is actually appended/displayed
+                if (typeof gtag === 'function') {
+                  gtag('event', 'Image-displayed-to-user', {
+                      'model_used': modelSelector.value, // Or from the message context if available
+                      'image_mime_type': imageData.mimeType
+                  });
+                }
+              });
+              setTimeout(() => chatPanel.scrollTop = chatPanel.scrollHeight, 10);
             };
 
-            if (selectedModel === 'gemini-2.0-flash-preview-image-generation') {
-              // Suggest 'application/json' for the image generation model.
-              // This is an allowed MIME type and suitable for function calling.
-              requestPayload.generationConfig = {
-                response_mime_type: 'application/json'
-              };
-            }
+            function handleStopAction() {
+              stopLetterAnimationGlobal = true; 
+              letterAnimationTimeouts.forEach(clearTimeout);
+              letterAnimationTimeouts = [];
 
-            const response = await fetch('/api/gemini-proxy', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(requestPayload),
-              signal: fetchAbortController.signal
-            });
+              if (fetchAbortController) {
+                fetchAbortController.abort(); 
+              }
 
-            const activeFetchController = fetchAbortController; // Preserve current controller for this specific fetch operation
-            fetchAbortController = null; // Mark that this specific fetch has passed the await point
+              if (combinedTextContentForAnimation && combinedTextContentForAnimation.trim() !== '' && botContentDiv) {
+                  if (botMessageSpanForAnimation) {
+                      const allLetters = botMessageSpanForAnimation.querySelectorAll('.anim-letter');
+                      allLetters.forEach(s => s.style.opacity = '1');
+                  } else { 
+                      botContentDiv.innerHTML = ''; 
+                      const tempSpan = document.createElement('span');
+                      tempSpan.classList.add('bot-typing-content', 'fade-in'); 
+                      botContentDiv.appendChild(tempSpan);
+                      tempSpan.innerHTML = formatBotMessage(combinedTextContentForAnimation);
+                      applySyntaxHighlighting(tempSpan);
+                  }
+                  appendImages(); 
+                  addCopyButtonToBotMessage(botContentDiv, combinedTextContentForAnimation); // Call is here
+              } else if (imageDatasForAnimation && imageDatasForAnimation.length > 0 && botContentDiv) {
+                  botContentDiv.innerHTML = ''; 
+                  appendImages();
+              } else if (botContentDiv) {
+                  botContentDiv.innerHTML = ''; 
+              }
 
-            if (stopLetterAnimationGlobal && activeFetchController && activeFetchController.signal.aborted) {
-              // If STOP was clicked during fetch, handleStopAction already ran or will run due to abort.
-              // UI should be reset by it.
-              // gtag event for stop is in handleStopAction
-              return; 
-            }
-
-            const data = await response.json();
-
-            // Log successful API response with model used
-            if (typeof gtag === 'function') {
-                gtag('event', 'Chat-API-response-received', {
-                    'model_used': selectedModel,
-                    'response_ok': response.ok,
-                    'function_call_present': !!(data.candidates?.[0]?.content?.parts?.find(part => part.functionCall)) // Add if function call was in response
-                });
-            }
-
-            if (!response.ok) {
-              const errorMessage = data.error?.message || data.error || response.statusText || 'An unknown error occurred';
-              if (botContentDiv) botContentDiv.innerHTML = formatBotMessage(`Error - ${errorMessage}`);
-              if (botContentDiv) applySyntaxHighlighting(botContentDiv);
-              console.error('Error from API:', data);
-              sendButton.textContent = 'Retry';
-              isRetryMode = true;
               chatInput.disabled = false;
+              sendButton.textContent = 'Send';
               sendButton.classList.remove('stop-generating');
               sendButton.disabled = false;
+              isRetryMode = false;
               if (currentStopButtonHandler) {
                 sendButton.removeEventListener('click', currentStopButtonHandler);
                 currentStopButtonHandler = null;
               }
-              return;
+              fetchAbortController = null; 
+              if (typeof gtag === 'function') gtag('event', 'Action-Stopped-By-User', {
+                'model_used': modelSelector.value // Add model used to this event too
+              });
             }
-            
-            isRetryMode = false; 
 
-            const responseParts = data.candidates?.[0]?.content?.parts;
+            currentStopButtonHandler = handleStopAction;
+            sendButton.textContent = 'STOP';
+            sendButton.classList.add('stop-generating');
+            sendButton.disabled = false; 
+            sendButton.addEventListener('click', currentStopButtonHandler);
 
-            if (responseParts && responseParts.length > 0) {
-              if (botContentDiv) botContentDiv.innerHTML = ''; 
-
-              let combinedTextContent = '';
-              imageDatasForAnimation = []; // Clear and populate for current message
-              combinedTextContentForAnimation = ''; // Reset for current message
-
-              responseParts.forEach(part => {
-                if (part.text) combinedTextContentForAnimation += part.text;
-                if (part.inlineData?.mimeType && part.inlineData?.data) {
-                    imageDatasForAnimation.push(part.inlineData);
-                    // This is where an image is received from the model in the primary response flow
-                    if (typeof gtag === 'function') {
-                        gtag('event', 'Image-received-from-model', {
-                            'model_used': selectedModel,
-                            'image_mime_type': part.inlineData.mimeType
-                        });
-                    }
-                }
-                // Check for function call to log image generation attempt
-                if (part.functionCall && part.functionCall.name === 'generate_image') {
-                    if (typeof gtag === 'function') {
-                        gtag('event', 'Image-generation-tool-called', {
-                            'model_used': selectedModel,
-                            'prompt_length': part.functionCall.args?.prompt?.length || 0
-                        });
-                    }
+            // Define wrapTextNodesWithLetterSpans at a higher scope
+            function wrapTextNodesWithLetterSpans(element) {
+              const letters = [];
+              Array.from(element.childNodes).forEach(child => {
+                if (child.nodeType === Node.TEXT_NODE) {
+                  const text = child.textContent;
+                  if (text.trim() === '') return; // Skip empty or whitespace-only text nodes
+                  const fragment = document.createDocumentFragment();
+                  for (let i = 0; i < text.length; i++) {
+                    const span = document.createElement('span');
+                    span.className = 'anim-letter';
+                    span.textContent = text[i];
+                    fragment.appendChild(span);
+                    letters.push(span);
+                  }
+                  child.parentNode.replaceChild(fragment, child);
+                } else if (child.nodeType === Node.ELEMENT_NODE) {
+                  letters.push(...wrapTextNodesWithLetterSpans(child));
                 }
               });
+              return letters;
+            }
 
-              // If STOP was clicked just after fetch but before this point, and global flag is set
-              if (stopLetterAnimationGlobal) {
-                if (combinedTextContentForAnimation.trim() !== '' && botContentDiv) {
-                    const tempSpan = document.createElement('span');
-                    tempSpan.classList.add('bot-typing-content', 'fade-in');
-                    botContentDiv.appendChild(tempSpan);
-                    tempSpan.innerHTML = formatBotMessage(combinedTextContentForAnimation); // Use the stored raw text
-                    applySyntaxHighlighting(tempSpan);
-                    appendImages(); 
-                    addCopyButtonToBotMessage(botContentDiv, combinedTextContentForAnimation);
-                } else if (imageDatasForAnimation.length > 0) {
-                    appendImages();
+            try {
+              let requestPayload = {
+                history: chatHistory,
+                recaptchaToken: token,
+                model: selectedModel
+              };
+
+              if (selectedModel === 'gemini-2.0-flash-preview-image-generation') {
+                // Suggest 'application/json' for the image generation model.
+                // This is an allowed MIME type and suitable for function calling.
+                requestPayload.generationConfig = {
+                  response_mime_type: 'application/json'
+                };
+              }
+
+              const response = await fetch('/api/gemini-proxy', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(requestPayload),
+                signal: fetchAbortController.signal
+              });
+
+              const activeFetchController = fetchAbortController; // Preserve current controller for this specific fetch operation
+              fetchAbortController = null; // Mark that this specific fetch has passed the await point
+
+              if (stopLetterAnimationGlobal && activeFetchController && activeFetchController.signal.aborted) {
+                // If STOP was clicked during fetch, handleStopAction already ran or will run due to abort.
+                // UI should be reset by it.
+                // gtag event for stop is in handleStopAction
+                return; 
+              }
+
+              const data = await response.json();
+
+              // Log successful API response with model used
+              if (typeof gtag === 'function') {
+                  gtag('event', 'Chat-API-response-received', {
+                      'model_used': selectedModel,
+                      'response_ok': response.ok,
+                      'function_call_present': !!(data.candidates?.[0]?.content?.parts?.find(part => part.functionCall)) // Add if function call was in response
+                  });
+              }
+
+              if (!response.ok) {
+                const errorMessage = data.error?.message || data.error || response.statusText || 'An unknown error occurred';
+                if (botContentDiv) botContentDiv.innerHTML = formatBotMessage(`Error - ${errorMessage}`);
+                if (botContentDiv) applySyntaxHighlighting(botContentDiv);
+                console.error('Error from API:', data);
+                sendButton.textContent = 'Retry';
+                isRetryMode = true;
+                chatInput.disabled = false;
+                sendButton.classList.remove('stop-generating');
+                sendButton.disabled = false;
+                if (currentStopButtonHandler) {
+                  sendButton.removeEventListener('click', currentStopButtonHandler);
+                  currentStopButtonHandler = null;
                 }
                 return;
               }
+              
+              isRetryMode = false; 
 
-              if (combinedTextContentForAnimation.trim() !== '') {
-                botMessageSpanForAnimation = document.createElement('span');
-                botMessageSpanForAnimation.classList.add('bot-typing-content');
-                if (botContentDiv) botContentDiv.appendChild(botMessageSpanForAnimation);
-                
-                requestAnimationFrame(() => {
-                    if(botMessageSpanForAnimation) botMessageSpanForAnimation.classList.add('fade-in');
+              const responseParts = data.candidates?.[0]?.content?.parts;
+
+              if (responseParts && responseParts.length > 0) {
+                if (botContentDiv) botContentDiv.innerHTML = ''; 
+
+                let combinedTextContent = '';
+                imageDatasForAnimation = []; // Clear and populate for current message
+                combinedTextContentForAnimation = ''; // Reset for current message
+
+                responseParts.forEach(part => {
+                  if (part.text) combinedTextContentForAnimation += part.text;
+                  if (part.inlineData?.mimeType && part.inlineData?.data) {
+                      imageDatasForAnimation.push(part.inlineData);
+                      // This is where an image is received from the model in the primary response flow
+                      if (typeof gtag === 'function') {
+                          gtag('event', 'Image-received-from-model', {
+                              'model_used': selectedModel,
+                              'image_mime_type': part.inlineData.mimeType
+                          });
+                      }
+                  }
+                  // Check for function call to log image generation attempt
+                  if (part.functionCall && part.functionCall.name === 'generate_image') {
+                      if (typeof gtag === 'function') {
+                          gtag('event', 'Image-generation-tool-called', {
+                              'model_used': selectedModel,
+                              'prompt_length': part.functionCall.args?.prompt?.length || 0
+                          });
+                      }
+                  }
                 });
 
-                const finalHtml = formatBotMessage(combinedTextContentForAnimation); // Use the stored raw text
-                botMessageSpanForAnimation.innerHTML = finalHtml;
-                applySyntaxHighlighting(botMessageSpanForAnimation);
-
-                // --- New Letter-by-Letter Animation Logic ---
-                // let currentStopListener = null; // Ensure this line is not present if it was part of old logic
-
-                // function wrapTextNodesWithLetterSpans() { /* DEFINITION MOVED ABOVE */ }
-
-                const letterSpans = wrapTextNodesWithLetterSpans(botMessageSpanForAnimation);
-
-                stopLetterAnimationGlobal = false; // Reset stop flag for new message
-
-                if (letterSpans.length > 0) {
-                  letterSpans.forEach((span, index) => {
-                    const timeoutId = setTimeout(() => {
-                      if (stopLetterAnimationGlobal) return;
-                      span.style.opacity = '1';
-                      if (index === letterSpans.length - 1) {
-                        appendImages(); 
-                        addCopyButtonToBotMessage(botContentDiv, combinedTextContentForAnimation); // Add copy button
-                        sendButton.textContent = 'Send';
-                        sendButton.classList.remove('stop-generating');
-                        chatInput.disabled = false;
-                        sendButton.disabled = false;
-                        if (currentStopButtonHandler) sendButton.removeEventListener('click', currentStopButtonHandler);
-                        currentStopButtonHandler = null;
-                        letterAnimationTimeouts = [];
-                        // gtag event for natural completion (if desired, can be added here)
-                      }
-                    }, index * (letterSpans.length > 0 ? (Math.max(250, Math.min(5000, letterSpans.length * 50))) / letterSpans.length : 0) );
-                    letterAnimationTimeouts.push(timeoutId);
-                  });
-                } else { // No letters to animate, but there was text content (e.g. only HTML tags after formatting)
-                    appendImages();
-                    addCopyButtonToBotMessage(botContentDiv, combinedTextContentForAnimation); // Add copy button
-                    sendButton.textContent = 'Send';
-                    sendButton.classList.remove('stop-generating');
-                    chatInput.disabled = false;
-                    sendButton.disabled = false;
-                    if (currentStopButtonHandler) sendButton.removeEventListener('click', currentStopButtonHandler);
-                    currentStopButtonHandler = null;
+                // If STOP was clicked just after fetch but before this point, and global flag is set
+                if (stopLetterAnimationGlobal) {
+                  if (combinedTextContentForAnimation.trim() !== '' && botContentDiv) {
+                      const tempSpan = document.createElement('span');
+                      tempSpan.classList.add('bot-typing-content', 'fade-in');
+                      botContentDiv.appendChild(tempSpan);
+                      tempSpan.innerHTML = formatBotMessage(combinedTextContentForAnimation); // Use the stored raw text
+                      applySyntaxHighlighting(tempSpan);
+                      appendImages(); 
+                      addCopyButtonToBotMessage(botContentDiv, combinedTextContentForAnimation);
+                  } else if (imageDatasForAnimation.length > 0) {
+                      appendImages();
+                  }
+                  return;
                 }
 
-              } else if (imageDatasForAnimation.length > 0) {
-                appendImages();
-                // No text, so no copy button for text here
-                sendButton.textContent = 'Send';
-                sendButton.classList.remove('stop-generating');
-                isRetryMode = false; chatInput.disabled = false; sendButton.disabled = false;
-                if (currentStopButtonHandler) sendButton.removeEventListener('click', currentStopButtonHandler);
-                currentStopButtonHandler = null;
-              } else {
-                if (botContentDiv) botContentDiv.innerHTML = formatBotMessage('Received an empty response.');
+                if (combinedTextContentForAnimation.trim() !== '') {
+                  botMessageSpanForAnimation = document.createElement('span');
+                  botMessageSpanForAnimation.classList.add('bot-typing-content');
+                  if (botContentDiv) botContentDiv.appendChild(botMessageSpanForAnimation);
+                  
+                  requestAnimationFrame(() => {
+                      if(botMessageSpanForAnimation) botMessageSpanForAnimation.classList.add('fade-in');
+                  });
+
+                  const finalHtml = formatBotMessage(combinedTextContentForAnimation); // Use the stored raw text
+                  botMessageSpanForAnimation.innerHTML = finalHtml;
+                  applySyntaxHighlighting(botMessageSpanForAnimation);
+
+                  // --- New Letter-by-Letter Animation Logic ---
+                  // let currentStopListener = null; // Ensure this line is not present if it was part of old logic
+
+                  // function wrapTextNodesWithLetterSpans() { /* DEFINITION MOVED ABOVE */ }
+
+                  const letterSpans = wrapTextNodesWithLetterSpans(botMessageSpanForAnimation);
+
+                  stopLetterAnimationGlobal = false; // Reset stop flag for new message
+
+                  if (letterSpans.length > 0) {
+                    letterSpans.forEach((span, index) => {
+                      const timeoutId = setTimeout(() => {
+                        if (stopLetterAnimationGlobal) return;
+                        span.style.opacity = '1';
+                        if (index === letterSpans.length - 1) {
+                          appendImages(); 
+                          addCopyButtonToBotMessage(botContentDiv, combinedTextContentForAnimation); // Add copy button
+                          sendButton.textContent = 'Send';
+                          sendButton.classList.remove('stop-generating');
+                          chatInput.disabled = false;
+                          sendButton.disabled = false;
+                          if (currentStopButtonHandler) sendButton.removeEventListener('click', currentStopButtonHandler);
+                          currentStopButtonHandler = null;
+                          letterAnimationTimeouts = [];
+                          // gtag event for natural completion (if desired, can be added here)
+                        }
+                      }, index * (letterSpans.length > 0 ? (Math.max(250, Math.min(5000, letterSpans.length * 50))) / letterSpans.length : 0) );
+                      letterAnimationTimeouts.push(timeoutId);
+                    });
+                  } else { // No letters to animate, but there was text content (e.g. only HTML tags after formatting)
+                      appendImages();
+                      addCopyButtonToBotMessage(botContentDiv, combinedTextContentForAnimation); // Add copy button
+                      sendButton.textContent = 'Send';
+                      sendButton.classList.remove('stop-generating');
+                      chatInput.disabled = false;
+                      sendButton.disabled = false;
+                      if (currentStopButtonHandler) sendButton.removeEventListener('click', currentStopButtonHandler);
+                      currentStopButtonHandler = null;
+                  }
+
+                } else if (imageDatasForAnimation.length > 0) {
+                  appendImages();
+                  // No text, so no copy button for text here
+                  sendButton.textContent = 'Send';
+                  sendButton.classList.remove('stop-generating');
+                  isRetryMode = false; chatInput.disabled = false; sendButton.disabled = false;
+                  if (currentStopButtonHandler) sendButton.removeEventListener('click', currentStopButtonHandler);
+                  currentStopButtonHandler = null;
+                } else {
+                  if (botContentDiv) botContentDiv.innerHTML = formatBotMessage('Received an empty response.');
+                  sendButton.textContent = 'Send';
+                  sendButton.classList.remove('stop-generating');
+                  chatInput.disabled = false; sendButton.disabled = false;
+                  if (currentStopButtonHandler) sendButton.removeEventListener('click', currentStopButtonHandler);
+                  currentStopButtonHandler = null;
+                }
+
+              } else { // No response parts
+                if (botContentDiv) botContentDiv.innerHTML = formatBotMessage('Received a response, but no content parts were found.');
                 sendButton.textContent = 'Send';
                 sendButton.classList.remove('stop-generating');
                 chatInput.disabled = false; sendButton.disabled = false;
                 if (currentStopButtonHandler) sendButton.removeEventListener('click', currentStopButtonHandler);
                 currentStopButtonHandler = null;
               }
-
-            } else { // No response parts
-              if (botContentDiv) botContentDiv.innerHTML = formatBotMessage('Received a response, but no content parts were found.');
-              sendButton.textContent = 'Send';
-              sendButton.classList.remove('stop-generating');
-              chatInput.disabled = false; sendButton.disabled = false;
-              if (currentStopButtonHandler) sendButton.removeEventListener('click', currentStopButtonHandler);
-              currentStopButtonHandler = null;
-            }
-          } catch (error) {
-            if (fetchAbortController) fetchAbortController = null; // Ensure cleared if error happened before it was nullified post-await
-                        
-            if (error.name === 'AbortError') {
-              console.log('Fetch aborted by user action.');
-              // gtag event for stop is in handleStopAction
-            } else {
-              if (botContentDiv) botContentDiv.innerHTML = formatBotMessage('Error - Could not connect to the API.');
-              if (botContentDiv) applySyntaxHighlighting(botContentDiv);
-              console.error('Failed to fetch from /api/gemini-proxy:', error);
-              sendButton.textContent = 'Retry';
-              isRetryMode = true;
-              // Ensure UI is reset for other errors too
-              chatInput.disabled = false;
-              sendButton.classList.remove('stop-generating');
-              sendButton.disabled = false;
-              if (currentStopButtonHandler) {
-                sendButton.removeEventListener('click', currentStopButtonHandler);
-                currentStopButtonHandler = null;
+            } catch (error) {
+              if (fetchAbortController) fetchAbortController = null; // Ensure cleared if error happened before it was nullified post-await
+                          
+              if (error.name === 'AbortError') {
+                console.log('Fetch aborted by user action.');
+                // gtag event for stop is in handleStopAction
+              } else {
+                if (botContentDiv) botContentDiv.innerHTML = formatBotMessage('Error - Could not connect to the API.');
+                if (botContentDiv) applySyntaxHighlighting(botContentDiv);
+                console.error('Failed to fetch from /api/gemini-proxy:', error);
+                sendButton.textContent = 'Retry';
+                isRetryMode = true;
+                // Ensure UI is reset for other errors too
+                chatInput.disabled = false;
+                sendButton.classList.remove('stop-generating');
+                sendButton.disabled = false;
+                if (currentStopButtonHandler) {
+                  sendButton.removeEventListener('click', currentStopButtonHandler);
+                  currentStopButtonHandler = null;
+                }
               }
             }
-          } 
-        })
-        .catch(function(recaptchaError) {
-          console.error('reCAPTCHA execution failed:', recaptchaError);
-          const errorBotMessageDiv = displayMessage('Bot', formatBotMessage('Error: reCAPTCHA verification failed. Please refresh and try again.'), true);
-          // Log reCAPTCHA failure event with model that would have been used
-          if (typeof gtag === 'function') {
-            gtag('event', 'Chat-reCAPTCHA-failed', {
-              'model_intended': modelSelector.value 
-            });
-          }
-          if (errorBotMessageDiv) { 
-            const errorBotContentDiv = errorBotMessageDiv.querySelector('.message-content');
-            if (errorBotContentDiv) { 
-                 applySyntaxHighlighting(errorBotContentDiv);
+          })
+          .catch(function(recaptchaError) {
+            console.error('reCAPTCHA execution failed:', recaptchaError);
+            const errorBotMessageDiv = displayMessage('Bot', formatBotMessage('Error: reCAPTCHA verification failed. Please refresh and try again.'), true);
+            // Log reCAPTCHA failure event with model that would have been used
+            if (typeof gtag === 'function') {
+              gtag('event', 'Chat-reCAPTCHA-failed', {
+                'model_intended': modelSelector.value 
+              });
             }
-          }
+            if (errorBotMessageDiv) { 
+              const errorBotContentDiv = errorBotMessageDiv.querySelector('.message-content');
+              if (errorBotContentDiv) { 
+                   applySyntaxHighlighting(errorBotContentDiv);
+              }
+            }
 
-          // Reset UI
-          chatInput.disabled = false;
-          sendButton.disabled = false;
-          sendButton.textContent = 'Send';
-          sendButton.classList.remove('stop-generating');
-          isRetryMode = false;
-          // Crucially, currentStopButtonHandler should be cleared if it was set, 
-          // as the operation effectively failed before the main logic ran.
-          if (currentStopButtonHandler) {
-              sendButton.removeEventListener('click', currentStopButtonHandler);
-              currentStopButtonHandler = null;
-          }
-        });
+            // Reset UI
+            chatInput.disabled = false;
+            sendButton.disabled = false;
+            sendButton.textContent = 'Send';
+            sendButton.classList.remove('stop-generating');
+            isRetryMode = false;
+            // Crucially, currentStopButtonHandler should be cleared if it was set, 
+            // as the operation effectively failed before the main logic ran.
+            if (currentStopButtonHandler) {
+                sendButton.removeEventListener('click', currentStopButtonHandler);
+                currentStopButtonHandler = null;
+            }
+          });
       });
     });
 
@@ -957,7 +958,6 @@
     }
 
     // Lightbox navigation functionality
-    let currentImageIndex = 0;
     let displayedImageCount = 0;
 
     function updateFilmstrip() {
