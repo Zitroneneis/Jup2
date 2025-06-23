@@ -412,6 +412,14 @@
     let imageDatasForAnimation = [];     
     let combinedTextContentForAnimation = ''; // Added to store raw text for copying
 
+    function handleLightboxKeys(event) {
+        if (event.key === 'ArrowLeft') {
+            showPrevImage();
+        } else if (event.key === 'ArrowRight') {
+            showNextImage();
+        }
+    }
+
     function showLightboxImage(index) {
         if (index < 0 || index >= sessionImages.length) {
             console.error("Invalid image index:", index);
@@ -420,6 +428,7 @@
         currentImageIndex = index;
         lightboxImage.src = sessionImages[currentImageIndex];
         lightboxOverlay.style.display = 'flex';
+        document.addEventListener('keydown', handleLightboxKeys);
 
         filmstripContainer.innerHTML = '';
         sessionImages.forEach((src, i) => {
@@ -952,12 +961,14 @@
     if (lightboxClose) {
       lightboxClose.addEventListener('click', () => {
         if (lightboxOverlay) lightboxOverlay.style.display = 'none';
+        document.removeEventListener('keydown', handleLightboxKeys);
       });
     }
     if (lightboxOverlay) {
       lightboxOverlay.addEventListener('click', (event) => {
         if (event.target === lightboxOverlay) {
           lightboxOverlay.style.display = 'none';
+          document.removeEventListener('keydown', handleLightboxKeys);
         }
       });
     }
