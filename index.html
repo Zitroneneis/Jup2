@@ -2,34 +2,30 @@
 <html lang="en">
 <head>
   <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-W8RMM2QWRV"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-W8RMM2QWRV');
-</script>
-<script type="text/javascript">
-    (function(c,l,a,r,i,t,y){
-        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-    })(window, document, "clarity", "script", "mk9ddtm32o");
-</script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-W8RMM2QWRV"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-W8RMM2QWRV');
+  </script>
+  <script type="text/javascript">
+      (function(c,l,a,r,i,t,y){
+          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", "mk9ddtm32o");
+  </script>
   <meta charset="UTF-8" />
-  <title>Demo: Embedded JupyterLite Notebook</title>
-  <script src="https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script> <!-- Added marked.js library -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/2.3.6/purify.min.js"></script> <!-- Added DOMPurify library -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script> <!-- Prism.js for syntax highlighting -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script> <!-- Auto-load language support -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css"> <!-- Prism CSS theme -->
+  <title>Chat Interface</title>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/2.3.6/purify.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
   <script src="https://www.google.com/recaptcha/enterprise.js?render=6LcQhFMrAAAAAMjWClxXSNDpZrFZj3rUrz5UHhWA"></script>
-  <!-- Lottie animation library -->
-  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.7.4/lottie.min.js"></script> REMOVED if only for chat -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.7.4/lottie.min.js"></script>
   <style>
-    /* Basic reset and styling to ensure panels appear side by side */
     html, body {
       margin: 0;
       padding: 0;
@@ -37,78 +33,140 @@
       width: 100%;
       box-sizing: border-box;
       font-family: sans-serif;
-      overflow: hidden; /* Prevent scrollbars when resizing */
-    }
-
-    .container {
       display: flex;
-      height: 100vh; /* Fill the viewport height */
-      width: 100%;
+      flex-direction: column;
+      background-color: #f0f2f5; /* Light gray background for a cleaner look */
     }
 
-    /* Left panel with embedded notebook */
-    .main-panel {
-      flex-grow: 1; /* Allow it to grow */
-      flex-basis: 60%; /* Initial width */
-      border-right: 1px solid #ccc;
-      overflow: hidden; /* If needed */
+    .chat-container {
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1; /* Takes up available space */
+      max-width: 800px; /* Max width for better readability */
+      width: 100%;
+      margin: 20px auto; /* Centering the chat container */
+      background-color: #ffffff; /* White background for the chat area */
+      border-radius: 8px; /* Rounded corners */
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1); /* Subtle shadow */
+      overflow: hidden; /* To contain children elements */
     }
 
-    /* The iframe is set to fill the main panel */
-    .main-panel iframe {
-      width: 100%;
-      height: 100%;
+    #chat-panel {
+      flex-grow: 1;
+      padding: 20px;
+      overflow-y: auto;
+      border-bottom: 1px solid #e0e0e0; /* Separator line */
+    }
+
+    .message {
+      margin-bottom: 15px; /* Increased spacing between messages */
+      display: flex;
+      flex-direction: column;
+    }
+
+    .message-content {
+      padding: 10px 15px;
+      border-radius: 18px; /* More rounded bubbles */
+      max-width: 75%; /* Max width for message bubbles */
+      word-wrap: break-word; /* Ensure long words break */
+    }
+
+    .message.user {
+      align-items: flex-end;
+    }
+
+    .message.user .message-content {
+      background-color: #007bff; /* Blue for user messages */
+      color: white;
+      border-bottom-right-radius: 5px; /* Differentiated corner for user */
+    }
+
+    .message.bot {
+      align-items: flex-start;
+    }
+
+    .message.bot .message-content {
+      background-color: #e9ecef; /* Lighter gray for bot messages */
+      color: #333;
+      border-bottom-left-radius: 5px; /* Differentiated corner for bot */
+    }
+    
+    .message-sender {
+        font-size: 0.8em;
+        color: #666;
+        margin-bottom: 3px;
+        padding: 0 5px;
+    }
+
+    .message.user .message-sender {
+        text-align: right;
+    }
+     .message.bot .message-sender {
+        text-align: left;
+    }
+
+
+    #chat-form {
+      display: flex;
+      padding: 15px;
+      background-color: #f9f9f9; /* Slightly different background for input area */
+    }
+
+    #chat-input {
+      flex: 1;
+      padding: 12px 15px; /* Increased padding */
+      font-size: 1em;
+      border: 1px solid #ccc;
+      border-radius: 20px; /* Rounded input field */
+      margin-right: 10px;
+    }
+
+    #send-button {
+      padding: 12px 20px; /* Increased padding */
+      font-size: 1em;
+      background-color: #007bff; /* Consistent button color */
+      color: white;
       border: none;
+      border-radius: 20px; /* Rounded button */
+      cursor: pointer;
+      transition: background-color 0.2s;
     }
 
-    /* Right panel for instructions or status info */
-    .right-panel {
-      flex-grow: 1; /* Allow it to grow */
-      flex-basis: 40%; /* Initial width */
-      padding: 1em;
-      background-color: #f9f9f9;
-      overflow: auto; /* Allow scrolling if content overflows */
+    #send-button:hover {
+      background-color: #0056b3; /* Darker blue on hover */
+    }
+    
+    #send-button:disabled {
+        background-color: #cccccc;
+        cursor: not-allowed;
+    }
+    
+    #send-button.stop-generating {
+        background-color: #dc3545; /* Red for stop generating */
+    }
+    #send-button.stop-generating:hover {
+        background-color: #c82333; /* Darker red on hover */
     }
 
-    .right-panel h2 {
-      margin-top: 0;
+
+    .lottie-holder, .thinking-gif {
+      width: 30px; /* Smaller thinking indicator */
+      height: 30px;
+      margin-right: 8px; /* Space it out a bit */
     }
 
-    /* Separator bar styles */
-    .separator {
-      width: 5px;
-      height: 100%;
-      background-color: #ccc;
-      cursor: col-resize;
-      position: relative; /* For potential future handles */
-      -webkit-user-select: none; /* Prevent text selection while dragging */
-      -moz-user-select: none;
-      user-select: none;
-    }
-
-    /* Chat panel styles REMOVED */
-    /* #chat-panel { ... } */
-    /* .message { ... } */
-    /* .message.user { ... } */
-    /* .bot { ... } */
-    /* #chat-form { ... } */
-    /* #chat-input { ... } */
-    /* #send-button { ... } */
-    /* .lottie-holder { ... } */
-
-    /* Code block and inline code styling - Keep if used elsewhere, remove if only for chat */
-    /* For now, assuming Prism might be used by JupyterLite or other content, so keeping these */
     code {
-      background-color: #f4f4f4;
-      padding: 2px 4px;
-      border-radius: 3px;
+      background-color: #e9ecef; /* Match bot message background */
+      padding: 2px 5px;
+      border-radius: 4px;
       font-family: 'Courier New', Monaco, monospace;
       font-size: 0.9em;
+      border: 1px solid #dee2e6; /* Subtle border for code blocks */
     }
 
     pre {
-      background-color: #f8f8f8;
-      border: 1px solid #e1e1e1;
+      background-color: #f8f9fa; /* Slightly different background for pre blocks */
+      border: 1px solid #ced4da;
       border-radius: 5px;
       padding: 12px;
       margin: 10px 0;
@@ -120,120 +178,902 @@
       background-color: transparent;
       padding: 0;
       border-radius: 0;
+      border: none; /* No double border */
       font-size: 0.85em;
     }
 
-    /* Language-specific code block styling */
-    .language-python { border-left: 4px solid #3776ab; }
-    .language-javascript { border-left: 4px solid #f7df1e; }
-    .language-html { border-left: 4px solid #e34f26; }
-    .language-css { border-left: 4px solid #1572b6; }
-    .language-json { border-left: 4px solid #000000; }
+    .language-python { border-left: 3px solid #3776ab; }
+    .language-javascript { border-left: 3px solid #f7df1e; }
+    .language-html { border-left: 3px solid #e34f26; }
+    .language-css { border-left: 3px solid #1572b6; }
+    .language-json { border-left: 3px solid #000000; }
 
-    /* Smooth typing effect animations REMOVED */
-    /* .bot-typing-content { ... } */
-    /* .bot-typing-content.fade-in { ... } */
-    /* .temp-raw-chunk-animated { ... } */
-    /* @keyframes fadeInRawChunk { ... } */
+    .bot-typing-content {
+      opacity: 0; 
+      display: block; 
+      /* vertical-align: top; Removed as it's not applicable for display:block */
+      white-space: pre-wrap; 
+    }
+
+    .bot-typing-content.fade-in {
+      opacity: 1;
+      transition: opacity 0.5s ease-out;
+    }
+
+    /* Removed .temp-raw-chunk-animated and @keyframes simpleFadeInChunk */
+
+    .anim-letter {
+      opacity: 0;
+      transition: opacity 0.15s ease-out; /* Added for smooth fade-in of each letter */
+    }
+
+    /* Lightbox Styles */
+    .lightbox-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.85);
+      display: none; /* Hidden by default */
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .lightbox-image {
+      max-width: 95%;
+      max-height: 95%;
+      object-fit: contain;
+      border-radius: 5px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+
+    .lightbox-close {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      font-size: 40px;
+      color: #fff;
+      cursor: pointer;
+      line-height: 1;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    }
+
+    .lightbox-prev, .lightbox-next {
+      cursor: pointer;
+      position: absolute;
+      top: 50%;
+      width: auto;
+      padding: 16px;
+      margin-top: -22px;
+      color: white;
+      font-weight: bold;
+      font-size: 20px;
+      transition: 0.6s ease;
+      user-select: none;
+      background-color: rgba(0,0,0,0.3);
+    }
+
+    .lightbox-prev {
+      left: 0;
+      border-radius: 3px 0 0 3px;
+    }
+
+    .lightbox-next {
+      right: 0;
+      border-radius: 0 3px 3px 0;
+    }
+
+    .lightbox-prev:hover, .lightbox-next:hover {
+      background-color: rgba(0,0,0,0.8);
+    }
+
+    .filmstrip-container {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 10px;
+      padding: 10px;
+      background-color: rgba(0,0,0,0.5);
+      border-radius: 10px;
+    }
+
+    .filmstrip-image {
+      width: 80px;
+      height: 60px;
+      object-fit: cover;
+      cursor: pointer;
+      border: 2px solid transparent;
+      border-radius: 5px;
+      transition: border-color 0.3s;
+    }
+
+    .filmstrip-image:hover, .filmstrip-image.active {
+      border-color: #fff;
+    }
+
+
+    .generated-image {
+      cursor: pointer;
+      transition: transform 0.2s ease-out;
+    }
+    .generated-image:hover {
+      transform: scale(1.03);
+    }
+
+    /* Copy Button Styles */
+    .copy-button {
+      background-color: #e0e0e0; /* Lighter gray */
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      padding: 4px 8px;
+      font-size: 0.85em;
+      color: #333;
+      cursor: pointer;
+      margin-top: 8px; /* Space above the button */
+      margin-left: 5px; /* Align with sender text a bit */
+      display: inline-block; /* Allow it to sit after text or on its own line */
+      transition: background-color 0.2s, color 0.2s;
+    }
+    .copy-button:hover {
+      background-color: #d0d0d0;
+    }
+    .copy-button.copied {
+      background-color: #4CAF50; /* Green for success */
+      color: white;
+      border-color: #4CAF50;
+    }
+
+    /* Model Selector Styles */
+    .model-selector-container {
+      padding: 0 20px 10px 20px; /* Match chat panel padding */
+      display: flex;
+      align-items: center;
+      background-color: #f9f9f9; /* Match chat form background */
+      border-bottom: 1px solid #e0e0e0; /* Separator line */
+    }
+    .model-selector-container label {
+      margin-right: 10px;
+      font-size: 0.9em;
+      color: #333;
+    }
+    #model-selector {
+      padding: 8px 10px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      font-size: 0.9em;
+      flex-grow: 1;
+    }
 
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="main-panel">
-      <iframe
-        src="https://jupyterlite.github.io/demo/?path=https://joop-xi.vercel.app/DemoBook.ipynb"
-        title="JupyterLite Notebook"
-        style="width: 100%; height: 100%; border: none;"
-      ></iframe>
+  <div class="chat-container">
+    <div class="model-selector-container">
+      <label for="model-selector">Model:</label>
+      <select id="model-selector">
+        <option value="gemini-2.0-flash-lite">gemini-2.0-flash-lite (Default)</option>
+        <option value="gemini-2.0-flash">gemini-2.0-flash</option>
+        <option value="gemini-1.5-flash">gemini-1.5-flash</option>
+        <option value="gemini-2.5-flash-preview-05-20">Gemini 2.5 Flash (05-20)</option>
+        <!-- <option value="gemini-2.0-pro-preview-image-generation">Gemini 2.0 Pro Preview (Image Gen)</option> -->
+        <option value="perplexity-sonar">Perplexity Sonar</option>
+      </select>
     </div>
-    <div class="separator"></div>
-    <div class="right-panel">
-      <h2>A JupyterLite Notebook Lesson!</h2>
-      <p>
-        If the lesson doesn't load automagically, in the Notebook interface, try going to "File" -> "Open from URL..." and copy/pasting one of the notebooks:<br />
-        <code>https://joop-xi.vercel.app/Lesson.ipynb</code><br />
-        <code>https://joop-xi.vercel.app/DemoBook.ipynb</code><br />
-        Interactve lesson: <code>https://joop-xi.vercel.app/d2.ipynb</code>
-      </p>
-      <p>Want to chat with robot? <a href="chat.html">Tap here to start chatting</a></p>
+    <div id="chat-panel"></div>
+    <form id="chat-form">
+      <input type="text" id="chat-input" placeholder="Type your message..." required />
+      <button type="submit" id="send-button">Send</button>
+    </form>
+  </div>
 
-      <!-- Chat panel and form REMOVED -->
-      <!-- <div id="chat-panel"></div> -->
-      <!-- <form id="chat-form"> ... </form> -->
-    </div>
-
-
-
-
+  <div class="lightbox-overlay" id="lightboxOverlay">
+    <span class="lightbox-close" id="lightboxClose">&times;</span>
+    <img src="" alt="Lightbox Image" class="lightbox-image" id="lightboxImage">
+    <a class="lightbox-prev" id="lightboxPrev">&#10094;</a>
+    <a class="lightbox-next" id="lightboxNext">&#10095;</a>
+    <div class="filmstrip-container" id="filmstripContainer"></div>
   </div>
 
   <script>
-    // Chat panel and form related constants REMOVED
-    // const chatPanel = document.getElementById('chat-panel');
-    // const chatForm = document.getElementById('chat-form');
-    // const chatInput = document.getElementById('chat-input');
-    // const sendButton = document.getElementById('send-button'); 
-    const RECAPTCHA_SITE_KEY = '6LcQhFMrAAAAAMjWClxXSNDpZrFZj3rUrz5UHhWA'; // Keep if reCAPTCHA is used elsewhere
-    const container = document.querySelector('.container');
-    const mainPanel = document.querySelector('.main-panel');
-    const rightPanel = document.querySelector('.right-panel');
-    const separator = document.querySelector('.separator');
+    const chatPanel = document.getElementById('chat-panel');
+    const chatForm = document.getElementById('chat-form');
+    const chatInput = document.getElementById('chat-input');
+    const sendButton = document.getElementById('send-button');
+    const RECAPTCHA_SITE_KEY = '6LcQhFMrAAAAAMjWClxXSNDpZrFZj3rUrz5UHhWA';
+    const modelSelector = document.getElementById('model-selector'); // Get model selector
 
-    // Chat history and related variables REMOVED
-    // let chatHistory = []; 
-    // const MIN_TYPING_DELAY_MS = 40; 
-    // const MAX_TYPING_DELAY_MS = 120; 
-    // const MIN_CHUNK_SIZE = 1; 
-    // const MAX_CHUNK_SIZE = 5; 
-    // let lastUserMessageText = ''; 
-    // let isRetryMode = false; 
+    // Lightbox elements
+    const lightboxOverlay = document.getElementById('lightboxOverlay');
+    const lightboxImage = document.getElementById('lightboxImage');
+    const lightboxClose = document.getElementById('lightboxClose');
+    const lightboxPrev = document.getElementById('lightboxPrev');
+    const lightboxNext = document.getElementById('lightboxNext');
+    const filmstripContainer = document.getElementById('filmstripContainer');
 
-    // Chat utility functions REMOVED if only for chat
-    // function formatBotMessage(text) { ... }
-    // function applySyntaxHighlighting(element) { ... } // Keep if Prism is used by JupyterLite
+    let chatHistory = [];
+    let sessionImages = [];
+    let currentImageIndex = 0;
+    // Removed MIN_TYPING_DELAY_MS, MAX_TYPING_DELAY_MS, MIN_CHUNK_SIZE, MAX_CHUNK_SIZE
+    let lastUserMessageText = '';
+    let isRetryMode = false;
+    let currentBotMessageDiv = null;
+    let letterAnimationTimeouts = []; 
+    let stopLetterAnimationGlobal = false; 
 
-    let isDragging = false;
+    let fetchAbortController = null;
+    let currentStopButtonHandler = null;
+    let botMessageSpanForAnimation = null; 
+    let imageDatasForAnimation = [];     
+    let combinedTextContentForAnimation = ''; // Added to store raw text for copying
 
-    separator.addEventListener('mousedown', (e) => {
-      isDragging = true;
-      startX = e.clientX;
-      mainPanelWidth = mainPanel.offsetWidth;
-      container.style.cursor = 'col-resize'; // Change cursor during drag
+    function handleLightboxKeys(event) {
+        if (event.key === 'ArrowLeft') {
+            showPrevImage();
+        } else if (event.key === 'ArrowRight') {
+            showNextImage();
+        }
+    }
+
+    function showLightboxImage(index) {
+        if (index < 0 || index >= sessionImages.length) {
+            console.error("Invalid image index:", index);
+            return;
+        }
+        currentImageIndex = index;
+        lightboxImage.src = sessionImages[currentImageIndex];
+        lightboxOverlay.style.display = 'flex';
+        document.addEventListener('keydown', handleLightboxKeys);
+
+        filmstripContainer.innerHTML = '';
+        sessionImages.forEach((src, i) => {
+            const filmstripImg = document.createElement('img');
+            filmstripImg.src = src;
+            filmstripImg.classList.add('filmstrip-image');
+            if (i === currentImageIndex) {
+                filmstripImg.classList.add('active');
+            }
+            filmstripImg.addEventListener('click', () => showLightboxImage(i));
+            filmstripContainer.appendChild(filmstripImg);
+        });
+
+        lightboxPrev.style.display = sessionImages.length > 1 ? 'block' : 'none';
+        lightboxNext.style.display = sessionImages.length > 1 ? 'block' : 'none';
+    }
+
+    function showNextImage() {
+        const newIndex = (currentImageIndex + 1) % sessionImages.length;
+        showLightboxImage(newIndex);
+    }
+
+    function showPrevImage() {
+        const newIndex = (currentImageIndex - 1 + sessionImages.length) % sessionImages.length;
+        showLightboxImage(newIndex);
+    }
+
+    lightboxPrev.addEventListener('click', showPrevImage);
+    lightboxNext.addEventListener('click', showNextImage);
+
+    function formatBotMessage(text) {
+      const html = DOMPurify.sanitize(marked.parse(text), {
+        ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'code', 'pre', 'blockquote', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'a', 'img', 'table', 'thead', 'tbody', 'tr', 'th', 'td', 'del', 'mark', 'span', 'div'],
+        ALLOWED_ATTR: ['href', 'title', 'target', 'rel', 'src', 'alt', 'width', 'height', 'class', 'id'],
+        ALLOW_DATA_ATTR: false,
+        ADD_ATTR: ['target'],
+      });
+      return html;
+    }
+
+    function applySyntaxHighlighting(element) {
+      if (typeof Prism !== 'undefined') {
+        const codeBlocks = element.querySelectorAll('pre code');
+        codeBlocks.forEach(block => {
+          Prism.highlightElement(block);
+        });
+      }
+    }
+    
+    function displayMessage(sender, textOrHtml, isHtml = false) {
+        const messageDiv = document.createElement('div');
+        messageDiv.classList.add('message', sender.toLowerCase());
+
+        const senderSpan = document.createElement('div');
+        senderSpan.classList.add('message-sender');
+        senderSpan.textContent = sender === 'User' ? 'You' : 'Bot';
+        messageDiv.appendChild(senderSpan);
+
+        const contentDiv = document.createElement('div');
+        contentDiv.classList.add('message-content');
+        if (isHtml) {
+            contentDiv.innerHTML = textOrHtml;
+        } else {
+            contentDiv.textContent = textOrHtml;
+        }
+        messageDiv.appendChild(contentDiv);
+        
+        chatPanel.appendChild(messageDiv);
+        chatPanel.scrollTop = chatPanel.scrollHeight;
+
+        return messageDiv; // Return the message div for potential updates (e.g., streaming)
+    }
+
+
+    chatForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const selectedModel = modelSelector.value; // Get selected model early
+
+      
+      let userMessageToProcess;
+
+      if (isRetryMode) {
+        userMessageToProcess = lastUserMessageText;
+        isRetryMode = false; 
+      } else {
+        userMessageToProcess = chatInput.value.trim();
+        if (!userMessageToProcess) return;
+        lastUserMessageToProcess = userMessageToProcess;
+        displayMessage('User', userMessageToProcess);
+        chatHistory.push({ role: "user", parts: [{ text: userMessageToProcess }] });
+      }
+
+      chatInput.value = '';
+      chatInput.disabled = true;
+      sendButton.disabled = true; // Initially disable, will be enabled as STOP or after completion
+      
+      if (typeof gtag === 'function') {
+        gtag('event', 'Chat-button-submitted', { // Add event parameters
+          'model_used': selectedModel
+        });
+      }
+
+      grecaptcha.enterprise.ready(function() {
+        grecaptcha.enterprise.execute(RECAPTCHA_SITE_KEY, {action: 'submit'})
+          .then(async function(token) {
+            // Helper functions are defined at the top of this .then() scope
+            function wrapTextNodesWithLetterSpans(element) {
+              const letters = [];
+              Array.from(element.childNodes).forEach(child => {
+                if (child.nodeType === Node.TEXT_NODE) {
+                  const text = child.textContent;
+                  if (text.trim() === '') return;
+                  const fragment = document.createDocumentFragment();
+                  for (let i = 0; i < text.length; i++) {
+                    const span = document.createElement('span');
+                    span.className = 'anim-letter';
+                    span.textContent = text[i];
+                    fragment.appendChild(span);
+                    letters.push(span);
+                  }
+                  child.parentNode.replaceChild(fragment, child);
+                } else if (child.nodeType === Node.ELEMENT_NODE) {
+                  letters.push(...wrapTextNodesWithLetterSpans(child));
+                }
+              });
+              return letters;
+            }
+
+            function addCopyButtonToBotMessage(targetContainer, rawTextToCopy) {
+              if (!rawTextToCopy || rawTextToCopy.trim() === '' || !targetContainer) return;
+              if (targetContainer.querySelector('.copy-button')) return;
+              const button = document.createElement('button');
+              button.innerHTML = '&#x1F4CB; Copy Text';
+              button.className = 'copy-button';
+              button.title = 'Copy message text to clipboard';
+              button.addEventListener('click', (event) => {
+                event.stopPropagation();
+                navigator.clipboard.writeText(rawTextToCopy).then(() => {
+                  button.textContent = 'Copied!';
+                  button.classList.add('copied');
+                  setTimeout(() => {
+                    button.innerHTML = '&#x1F4CB; Copy Text';
+                    button.classList.remove('copied');
+                  }, 2000);
+                }).catch(err => {
+                  console.error('Failed to copy text: ', err);
+                  button.textContent = 'Error copying';
+                  setTimeout(() => {
+                    button.innerHTML = '&#x1F4CB; Copy Text';
+                  }, 2000);
+                });
+              });
+              targetContainer.appendChild(button);
+            }
+
+            currentBotMessageDiv = displayMessage('Bot', '<img src="assets/thinking.gif" alt="Thinking..." class="thinking-gif" />', true);
+            const botContentDiv = currentBotMessageDiv.querySelector('.message-content');
+
+            stopLetterAnimationGlobal = false;
+            letterAnimationTimeouts.forEach(clearTimeout);
+            letterAnimationTimeouts = [];
+            if (currentStopButtonHandler) {
+              sendButton.removeEventListener('click', currentStopButtonHandler);
+              currentStopButtonHandler = null;
+            }
+            fetchAbortController = new AbortController();
+            botMessageSpanForAnimation = null; 
+            imageDatasForAnimation = []; 
+
+            const appendImages = () => {
+              if (!botContentDiv) return;
+              imageDatasForAnimation.forEach(imageData => {
+                const img = document.createElement('img');
+                const imgSrc = `data:${imageData.mimeType};base64,${imageData.data}`;
+                img.src = imgSrc;
+
+                if (!sessionImages.includes(imgSrc)) {
+                    sessionImages.push(imgSrc);
+                }
+                const imageIndex = sessionImages.indexOf(imgSrc);
+                
+                img.alt = "Generated Image";
+                img.style.maxWidth = "100%";
+                img.style.display = "block"; 
+                img.style.marginTop = "10px"; 
+                img.classList.add('generated-image');
+
+                // Event listener for opening lightbox
+                img.addEventListener('click', () => {
+                  showLightboxImage(imageIndex);
+                  if (typeof gtag === 'function') {
+                      gtag('event', 'Lightbox-image-opened', {
+                          'model_used': modelSelector.value // Or derive from message if needed
+                      });
+                  }
+                });
+
+                botContentDiv.appendChild(img); 
+                img.onload = () => chatPanel.scrollTop = chatPanel.scrollHeight;
+
+                // Event for when an image is actually appended/displayed
+                if (typeof gtag === 'function') {
+                  gtag('event', 'Image-displayed-to-user', {
+                      'model_used': modelSelector.value, // Or from the message context if available
+                      'image_mime_type': imageData.mimeType
+                  });
+                }
+              });
+              setTimeout(() => chatPanel.scrollTop = chatPanel.scrollHeight, 10);
+            };
+
+            function handleStopAction() {
+              stopLetterAnimationGlobal = true; 
+              letterAnimationTimeouts.forEach(clearTimeout);
+              letterAnimationTimeouts = [];
+
+              if (fetchAbortController) {
+                fetchAbortController.abort(); 
+              }
+
+              if (combinedTextContentForAnimation && combinedTextContentForAnimation.trim() !== '' && botContentDiv) {
+                  if (botMessageSpanForAnimation) {
+                      const allLetters = botMessageSpanForAnimation.querySelectorAll('.anim-letter');
+                      allLetters.forEach(s => s.style.opacity = '1');
+                  } else { 
+                      botContentDiv.innerHTML = ''; 
+                      const tempSpan = document.createElement('span');
+                      tempSpan.classList.add('bot-typing-content', 'fade-in'); 
+                      botContentDiv.appendChild(tempSpan);
+                      tempSpan.innerHTML = formatBotMessage(combinedTextContentForAnimation);
+                      applySyntaxHighlighting(tempSpan);
+                  }
+                  appendImages(); 
+                  addCopyButtonToBotMessage(botContentDiv, combinedTextContentForAnimation); // Call is here
+              } else if (imageDatasForAnimation && imageDatasForAnimation.length > 0 && botContentDiv) {
+                  botContentDiv.innerHTML = ''; 
+                  appendImages();
+              } else if (botContentDiv) {
+                  botContentDiv.innerHTML = ''; 
+              }
+
+              chatInput.disabled = false;
+              sendButton.textContent = 'Send';
+              sendButton.classList.remove('stop-generating');
+              sendButton.disabled = false;
+              isRetryMode = false;
+              if (currentStopButtonHandler) {
+                sendButton.removeEventListener('click', currentStopButtonHandler);
+                currentStopButtonHandler = null;
+              }
+              fetchAbortController = null; 
+              if (typeof gtag === 'function') gtag('event', 'Action-Stopped-By-User', {
+                'model_used': modelSelector.value // Add model used to this event too
+              });
+            }
+
+            currentStopButtonHandler = handleStopAction;
+            sendButton.textContent = 'STOP';
+            sendButton.classList.add('stop-generating');
+            sendButton.disabled = false; 
+            sendButton.addEventListener('click', currentStopButtonHandler);
+
+            // Define wrapTextNodesWithLetterSpans at a higher scope
+            function wrapTextNodesWithLetterSpans(element) {
+              const letters = [];
+              Array.from(element.childNodes).forEach(child => {
+                if (child.nodeType === Node.TEXT_NODE) {
+                  const text = child.textContent;
+                  if (text.trim() === '') return; // Skip empty or whitespace-only text nodes
+                  const fragment = document.createDocumentFragment();
+                  for (let i = 0; i < text.length; i++) {
+                    const span = document.createElement('span');
+                    span.className = 'anim-letter';
+                    span.textContent = text[i];
+                    fragment.appendChild(span);
+                    letters.push(span);
+                  }
+                  child.parentNode.replaceChild(fragment, child);
+                } else if (child.nodeType === Node.ELEMENT_NODE) {
+                  letters.push(...wrapTextNodesWithLetterSpans(child));
+                }
+              });
+              return letters;
+            }
+
+            try {
+              let requestPayload = {
+                history: chatHistory,
+                recaptchaToken: token,
+                model: selectedModel
+              };
+
+              if (selectedModel === 'gemini-2.0-flash-preview-image-generation') {
+                // Suggest 'application/json' for the image generation model.
+                // This is an allowed MIME type and suitable for function calling.
+                requestPayload.generationConfig = {
+                  response_mime_type: 'application/json'
+                };
+              }
+
+              const response = await fetch('/api/gemini-proxy', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(requestPayload),
+                signal: fetchAbortController.signal
+              });
+
+              const activeFetchController = fetchAbortController; // Preserve current controller for this specific fetch operation
+              fetchAbortController = null; // Mark that this specific fetch has passed the await point
+
+              if (stopLetterAnimationGlobal && activeFetchController && activeFetchController.signal.aborted) {
+                // If STOP was clicked during fetch, handleStopAction already ran or will run due to abort.
+                // UI should be reset by it.
+                // gtag event for stop is in handleStopAction
+                return; 
+              }
+
+              const data = await response.json();
+
+              // Log successful API response with model used
+              if (typeof gtag === 'function') {
+                  gtag('event', 'Chat-API-response-received', {
+                      'model_used': selectedModel,
+                      'response_ok': response.ok,
+                      'function_call_present': !!(data.candidates?.[0]?.content?.parts?.find(part => part.functionCall)) // Add if function call was in response
+                  });
+              }
+
+              if (!response.ok) {
+                const errorMessage = data.error?.message || data.error || response.statusText || 'An unknown error occurred';
+                if (botContentDiv) botContentDiv.innerHTML = formatBotMessage(`Error - ${errorMessage}`);
+                if (botContentDiv) applySyntaxHighlighting(botContentDiv);
+                console.error('Error from API:', data);
+                sendButton.textContent = 'Retry';
+                isRetryMode = true;
+                chatInput.disabled = false;
+                sendButton.classList.remove('stop-generating');
+                sendButton.disabled = false;
+                if (currentStopButtonHandler) {
+                  sendButton.removeEventListener('click', currentStopButtonHandler);
+                  currentStopButtonHandler = null;
+                }
+                return;
+              }
+              
+              isRetryMode = false; 
+
+              const responseParts = data.candidates?.[0]?.content?.parts;
+
+              if (responseParts && responseParts.length > 0) {
+                if (botContentDiv) botContentDiv.innerHTML = ''; 
+
+                let combinedTextContent = '';
+                imageDatasForAnimation = []; // Clear and populate for current message
+                combinedTextContentForAnimation = ''; // Reset for current message
+
+                responseParts.forEach(part => {
+                  if (part.text) combinedTextContentForAnimation += part.text;
+                  if (part.inlineData?.mimeType && part.inlineData?.data) {
+                      imageDatasForAnimation.push(part.inlineData);
+                      // This is where an image is received from the model in the primary response flow
+                      if (typeof gtag === 'function') {
+                          gtag('event', 'Image-received-from-model', {
+                              'model_used': selectedModel,
+                              'image_mime_type': part.inlineData.mimeType
+                          });
+                      }
+                  }
+                  // Check for function call to log image generation attempt
+                  if (part.functionCall && part.functionCall.name === 'generate_image') {
+                      if (typeof gtag === 'function') {
+                          gtag('event', 'Image-generation-tool-called', {
+                              'model_used': selectedModel,
+                              'prompt_length': part.functionCall.args?.prompt?.length || 0
+                          });
+                      }
+                  }
+                });
+
+                // If STOP was clicked just after fetch but before this point, and global flag is set
+                if (stopLetterAnimationGlobal) {
+                  if (combinedTextContentForAnimation.trim() !== '' && botContentDiv) {
+                      const tempSpan = document.createElement('span');
+                      tempSpan.classList.add('bot-typing-content', 'fade-in');
+                      botContentDiv.appendChild(tempSpan);
+                      tempSpan.innerHTML = formatBotMessage(combinedTextContentForAnimation); // Use the stored raw text
+                      applySyntaxHighlighting(tempSpan);
+                      appendImages(); 
+                      addCopyButtonToBotMessage(botContentDiv, combinedTextContentForAnimation);
+                  } else if (imageDatasForAnimation.length > 0) {
+                      appendImages();
+                  }
+                  return;
+                }
+
+                if (combinedTextContentForAnimation.trim() !== '') {
+                  botMessageSpanForAnimation = document.createElement('span');
+                  botMessageSpanForAnimation.classList.add('bot-typing-content');
+                  if (botContentDiv) botContentDiv.appendChild(botMessageSpanForAnimation);
+                  
+                  requestAnimationFrame(() => {
+                      if(botMessageSpanForAnimation) botMessageSpanForAnimation.classList.add('fade-in');
+                  });
+
+                  const finalHtml = formatBotMessage(combinedTextContentForAnimation); // Use the stored raw text
+                  botMessageSpanForAnimation.innerHTML = finalHtml;
+                  applySyntaxHighlighting(botMessageSpanForAnimation);
+
+                  // --- New Letter-by-Letter Animation Logic ---
+                  // let currentStopListener = null; // Ensure this line is not present if it was part of old logic
+
+                  // function wrapTextNodesWithLetterSpans() { /* DEFINITION MOVED ABOVE */ }
+
+                  const letterSpans = wrapTextNodesWithLetterSpans(botMessageSpanForAnimation);
+
+                  stopLetterAnimationGlobal = false; // Reset stop flag for new message
+
+                  if (letterSpans.length > 0) {
+                    letterSpans.forEach((span, index) => {
+                      const timeoutId = setTimeout(() => {
+                        if (stopLetterAnimationGlobal) return;
+                        span.style.opacity = '1';
+                        if (index === letterSpans.length - 1) {
+                          appendImages(); 
+                          addCopyButtonToBotMessage(botContentDiv, combinedTextContentForAnimation); // Add copy button
+                          sendButton.textContent = 'Send';
+                          sendButton.classList.remove('stop-generating');
+                          chatInput.disabled = false;
+                          sendButton.disabled = false;
+                          if (currentStopButtonHandler) sendButton.removeEventListener('click', currentStopButtonHandler);
+                          currentStopButtonHandler = null;
+                          letterAnimationTimeouts = [];
+                          // gtag event for natural completion (if desired, can be added here)
+                        }
+                      }, index * (letterSpans.length > 0 ? (Math.max(250, Math.min(5000, letterSpans.length * 50))) / letterSpans.length : 0) );
+                      letterAnimationTimeouts.push(timeoutId);
+                    });
+                  } else { // No letters to animate, but there was text content (e.g. only HTML tags after formatting)
+                      appendImages();
+                      addCopyButtonToBotMessage(botContentDiv, combinedTextContentForAnimation); // Add copy button
+                      sendButton.textContent = 'Send';
+                      sendButton.classList.remove('stop-generating');
+                      chatInput.disabled = false;
+                      sendButton.disabled = false;
+                      if (currentStopButtonHandler) sendButton.removeEventListener('click', currentStopButtonHandler);
+                      currentStopButtonHandler = null;
+                  }
+
+                } else if (imageDatasForAnimation.length > 0) {
+                  appendImages();
+                  // No text, so no copy button for text here
+                  sendButton.textContent = 'Send';
+                  sendButton.classList.remove('stop-generating');
+                  isRetryMode = false; chatInput.disabled = false; sendButton.disabled = false;
+                  if (currentStopButtonHandler) sendButton.removeEventListener('click', currentStopButtonHandler);
+                  currentStopButtonHandler = null;
+                } else {
+                  if (botContentDiv) botContentDiv.innerHTML = formatBotMessage('Received an empty response.');
+                  sendButton.textContent = 'Send';
+                  sendButton.classList.remove('stop-generating');
+                  chatInput.disabled = false; sendButton.disabled = false;
+                  if (currentStopButtonHandler) sendButton.removeEventListener('click', currentStopButtonHandler);
+                  currentStopButtonHandler = null;
+                }
+
+              } else { // No response parts
+                if (botContentDiv) botContentDiv.innerHTML = formatBotMessage('Received a response, but no content parts were found.');
+                sendButton.textContent = 'Send';
+                sendButton.classList.remove('stop-generating');
+                chatInput.disabled = false; sendButton.disabled = false;
+                if (currentStopButtonHandler) sendButton.removeEventListener('click', currentStopButtonHandler);
+                currentStopButtonHandler = null;
+              }
+            } catch (error) {
+              if (fetchAbortController) fetchAbortController = null; // Ensure cleared if error happened before it was nullified post-await
+                          
+              if (error.name === 'AbortError') {
+                console.log('Fetch aborted by user action.');
+                // gtag event for stop is in handleStopAction
+              } else {
+                if (botContentDiv) botContentDiv.innerHTML = formatBotMessage('Error - Could not connect to the API.');
+                if (botContentDiv) applySyntaxHighlighting(botContentDiv);
+                console.error('Failed to fetch from /api/gemini-proxy:', error);
+                sendButton.textContent = 'Retry';
+                isRetryMode = true;
+                // Ensure UI is reset for other errors too
+                chatInput.disabled = false;
+                sendButton.classList.remove('stop-generating');
+                sendButton.disabled = false;
+                if (currentStopButtonHandler) {
+                  sendButton.removeEventListener('click', currentStopButtonHandler);
+                  currentStopButtonHandler = null;
+                }
+              }
+            }
+          })
+          .catch(function(recaptchaError) {
+            console.error('reCAPTCHA execution failed:', recaptchaError);
+            const errorBotMessageDiv = displayMessage('Bot', formatBotMessage('Error: reCAPTCHA verification failed. Please refresh and try again.'), true);
+            // Log reCAPTCHA failure event with model that would have been used
+            if (typeof gtag === 'function') {
+              gtag('event', 'Chat-reCAPTCHA-failed', {
+                'model_intended': modelSelector.value 
+              });
+            }
+            if (errorBotMessageDiv) { 
+              const errorBotContentDiv = errorBotMessageDiv.querySelector('.message-content');
+              if (errorBotContentDiv) { 
+                   applySyntaxHighlighting(errorBotContentDiv);
+              }
+            }
+
+            // Reset UI
+            chatInput.disabled = false;
+            sendButton.disabled = false;
+            sendButton.textContent = 'Send';
+            sendButton.classList.remove('stop-generating');
+            isRetryMode = false;
+            // Crucially, currentStopButtonHandler should be cleared if it was set, 
+            // as the operation effectively failed before the main logic ran.
+            if (currentStopButtonHandler) {
+                sendButton.removeEventListener('click', currentStopButtonHandler);
+                currentStopButtonHandler = null;
+            }
+          });
+      });
     });
 
-    document.addEventListener('mousemove', (e) => {
-      if (!isDragging) return;
+    // Lightbox close functionality
+    if (lightboxClose) {
+      lightboxClose.addEventListener('click', () => {
+        if (lightboxOverlay) lightboxOverlay.style.display = 'none';
+        document.removeEventListener('keydown', handleLightboxKeys);
+      });
+    }
+    if (lightboxOverlay) {
+      lightboxOverlay.addEventListener('click', (event) => {
+        if (event.target === lightboxOverlay) {
+          lightboxOverlay.style.display = 'none';
+          document.removeEventListener('keydown', handleLightboxKeys);
+        }
+      });
+    }
 
-      const dx = e.clientX - startX;
-      const newMainWidth = mainPanelWidth + dx;
+    // Lightbox navigation functionality
+    let displayedImageCount = 0;
 
-      // Ensure panels don't collapse completely
-      const minWidth = 50; // Minimum width in pixels
-      if (newMainWidth > minWidth && (container.offsetWidth - newMainWidth) > minWidth) {
-        mainPanel.style.flexBasis = `${newMainWidth}px`;
-        rightPanel.style.flexBasis = `${container.offsetWidth - newMainWidth}px`;
+    function updateFilmstrip() {
+      if (!filmstripContainer || imageDatasForAnimation.length === 0) return;
+
+      // Clear existing thumbnails
+      filmstripContainer.innerHTML = '';
+
+      // Add new thumbnails
+      imageDatasForAnimation.forEach((imageData, index) => {
+        const thumbnail = document.createElement('div');
+        thumbnail.className = 'filmstrip-thumbnail';
+        thumbnail.dataset.index = index;
+
+        const img = document.createElement('img');
+        img.src = `data:${imageData.mimeType};base64,${imageData.data}`;
+        img.alt = "Thumbnail";
+        thumbnail.appendChild(img);
+
+        // Click event to navigate to the corresponding image
+        thumbnail.addEventListener('click', () => {
+          currentImageIndex = index;
+          showImageInLightbox(currentImageIndex);
+        });
+
+        filmstripContainer.appendChild(thumbnail);
+      });
+
+      displayedImageCount = imageDatasForAnimation.length;
+      updateLightboxNavigation();
+    }
+
+    function updateLightboxNavigation() {
+      if (displayedImageCount <= 1) {
+        lightboxPrev.style.display = 'none';
+        lightboxNext.style.display = 'none';
+      } else {
+        lightboxPrev.style.display = 'block';
+        lightboxNext.style.display = 'block';
+      }
+    }
+
+    function showImageInLightbox(index) {
+      if (index < 0 || index >= imageDatasForAnimation.length) return;
+
+      const imageData = imageDatasForAnimation[index];
+      lightboxImage.src = `data:${imageData.mimeType};base64,${imageData.data}`;
+      currentImageIndex = index;
+
+      // Update filmstrip selection
+      const thumbnails = filmstripContainer.querySelectorAll('.filmstrip-thumbnail');
+      thumbnails.forEach((thumb, idx) => {
+        thumb.classList.toggle('selected', idx === currentImageIndex);
+      });
+
+      updateLightboxNavigation();
+    }
+
+    // Lightbox next/prev functionality
+    lightboxNext.addEventListener('click', (event) => {
+      event.stopPropagation();
+      if (currentImageIndex < imageDatasForAnimation.length - 1) {
+        currentImageIndex++;
+        showImageInLightbox(currentImageIndex);
       }
     });
 
-    document.addEventListener('mouseup', () => {
-      if (!isDragging) return;
-      isDragging = false;
-      container.style.cursor = 'default'; // Reset cursor
-    });
-
-    // Prevent dragging outside the window
-    document.addEventListener('mouseleave', () => {
-      if (isDragging) {
-        isDragging = false;
-        container.style.cursor = 'default';
+    lightboxPrev.addEventListener('click', (event) => {
+      event.stopPropagation();
+      if (currentImageIndex > 0) {
+        currentImageIndex--;
+        showImageInLightbox(currentImageIndex);
       }
     });
 
-    // Chat form submit listener REMOVED
-    // chatForm.addEventListener('submit', async (event) => { ... });
+    // Integrate filmstrip update in the message display logic
+    function displayMessage(sender, textOrHtml, isHtml = false) {
+        const messageDiv = document.createElement('div');
+        messageDiv.classList.add('message', sender.toLowerCase());
+
+        const senderSpan = document.createElement('div');
+        senderSpan.classList.add('message-sender');
+        senderSpan.textContent = sender === 'User' ? 'You' : 'Bot';
+        messageDiv.appendChild(senderSpan);
+
+        const contentDiv = document.createElement('div');
+        contentDiv.classList.add('message-content');
+        if (isHtml) {
+            contentDiv.innerHTML = textOrHtml;
+        } else {
+            contentDiv.textContent = textOrHtml;
+        }
+        messageDiv.appendChild(contentDiv);
+        
+        chatPanel.appendChild(messageDiv);
+        chatPanel.scrollTop = chatPanel.scrollHeight;
+
+        return messageDiv; // Return the message div for potential updates (e.g., streaming)
+    }
+
   </script>
-<!-- Footer bar-->
- 
 </body>
 </html>
