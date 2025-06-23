@@ -297,6 +297,59 @@
       border-color: #fff;
     }
 
+    /* Gallery Panel Styles */
+    .gallery-panel {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 250px;
+      height: 100%;
+      background-color: #f9f9f9;
+      border-left: 1px solid #e0e0e0;
+      box-shadow: -2px 0 5px rgba(0,0,0,0.1);
+      padding: 15px;
+      box-sizing: border-box;
+      overflow-y: auto;
+      display: none; /* Hidden by default */
+      flex-direction: column;
+      z-index: 999; /* Below lightbox but above other content */
+    }
+
+    body.gallery-visible .chat-container {
+        margin-right: 270px; /* gallery width + padding */
+    }
+
+    .gallery-panel h2 {
+      margin-top: 0;
+      margin-bottom: 15px;
+      font-size: 1.2em;
+      color: #333;
+      border-bottom: 1px solid #e0e0e0;
+      padding-bottom: 10px;
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: 10px;
+    }
+
+    .gallery-thumbnail {
+      width: 100%;
+      height: auto;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      cursor: pointer;
+      border-radius: 5px;
+      border: 2px solid transparent;
+      transition: border-color 0.3s, transform 0.2s;
+    }
+
+    .gallery-thumbnail:hover {
+      border-color: #007bff;
+      transform: scale(1.05);
+    }
+
 
     .generated-image {
       cursor: pointer;
@@ -372,6 +425,11 @@
     </form>
   </div>
 
+  <div id="gallery-panel" class="gallery-panel">
+    <h2>Gallery</h2>
+    <div id="gallery-grid" class="gallery-grid"></div>
+  </div>
+
   <div class="lightbox-overlay" id="lightboxOverlay">
     <span class="lightbox-close" id="lightboxClose">&times;</span>
     <img src="" alt="Lightbox Image" class="lightbox-image" id="lightboxImage">
@@ -395,6 +453,10 @@
     const lightboxPrev = document.getElementById('lightboxPrev');
     const lightboxNext = document.getElementById('lightboxNext');
     const filmstripContainer = document.getElementById('filmstripContainer');
+
+    // Gallery elements
+    const galleryPanel = document.getElementById('gallery-panel');
+    const galleryGrid = document.getElementById('gallery-grid');
 
     let chatHistory = [];
     let sessionImages = [];
@@ -458,6 +520,31 @@
 
     lightboxPrev.addEventListener('click', showPrevImage);
     lightboxNext.addEventListener('click', showNextImage);
+
+    function updateGallery() {
+        if (sessionImages.length === 0) {
+            galleryPanel.style.display = 'none';
+            document.body.classList.remove('gallery-visible');
+            return;
+        }
+
+        if (galleryPanel.style.display === 'none') {
+            galleryPanel.style.display = 'flex';
+            document.body.classList.add('gallery-visible');
+        }
+        
+        galleryGrid.innerHTML = ''; // Clear and rebuild to keep order and avoid duplicates
+
+        sessionImages.forEach((imgSrc, index) => {
+            const galleryThumb = document.createElement('img');
+            galleryThumb.src = imgSrc;
+            galleryThumb.classList.add('gallery-thumbnail');
+            galleryThumb.addEventListener('click', () => {
+                showLightboxImage(index);
+            });
+            galleryGrid.appendChild(galleryThumb);
+        });
+    }
 
     function formatBotMessage(text) {
       const html = DOMPurify.sanitize(marked.parse(text), {
@@ -638,6 +725,7 @@
                 }
               });
               setTimeout(() => chatPanel.scrollTop = chatPanel.scrollHeight, 10);
+              updateGallery();
             };
 
             function handleStopAction() {
@@ -692,7 +780,7 @@
             sendButton.addEventListener('click', currentStopButtonHandler);
 
             // Define wrapTextNodesWithLetterSpans at a higher scope
-            function wrapTextNodesWithLetterSpans(element) {
+            function wrapTextNodesWithLetterSpans() {
               const letters = [];
               Array.from(element.childNodes).forEach(child => {
                 if (child.nodeType === Node.TEXT_NODE) {
