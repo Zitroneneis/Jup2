@@ -486,18 +486,6 @@
         chatPanel.appendChild(messageDiv);
         chatPanel.scrollTop = chatPanel.scrollHeight;
 
-        // Update filmstrip after bot message is displayed
-        if (sender === 'Bot' && isHtml) {
-          const parser = new DOMParser();
-          const doc = parser.parseFromString(textOrHtml, 'text/html');
-          const images = doc.querySelectorAll('img');
-          imageDatasForAnimation = Array.from(images).map(img => ({
-            mimeType: img.src.split(';')[0].split(':')[1],
-            data: img.src.split(',')[1]
-          }));
-          updateFilmstrip();
-        }
-
         return messageDiv; // Return the message div for potential updates (e.g., streaming)
     }
 
@@ -1066,18 +1054,6 @@
         
         chatPanel.appendChild(messageDiv);
         chatPanel.scrollTop = chatPanel.scrollHeight;
-
-        // Update filmstrip after bot message is displayed
-        if (sender === 'Bot' && isHtml) {
-          const parser = new DOMParser();
-          const doc = parser.parseFromString(textOrHtml, 'text/html');
-          const images = doc.querySelectorAll('img');
-          imageDatasForAnimation = Array.from(images).map(img => ({
-            mimeType: img.src.split(';')[0].split(':')[1],
-            data: img.src.split(',')[1]
-          }));
-          updateFilmstrip();
-        }
 
         return messageDiv; // Return the message div for potential updates (e.g., streaming)
     }

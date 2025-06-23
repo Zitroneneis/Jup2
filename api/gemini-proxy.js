@@ -123,22 +123,6 @@ export default async function handler(req, res) {
       }
     }
 
-
-    // If frontend sends a generationConfig, merge it.
-    // This allows the frontend to specify response_mime_type for specific models.
-    if (frontendGenerationConfig) {
-      requestBody.generationConfig = { ...requestBody.generationConfig, ...frontendGenerationConfig };
-    }
-
-    // Add systemPrompt only if it exists and the model is not the image generation model
-    if (systemPrompt && modelToUse !== 'gemini-2.0-flash-preview-image-generation' && !isPerplexityModel) {
-        requestBody.systemInstruction = { parts: [{ text: systemPrompt }] };
-    }
-
-    if (supportsFunctionCalling && !isPerplexityModel) {
-      requestBody.tools = [imageGenerationTool];
-    }
-
     // If the model is specifically for image generation, adjust config
     if (modelToUse === 'gemini-2.0-flash-preview-image-generation') {
       // This model might expect a different request structure or config for image generation.
