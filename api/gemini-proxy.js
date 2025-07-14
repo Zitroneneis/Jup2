@@ -532,7 +532,7 @@ export default async function handler(req, res) {
               functionResponse: {
                 name: 'get_weather',
                 response: {
-                  content: `Current weather in ${weatherData.location}: ${weatherData.temperature}°C, ${weatherData.description}. Feels like ${weatherData.feels_like}°C. Humidity: ${weatherData.humidity}%, Wind: ${weatherData.wind_speed} m/s`,
+                  content: `Current weather in ${weatherData.location}: ${weatherData.temperature}°F, ${weatherData.description}. Feels like ${weatherData.feels_like}°F. Humidity: ${weatherData.humidity}%, Wind: ${weatherData.wind_speed} mph`,
                   data: weatherData
                 }
               }
@@ -616,7 +616,7 @@ async function fetchWeatherData(location, openWeatherApiKey) {
   console.log(`Fetching weather data for location: ${location}`);
   
   try {
-    const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(location)}&appid=${openWeatherApiKey}&units=metric`;
+    const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(location)}&appid=${openWeatherApiKey}&units=imperial`;
     
     const weatherResponse = await fetch(weatherUrl);
     const weatherData = await weatherResponse.json();
