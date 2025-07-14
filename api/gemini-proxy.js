@@ -511,7 +511,7 @@ export default async function handler(req, res) {
         } else {
           // Fetch weather data
           console.log('Fetching weather for location:', location);
-          const weatherData = await fetchWeatherData(location);
+          const weatherData = await fetchWeatherData(location, openWeatherApiKey);
           
           let toolResponsePart;
           
@@ -607,7 +607,7 @@ export default async function handler(req, res) {
 }
 
 // Helper function to fetch weather data
-async function fetchWeatherData(location) {
+async function fetchWeatherData(location, openWeatherApiKey) {
   if (!openWeatherApiKey) {
     console.error('OpenWeatherMap API key not configured');
     return { error: 'Weather service is not configured' };
