@@ -107,10 +107,10 @@ export default async function handler(req, res) {
     ]
   };
 
-  // Determine if the current model supports function calling for image generation
+  // Determine if the current model supports function calling for image generation and weather
   // For this example, let's assume gemini-2.0-flash-lite and gemini-2.5-pro-preview-06-05 support it.
   // The gemini-2.0-flash-preview-image-generation model generates images directly.
-  const supportsFunctionCalling = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-2.5-flash-lite-preview-06-17'].includes(modelToUse);
+  const supportsFunctionCalling = ['gemini-2.0-flash', 'gemini-2.0-flash-lite', 'gemini-1.5-flash', 'gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-2.5-flash-lite-preview-06-17'].includes(modelToUse);
   const isPerplexityModel = modelToUse.startsWith('perplexity-');
 
   try {
@@ -155,7 +155,11 @@ export default async function handler(req, res) {
           requestBody.systemInstruction = { parts: [{ text: systemPrompt }] };
       }
       if (supportsFunctionCalling) {
+        console.log('Adding function calling tools to request for model:', modelToUse);
+        console.log('Available tools:', allTools.functionDeclarations.map(tool => tool.name));
         requestBody.tools = [allTools];
+      } else {
+        console.log('Model does not support function calling:', modelToUse);
       }
     }
 
