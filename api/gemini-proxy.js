@@ -8,13 +8,16 @@ export default async function handler(req, res) {
   const { history, recaptchaToken, model: requestedModel, generationConfig: frontendGenerationConfig } = req.body; // Add model and generationConfig from request
   const geminiApiKey = process.env.GEMINI_API_KEY;
   const perplexityApiKey = process.env.PERPLEXITY_API_KEY; // Added Perplexity API Key
-  const recaptchaSecretKey = process.env.RECAPTCHA_SECRET_KEY; 
+  const recaptchaSecretKey = process.env.RECAPTCHA_SECRET_KEY;
+  const openWeatherApiKey = process.env.OPEN_WEATHER_API_KEY; 
   
   // Determine the model to use, defaulting to gemini-2.0-flash-lite
   const modelToUse = requestedModel || 'gemini-2.0-flash-lite';
 
   // Define your system prompt here
-  const systemPrompt = `You are a bot embedded in a tech prototype. You can use a function to generate images. To generate an image, you MUST call the function named \'generate_image\' with a detailed textual prompt. Only call this function when the user explicitly asks for an image, diagram, or visual content, or when an image would significantly enhance the response. Do not attempt to generate images in any other way or state you will generate one without calling the function.`;
+  const systemPrompt = `You are a bot embedded in a tech prototype. You can use a function to generate images. To generate an image, you MUST call the function named 'generate_image' with a detailed textual prompt. Only call this function when the user explicitly asks for an image, diagram, or visual content, or when an image would significantly enhance the response. Do not attempt to generate images in any other way or state you will generate one without calling the function.
+
+You also have access to a weather function. To get current weather information, you MUST call the function named 'get_weather' with a location (city, state/country). Only call this function when the user asks for weather information, current conditions, or weather-related queries.`;
 
   // API Key validation based on selected model provider
   if (modelToUse.startsWith('gemini-') && !geminiApiKey) {
@@ -66,6 +69,20 @@ export default async function handler(req, res) {
             }
           },
           required: ['prompt']
+        }
+      },
+      {
+        name: 'get_weather',
+        description: 'Gets current weather information for a specified location. Use this when the user asks for weather information, current conditions, forecast, or weather-related queries.',
+        parameters: {
+          type: 'object',
+          properties: {
+            location: {
+              type: 'string',
+              description: 'The location to get weather for (city name, city and state/country, or coordinates). Examples: "New York", "London, UK", "Tokyo, Japan", "40.7128,-74.0060"'
+            }
+          },
+          required: ['location']
         }
       }
     ]
@@ -218,13 +235,237 @@ export default async function handler(req, res) {
       }
     }
 
-
     // Check for function call (This part now primarily handles Gemini's function calls, 
     // or Gemini's function calls made on behalf of Perplexity)
     const partContainingFunctionCall = data.candidates?.[0]?.content?.parts?.find(part => part.functionCall);
     const actualFunctionCall = partContainingFunctionCall ? partContainingFunctionCall.functionCall : null;
     
-    if (supportsFunctionCalling && actualFunctionCall && actualFunctionCall.name === 'generate_image') {
+    // Handle weather function call
+    if (supportsFunctionCalling && actualFunctionCall && actualFunctionCall.name === 'get_weather') {
+      const location = actualFunctionCall.args.location;
+
+      if (!location) {
+        // Handle missing location
+        const toolResponsePart = {
+          functionResponse: {
+            name: 'get_weather',
+            response: {
+              error: 'Missing location for weather query.',
+              content: 'Error: I need a location to get weather information. Please provide a city name or location.'
+            }
+          }
+        };
+        
+        // Send error response back to model
+        const followupRequestBody = {
+          contents: [...history, data.candidates[0].content, {role: "tool", parts: [toolResponsePart]}],
+        };
+        
+        let followupApiUrl = apiUrl;
+        let followupHeaders = headers;
+        let followupBody = followupRequestBody;
+
+        if (isPerplexityModel && partContainingFunctionCall) {
+          followupApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`;
+          followupHeaders = { 'Content-Type': 'application/json' };
+          followupBody = {
+            contents: followupRequestBody.contents,
+            tools: [imageGenerationTool],
+            systemInstruction: { parts: [{ text: systemPrompt }] }
+          };
+        } else if (!isPerplexityModel) {
+          followupBody = {
+            ...requestBody,
+            contents: followupRequestBody.contents
+          };
+        }
+
+        apiResponse = await fetch(followupApiUrl, {
+          method: 'POST',
+          headers: followupHeaders,
+          body: JSON.stringify(followupBody)
+        });
+        
+        const finalDataAfterWeatherError = await apiResponse.json();
+        data = finalDataAfterWeatherError;
+
+        if (!apiResponse.ok) {
+          console.error('Error from API after sending weather tool error response:', data);
+          return res.status(apiResponse.status).json({ error: data?.error?.message || 'API error after weather tool response' });
+        }
+      } else {
+        // Call OpenWeatherMap API
+        try {
+          let weatherApiUrl;
+          
+          // Check if location is coordinates (lat,lon format)
+          const coordPattern = /^-?\d+\.?\d*,-?\d+\.?\d*$/;
+          if (coordPattern.test(location)) {
+            const [lat, lon] = location.split(',');
+            weatherApiUrl = `https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${lon}&appid=${openWeatherApiKey}&units=metric`;
+          } else {
+            // First get coordinates from location name using geocoding API
+            const geocodeUrl = `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(location)}&limit=1&appid=${openWeatherApiKey}`;
+            const geocodeResponse = await fetch(geocodeUrl);
+            const geocodeData = await geocodeResponse.json();
+            
+            if (!geocodeResponse.ok || !geocodeData || geocodeData.length === 0) {
+              throw new Error('Location not found');
+            }
+            
+            const { lat, lon } = geocodeData[0];
+            weatherApiUrl = `https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${lon}&appid=${openWeatherApiKey}&units=metric`;
+          }
+
+          const weatherResponse = await fetch(weatherApiUrl);
+          const weatherData = await weatherResponse.json();
+
+          let toolResponsePart;
+          if (weatherResponse.ok && weatherData.current) {
+            const current = weatherData.current;
+            const weatherInfo = {
+              location: location,
+              temperature: Math.round(current.temp),
+              feels_like: Math.round(current.feels_like),
+              humidity: current.humidity,
+              pressure: current.pressure,
+              visibility: current.visibility ? (current.visibility / 1000) : 'N/A',
+              uv_index: current.uvi,
+              weather: current.weather[0].description,
+              wind_speed: current.wind_speed,
+              wind_direction: current.wind_deg,
+              timestamp: new Date(current.dt * 1000).toLocaleString()
+            };
+
+            toolResponsePart = {
+              functionResponse: {
+                name: 'get_weather',
+                response: {
+                  content: `Current weather for ${location}:
+Temperature: ${weatherInfo.temperature}°C (feels like ${weatherInfo.feels_like}°C)
+Conditions: ${weatherInfo.weather}
+Humidity: ${weatherInfo.humidity}%
+Pressure: ${weatherInfo.pressure} hPa
+Wind: ${weatherInfo.wind_speed} m/s
+UV Index: ${weatherInfo.uv_index}
+Visibility: ${weatherInfo.visibility} km
+Last updated: ${weatherInfo.timestamp}`,
+                  data: weatherInfo
+                }
+              }
+            };
+          } else {
+            console.error('Weather API error:', weatherData);
+            toolResponsePart = {
+              functionResponse: {
+                name: 'get_weather',
+                response: {
+                  error: 'Failed to get weather data.',
+                  content: 'Sorry, I was unable to get weather information for that location at this time.'
+                }
+              }
+            };
+          }
+
+          // Send the function response back to the original chat model
+          const followupRequestBodyAfterWeather = {
+            contents: [
+              ...history,
+              data.candidates[0].content,
+              { role: "tool", parts: [toolResponsePart] }
+            ],
+          };
+
+          let followupApiUrlAfterWeather = apiUrl;
+          let followupHeadersAfterWeather = headers;
+          let finalRequestBodyAfterWeather = followupRequestBodyAfterWeather;
+
+          if (isPerplexityModel && partContainingFunctionCall) {
+            followupApiUrlAfterWeather = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`;
+            followupHeadersAfterWeather = { 'Content-Type': 'application/json' };
+            finalRequestBodyAfterWeather = {
+              contents: followupRequestBodyAfterWeather.contents,
+              tools: [imageGenerationTool],
+              systemInstruction: { parts: [{ text: systemPrompt }] }
+            };
+          } else if (!isPerplexityModel) {
+            finalRequestBodyAfterWeather = {
+              ...requestBody,
+              contents: followupRequestBodyAfterWeather.contents
+            };
+          }
+
+          apiResponse = await fetch(followupApiUrlAfterWeather, {
+            method: 'POST',
+            headers: followupHeadersAfterWeather,
+            body: JSON.stringify(finalRequestBodyAfterWeather)
+          });
+
+          const finalDataAfterWeather = await apiResponse.json();
+          data = finalDataAfterWeather;
+
+          if (!apiResponse.ok) {
+            console.error('Error from API after sending weather tool response:', data);
+            return res.status(apiResponse.status).json({ error: data?.error?.message || 'API error after weather tool response' });
+          }
+
+        } catch (error) {
+          console.error('Weather API error:', error);
+          
+          // Send error response back to model
+          const toolResponsePart = {
+            functionResponse: {
+              name: 'get_weather',
+              response: {
+                error: 'Weather service error.',
+                content: `Sorry, I encountered an error getting weather information: ${error.message}`
+              }
+            }
+          };
+          
+          const followupRequestBodyAfterWeatherError = {
+            contents: [
+              ...history,
+              data.candidates[0].content,
+              { role: "tool", parts: [toolResponsePart] }
+            ],
+          };
+
+          let followupApiUrlAfterWeatherError = apiUrl;
+          let followupHeadersAfterWeatherError = headers;
+          let finalRequestBodyAfterWeatherError = followupRequestBodyAfterWeatherError;
+
+          if (isPerplexityModel && partContainingFunctionCall) {
+            followupApiUrlAfterWeatherError = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`;
+            followupHeadersAfterWeatherError = { 'Content-Type': 'application/json' };
+            finalRequestBodyAfterWeatherError = {
+              contents: followupRequestBodyAfterWeatherError.contents,
+              tools: [imageGenerationTool],
+              systemInstruction: { parts: [{ text: systemPrompt }] }
+            };
+          } else if (!isPerplexityModel) {
+            finalRequestBodyAfterWeatherError = {
+              ...requestBody,
+              contents: followupRequestBodyAfterWeatherError.contents
+            };
+          }
+
+          apiResponse = await fetch(followupApiUrlAfterWeatherError, {
+            method: 'POST',
+            headers: followupHeadersAfterWeatherError,
+            body: JSON.stringify(finalRequestBodyAfterWeatherError)
+          });
+
+          const finalDataAfterWeatherError = await apiResponse.json();
+          data = finalDataAfterWeatherError;
+
+          if (!apiResponse.ok) {
+            console.error('Error from API after sending weather error response:', data);
+            return res.status(apiResponse.status).json({ error: data?.error?.message || 'API error after weather error response' });
+          }
+        }
+      }
+    } else if (supportsFunctionCalling && actualFunctionCall && actualFunctionCall.name === 'generate_image') {
       const imagePrompt = actualFunctionCall.args.prompt;
 
       if (!imagePrompt) {
