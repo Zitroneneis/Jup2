@@ -26,6 +26,11 @@ You also have access to a weather function. To get current weather information, 
     return res.status(500).json({ error: 'Perplexity API key not configured.' });
   }
 
+  // Check if OpenWeatherMap API key is available
+  if (!openWeatherApiKey) {
+    console.warn('OpenWeatherMap API key not configured. Weather function will not work.');
+  }
+
 
   if (!history || !Array.isArray(history) || history.length === 0) { // Validate history
     return res.status(400).json({ error: 'History is required and must be a non-empty array.' });
@@ -54,8 +59,8 @@ You also have access to a weather function. To get current weather information, 
   const imageKeywords = ['image', 'picture', 'diagram', 'chart', 'illustration', 'draw', 'create a visual', 'show me', 'generate an image'];
   const isImageRequest = imageKeywords.some(keyword => userText.includes(keyword));
 
-  // Define the image generation tool
-  const imageGenerationTool = {
+  // Define the tools (combined image generation and weather)
+  const tools = {
     functionDeclarations: [
       {
         name: 'generate_image',
@@ -88,10 +93,17 @@ You also have access to a weather function. To get current weather information, 
     ]
   };
 
-  // Determine if the current model supports function calling for image generation
-  // For this example, let's assume gemini-2.0-flash-lite and gemini-2.5-pro-preview-06-05 support it.
-  // The gemini-2.0-flash-preview-image-generation model generates images directly.
-  const supportsFunctionCalling = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-2.5-flash-lite-preview-06-17'].includes(modelToUse);
+  // Determine if the current model supports function calling
+  // Updated to include more models and make it more comprehensive
+  const supportsFunctionCalling = [
+    'gemini-2.0-flash-lite',
+    'gemini-2.0-flash', 
+    'gemini-1.5-flash', 
+    'gemini-2.5-flash', 
+    'gemini-2.5-pro', 
+    'gemini-2.5-flash-lite-preview-06-17',
+    'gemini-1.5-pro'
+  ].includes(modelToUse);
   const isPerplexityModel = modelToUse.startsWith('perplexity-');
 
   try {
@@ -128,15 +140,15 @@ You also have access to a weather function. To get current weather information, 
         generationConfig: {
           temperature: 0.7,
         }
-      };
-      if (frontendGenerationConfig) {
-        requestBody.generationConfig = { ...requestBody.generationConfig, ...frontendGenerationConfig };
+      if (supportsFunctionCalling) {
+        requestBody.tools = [tools];
+      } requestBody.generationConfig = { ...requestBody.generationConfig, ...frontendGenerationConfig };
       }
       if (systemPrompt && modelToUse !== 'gemini-2.0-flash-preview-image-generation') {
           requestBody.systemInstruction = { parts: [{ text: systemPrompt }] };
       }
       if (supportsFunctionCalling) {
-        requestBody.tools = [imageGenerationTool];
+        requestBody.tools = [tools];
       }
     }
 
@@ -176,16 +188,16 @@ You also have access to a weather function. To get current weather information, 
         const perplexityRequestsImage = imageKeywords.some(keyword => perplexityContent.toLowerCase().includes(keyword));
 
         if (perplexityRequestsImage && !data.choices[0].message.tool_calls) { // If Perplexity wants an image but didn't make a tool call itself
-            // We will now make a separate call to Gemini for the image generation function
-            // using the content from Perplexity as a basis for the prompt.
-
-            // Create a temporary history for Gemini function calling
-            const geminiFunctionCallHistory = [
-                { role: "user", parts: [{ text: perplexityContent + " - Please generate an image based on this." }] } 
+            const geminiFcRequestBody = {
+                contents: geminiFunctionCallHistory,
+                tools: [tools],
+                systemInstruction: { parts: [{ text: systemPrompt }] }, // Gemini needs its system prompt
+                generationConfig: { temperature: 0.7 }
+            };  { role: "user", parts: [{ text: perplexityContent + " - Please generate an image based on this." }] } 
             ];
             const geminiFcRequestBody = {
                 contents: geminiFunctionCallHistory,
-                tools: [imageGenerationTool],
+                tools: [tools],
                 systemInstruction: { parts: [{ text: systemPrompt }] }, // Gemini needs its system prompt
                 generationConfig: { temperature: 0.7 }
             };
@@ -270,7 +282,7 @@ You also have access to a weather function. To get current weather information, 
           followupHeaders = { 'Content-Type': 'application/json' };
           followupBody = {
             contents: followupRequestBody.contents,
-            tools: [imageGenerationTool],
+            tools: [tools],
             systemInstruction: { parts: [{ text: systemPrompt }] }
           };
         } else if (!isPerplexityModel) {
@@ -385,7 +397,7 @@ Last updated: ${weatherInfo.timestamp}`,
             followupHeadersAfterWeather = { 'Content-Type': 'application/json' };
             finalRequestBodyAfterWeather = {
               contents: followupRequestBodyAfterWeather.contents,
-              tools: [imageGenerationTool],
+              tools: [tools],
               systemInstruction: { parts: [{ text: systemPrompt }] }
             };
           } else if (!isPerplexityModel) {
@@ -440,7 +452,7 @@ Last updated: ${weatherInfo.timestamp}`,
             followupHeadersAfterWeatherError = { 'Content-Type': 'application/json' };
             finalRequestBodyAfterWeatherError = {
               contents: followupRequestBodyAfterWeatherError.contents,
-              tools: [imageGenerationTool],
+              tools: [tools],
               systemInstruction: { parts: [{ text: systemPrompt }] }
             };
           } else if (!isPerplexityModel) {
@@ -499,7 +511,7 @@ Last updated: ${weatherInfo.timestamp}`,
           // Gemini expects 'contents' and potentially 'systemInstruction'
           followupBody = {
             contents: followupRequestBody.contents, // Already in Gemini format
-            tools: [imageGenerationTool], // Resend tools
+            tools: [tools], // Resend tools
             systemInstruction: { parts: [{ text: systemPrompt }] }
           };
         } else if (!isPerplexityModel) {
@@ -609,7 +621,7 @@ Last updated: ${weatherInfo.timestamp}`,
             followupHeadersAfterTool = { 'Content-Type': 'application/json' };
             finalRequestBodyAfterTool = { // Gemini format
                 contents: followupRequestBodyAfterTool.contents,
-                tools: [imageGenerationTool],
+                tools: [tools],
                 systemInstruction: { parts: [{ text: systemPrompt }] }
             };
         } else if (!isPerplexityModel) {
