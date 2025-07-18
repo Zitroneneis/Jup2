@@ -414,6 +414,9 @@
   </style>
 </head>
 <body>
+  <div id="conversation-title-container" style="display: none; text-align: center; padding: 10px; border-bottom: 1px solid #ccc; background-color: #f9f9f9;">
+    <h2 id="conversation-title" style="margin: 0; font-size: 1.2em; color: #333;"></h2>
+  </div>
   <div class="chat-container">
     <div class="model-selector-container">
       <label for="model-selector">Model:</label>
@@ -483,6 +486,41 @@
     let botMessageSpanForAnimation = null; 
     let imageDatasForAnimation = [];     
     let combinedTextContentForAnimation = ''; // Added to store raw text for copying
+    let conversationTitleSet = false;
+
+    async function generateAndDisplayTitle(history, recaptchaToken) {
+        try {
+            const requestPayload = {
+                history: history,
+                recaptchaToken: recaptchaToken,
+                task: 'generate_title'
+            };
+            const response = await fetch('/api/gemini-proxy', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(requestPayload)
+            });
+
+            if (!response.ok) {
+                console.error('Failed to generate title');
+                return;
+            }
+
+            const data = await response.json();
+            const title = data.title?.trim();
+
+            if (title) {
+                const titleContainer = document.getElementById('conversation-title-container');
+                const titleElement = document.getElementById('conversation-title');
+                titleElement.textContent = title;
+                titleContainer.style.display = 'block';
+                document.title = title;
+                conversationTitleSet = true;
+            }
+        } catch (error) {
+            console.error('Error generating conversation title:', error);
+        }
+    }
 
     function handleLightboxKeys(event) {
         if (event.key === 'ArrowLeft') {
@@ -606,6 +644,7 @@
 
       
       let userMessageToProcess;
+      let isNewChat = false;
 
       if (isRetryMode) {
         userMessageToProcess = lastUserMessageText;
@@ -613,9 +652,12 @@
       } else {
         userMessageToProcess = chatInput.value.trim();
         if (!userMessageToProcess) return;
-        lastUserMessageToProcess = userMessageToProcess;
+        lastUserMessageText = userMessageToProcess;
         displayMessage('User', userMessageToProcess);
         chatHistory.push({ role: "user", parts: [{ text: userMessageToProcess }] });
+        if (chatHistory.length === 1) {
+            isNewChat = true;
+        }
       }
 
       chatInput.value = '';
@@ -631,6 +673,9 @@
       grecaptcha.enterprise.ready(function() {
         grecaptcha.enterprise.execute(RECAPTCHA_SITE_KEY, {action: 'submit'})
           .then(async function(token) {
+            if (isNewChat && !conversationTitleSet) {
+                generateAndDisplayTitle(chatHistory, token);
+            }
             // Helper functions are defined at the top of this .then() scope
             function wrapTextNodesWithLetterSpans(element) {
               const letters = [];

@@ -5,12 +5,77 @@ export default async function handler(req, res) {
     return res.status(405).end(`Method ${req.method} Not Allowed`);
   }
 
-  const { history, recaptchaToken, model: requestedModel, generationConfig: frontendGenerationConfig } = req.body; // Add model and generationConfig from request
+  const { history, recaptchaToken, model: requestedModel, generationConfig: frontendGenerationConfig, task } = req.body; // Add task from request
   const geminiApiKey = process.env.GEMINI_API_KEY;
   const perplexityApiKey = process.env.PERPLEXITY_API_KEY; // Added Perplexity API Key
   const recaptchaSecretKey = process.env.RECAPTCHA_SECRET_KEY;
   const openWeatherApiKey = process.env.OPEN_WEATHER_API_KEY; 
   
+  // --- reCAPTCHA Verification (moved up to be used by both tasks) ---
+  if (!recaptchaToken) {
+    return res.status(400).json({ error: 'reCAPTCHA token is missing.' });
+  }
+  try {
+    const recaptchaVerifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${recaptchaSecretKey}&response=${recaptchaToken}`;
+    const recaptchaRes = await fetch(recaptchaVerifyUrl, { method: 'POST' });
+    const recaptchaData = await recaptchaRes.json();
+    if (!recaptchaData.success || recaptchaData.score < 0.5) { // Check for success and score
+      console.error('reCAPTCHA verification failed:', recaptchaData);
+      return res.status(403).json({ error: 'reCAPTCHA verification failed.' });
+    }
+  } catch (error) {
+    console.error('Error verifying reCAPTCHA:', error);
+    return res.status(500).json({ error: 'Error verifying reCAPTCHA.' });
+  }
+
+  // --- Task: Generate Conversation Title ---
+  if (task === 'generate_title') {
+    if (!geminiApiKey) {
+      return res.status(500).json({ error: 'Gemini API key not configured for title generation.' });
+    }
+    if (!history || history.length === 0) {
+      return res.status(400).json({ error: 'History is required for title generation.' });
+    }
+
+    const titleGenModel = 'gemini-2.0-flash-lite';
+    const titleGenUrl = `https://generativelanguage.googleapis.com/v1beta/models/${titleGenModel}:generateContent?key=${geminiApiKey}`;
+    const titleGenSystemPrompt = `You are an expert in creating concise and compelling titles. Based on the user's first message, generate a short title for the conversation. The title should be no more than 6 words long and capture the main topic or question. Do not add any introductory text like "Title:" or use quotation marks. Just return the title.`;
+
+    const requestBody = {
+      contents: history,
+      systemInstruction: { parts: [{ text: titleGenSystemPrompt }] },
+      generationConfig: {
+        temperature: 0.3,
+        maxOutputTokens: 20,
+        topP: 1,
+        topK: 1,
+      }
+    };
+
+    try {
+      const apiResponse = await fetch(titleGenUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestBody)
+      });
+      const data = await apiResponse.json();
+
+      if (!apiResponse.ok) {
+        console.error(`Error from Gemini API for title generation:`, data);
+        return res.status(apiResponse.status).json({ error: 'Failed to generate title' });
+      }
+
+      const title = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim().replace(/"/g, '') || 'New Chat';
+      return res.status(200).json({ title: title });
+
+    } catch (error) {
+      console.error('Error in title generation:', error);
+      return res.status(500).json({ error: 'Internal Server Error during title generation' });
+    }
+  }
+  
+  // --- Default Task: Continue with chat response generation ---
+
   // Determine the model to use, defaulting to gemini-2.0-flash-lite
   const modelToUse = requestedModel || 'gemini-2.0-flash-lite';
 
@@ -32,23 +97,6 @@ export default async function handler(req, res) {
 
   if (!history || !Array.isArray(history) || history.length === 0) { // Validate history
     return res.status(400).json({ error: 'History is required and must be a non-empty array.' });
-  }
-
-  // Verify reCAPTCHA token
-  if (!recaptchaToken) {
-    return res.status(400).json({ error: 'reCAPTCHA token is missing.' });
-  }
-  try {
-    const recaptchaVerifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${recaptchaSecretKey}&response=${recaptchaToken}`;
-    const recaptchaRes = await fetch(recaptchaVerifyUrl, { method: 'POST' });
-    const recaptchaData = await recaptchaRes.json();
-    if (!recaptchaData.success || recaptchaData.score < 0.5) { // Check for success and score
-      console.error('reCAPTCHA verification failed:', recaptchaData);
-      return res.status(403).json({ error: 'reCAPTCHA verification failed.' });
-    }
-  } catch (error) {
-    console.error('Error verifying reCAPTCHA:', error);
-    return res.status(500).json({ error: 'Error verifying reCAPTCHA.' });
   }
 
   // Check if user is asking for an image or weather
