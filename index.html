@@ -488,40 +488,6 @@
     let combinedTextContentForAnimation = ''; // Added to store raw text for copying
     let conversationTitleSet = false;
 
-    async function generateAndDisplayTitle(history, recaptchaToken) {
-        try {
-            const requestPayload = {
-                history: history,
-                recaptchaToken: recaptchaToken,
-                task: 'generate_title'
-            };
-            const response = await fetch('/api/gemini-proxy', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(requestPayload)
-            });
-
-            if (!response.ok) {
-                console.error('Failed to generate title');
-                return;
-            }
-
-            const data = await response.json();
-            const title = data.title?.trim();
-
-            if (title) {
-                const titleContainer = document.getElementById('conversation-title-container');
-                const titleElement = document.getElementById('conversation-title');
-                titleElement.textContent = title;
-                titleContainer.style.display = 'block';
-                document.title = title;
-                conversationTitleSet = true;
-            }
-        } catch (error) {
-            console.error('Error generating conversation title:', error);
-        }
-    }
-
     function handleLightboxKeys(event) {
         if (event.key === 'ArrowLeft') {
             showPrevImage();
@@ -655,7 +621,7 @@
         lastUserMessageText = userMessageToProcess;
         displayMessage('User', userMessageToProcess);
         chatHistory.push({ role: "user", parts: [{ text: userMessageToProcess }] });
-        if (chatHistory.length === 1) {
+        if (chatHistory.length === 1 && !conversationTitleSet) {
             isNewChat = true;
         }
       }
@@ -673,9 +639,6 @@
       grecaptcha.enterprise.ready(function() {
         grecaptcha.enterprise.execute(RECAPTCHA_SITE_KEY, {action: 'submit'})
           .then(async function(token) {
-            if (isNewChat && !conversationTitleSet) {
-                generateAndDisplayTitle(chatHistory, token);
-            }
             // Helper functions are defined at the top of this .then() scope
             function wrapTextNodesWithLetterSpans(element) {
               const letters = [];
@@ -838,7 +801,8 @@
               let requestPayload = {
                 history: chatHistory,
                 recaptchaToken: token,
-                model: selectedModel
+                model: selectedModel,
+                task: isNewChat ? 'generate_title_and_chat' : 'chat' // Specify combined task
               };
 
               if (selectedModel === 'gemini-2.0-flash-preview-image-generation') {
@@ -867,6 +831,17 @@
               }
 
               const data = await response.json();
+
+              // --- Handle Title from Response ---
+              if (data.title) {
+                  const title = data.title.trim();
+                  const titleContainer = document.getElementById('conversation-title-container');
+                  const titleElement = document.getElementById('conversation-title');
+                  titleElement.textContent = title;
+                  titleContainer.style.display = 'block';
+                  document.title = title;
+                  conversationTitleSet = true;
+              }
 
               // Log successful API response with model used
               if (typeof gtag === 'function') {

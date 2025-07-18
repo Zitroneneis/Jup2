@@ -11,7 +11,7 @@ export default async function handler(req, res) {
   const recaptchaSecretKey = process.env.RECAPTCHA_SECRET_KEY;
   const openWeatherApiKey = process.env.OPEN_WEATHER_API_KEY; 
   
-  // --- reCAPTCHA Verification (moved up to be used by both tasks) ---
+  // --- reCAPTCHA Verification (runs once for all tasks) ---
   if (!recaptchaToken) {
     return res.status(400).json({ error: 'reCAPTCHA token is missing.' });
   }
@@ -28,53 +28,48 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'Error verifying reCAPTCHA.' });
   }
 
-  // --- Task: Generate Conversation Title ---
-  if (task === 'generate_title') {
-    if (!geminiApiKey) {
-      return res.status(500).json({ error: 'Gemini API key not configured for title generation.' });
-    }
-    if (!history || history.length === 0) {
-      return res.status(400).json({ error: 'History is required for title generation.' });
-    }
+  let conversationTitle = null;
 
-    const titleGenModel = 'gemini-2.0-flash-lite';
-    const titleGenUrl = `https://generativelanguage.googleapis.com/v1beta/models/${titleGenModel}:generateContent?key=${geminiApiKey}`;
-    const titleGenSystemPrompt = `You are an expert in creating concise and compelling titles. Based on the user's first message, generate a short title for the conversation. The title should be no more than 6 words long and capture the main topic or question. Do not add any introductory text like "Title:" or use quotation marks. Just return the title.`;
+  // --- Task: Generate Conversation Title (if requested as part of a combined task) ---
+  if (task === 'generate_title_and_chat') {
+    if (geminiApiKey && history && history.length > 0) {
+      const titleGenModel = 'gemini-2.0-flash-lite';
+      const titleGenUrl = `https://generativelanguage.googleapis.com/v1beta/models/${titleGenModel}:generateContent?key=${geminiApiKey}`;
+      const titleGenSystemPrompt = `You are an expert in creating concise and compelling titles. Based on the user's first message, generate a short title for the conversation. The title should be no more than 6 words long and capture the main topic or question. Do not add any introductory text like "Title:" or use quotation marks. Just return the title.`;
 
-    const requestBody = {
-      contents: history,
-      systemInstruction: { parts: [{ text: titleGenSystemPrompt }] },
-      generationConfig: {
-        temperature: 0.3,
-        maxOutputTokens: 20,
-        topP: 1,
-        topK: 1,
+      const requestBody = {
+        contents: history,
+        systemInstruction: { parts: [{ text: titleGenSystemPrompt }] },
+        generationConfig: {
+          temperature: 0.3,
+          maxOutputTokens: 20,
+          topP: 1,
+          topK: 1,
+        }
+      };
+
+      try {
+        const apiResponse = await fetch(titleGenUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(requestBody)
+        });
+        const data = await apiResponse.json();
+
+        if (apiResponse.ok) {
+          conversationTitle = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim().replace(/"/g, '') || null;
+        } else {
+          console.error(`Error from Gemini API for title generation:`, data);
+        }
+      } catch (error) {
+        console.error('Error in title generation:', error);
       }
-    };
-
-    try {
-      const apiResponse = await fetch(titleGenUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(requestBody)
-      });
-      const data = await apiResponse.json();
-
-      if (!apiResponse.ok) {
-        console.error(`Error from Gemini API for title generation:`, data);
-        return res.status(apiResponse.status).json({ error: 'Failed to generate title' });
-      }
-
-      const title = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim().replace(/"/g, '') || 'New Chat';
-      return res.status(200).json({ title: title });
-
-    } catch (error) {
-      console.error('Error in title generation:', error);
-      return res.status(500).json({ error: 'Internal Server Error during title generation' });
+    } else {
+      console.error('Could not generate title: Missing Gemini API key or history.');
     }
   }
   
-  // --- Default Task: Continue with chat response generation ---
+  // --- Main Task: Continue with chat response generation ---
 
   // Determine the model to use, defaulting to gemini-2.0-flash-lite
   const modelToUse = requestedModel || 'gemini-2.0-flash-lite';
@@ -512,7 +507,13 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: 'Invalid response structure from API after all processing' });
     }
 
-    res.status(200).json(data);
+    // Include the generated title in the response if available
+    const responseToSend = {
+      ...data,
+      title: conversationTitle // Add title to response
+    };
+
+    res.status(200).json(responseToSend);
 
   } catch (error) {
     console.error('Error in proxy function:', error);
