@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Understanding LLMs - Interactive Learning</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            gap: 30px;
+            min-height: calc(100vh - 40px);
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .left-panel {
+            flex: 1;
+            padding: 40px;
+            background: linear-gradient(145deg, #f8f9ff 0%, #e8efff 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .right-panel {
+            flex: 1;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        h1 {
+            color: #2d3748;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+        
+        h2 {
+            color: #4a5568;
+            font-size: 1.8em;
+            margin: 25px 0 15px 0;
+            font-weight: 600;
+        }
+        
+        p {
+            color: #718096;
+            line-height: 1.7;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+        }
+        
+        .highlight {
+            background: linear-gradient(120deg, #a78bfa 0%, #ec4899 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 600;
+        }
+        
+        .key-points {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin: 20px 0;
+        }
+        
+        .key-points ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .key-points li {
+            padding: 8px 0;
+            position: relative;
+            padding-left: 25px;
+        }
+        
+        .key-points li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #667eea;
+            font-weight: bold;
+        }
+        
+        .h5p-container {
+            width: 100%;
+            max-width: 1090px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .h5p-container iframe {
+            width: 100%;
+            border: none;
+            border-radius: 10px;
+        }
+        
+        @media (max-width: 1024px) {
+            .container {
+                flex-direction: column;
+                margin: 10px;
+                min-height: auto;
+            }
+            
+            .left-panel, .right-panel {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            h2 {
+                font-size: 1.5em;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                margin: 0;
+            }
+            
+            .left-panel, .right-panel {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="left-panel">
+            <h1>What is a <span class="highlight">Large Language Model</span>?</h1>
+            
+            <p>
+                A <strong>Large Language Model (LLM)</strong> is a sophisticated artificial intelligence system 
+                designed to understand and generate human-like text. Think of it as a highly advanced 
+                digital assistant that has been trained on vast amounts of written content from books, 
+                articles, websites, and other text sources.
+            </p>
+            
+            <h2>How do LLMs work?</h2>
+            <p>
+                LLMs use a technology called <strong>neural networks</strong> - computer systems modeled 
+                after the human brain. These models learn patterns in language by analyzing billions 
+                of text examples, allowing them to predict what words should come next in a sentence 
+                or respond to questions in a meaningful way.
+            </p>
+            
+            <div class="key-points">
+                <h2>Key Capabilities</h2>
+                <ul>
+                    <li><strong>Text Generation:</strong> Create articles, stories, and creative content</li>
+                    <li><strong>Question Answering:</strong> Provide informative responses to queries</li>
+                    <li><strong>Language Translation:</strong> Convert text between different languages</li>
+                    <li><strong>Code Writing:</strong> Generate and explain programming code</li>
+                    <li><strong>Summarization:</strong> Condense long texts into key points</li>
+                    <li><strong>Analysis:</strong> Break down complex topics and explain concepts</li>
+                </ul>
+            </div>
+            
+            <h2>Why are they important?</h2>
+            <p>
+                LLMs are revolutionizing how we interact with technology, making it possible to 
+                communicate with computers using natural language. They're being used in education, 
+                research, content creation, customer service, and countless other applications 
+                to augment human capabilities and productivity.
+            </p>
+            
+            <p>
+                <em>The interactive content on the right demonstrates how these technologies 
+                can be applied in real-world scenarios, particularly around data handling and privacy.</em>
+            </p>
+        </div>
+        
+        <div class="right-panel">
+            <div class="h5p-container">
+                <iframe src="https://h5p.org/h5p/embed/1540582" width="1090" height="881" frameborder="0" allowfullscreen="allowfullscreen" allow="geolocation *; microphone *; camera *; midi *; encrypted-media *" title="How do you handle your data?"></iframe>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://h5p.org/sites/all/modules/h5p/library/js/h5p-resizer.js" charset="UTF-8"></script>
+</body>
+</html>
