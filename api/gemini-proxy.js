@@ -152,7 +152,7 @@ export default async function handler(req, res) {
 
   // Determine if the current model supports function calling for image generation and weather
   // For this example, let's assume gemini-2.0-flash-lite and gemini-2.5-pro-preview-06-05 support it.
-  // The gemini-2.0-flash-preview-image-generation model generates images directly.
+  // The gemini-2.5-flash-image-preview model generates images directly.
   const supportsFunctionCalling = ['gemini-2.0-flash', 'gemini-2.0-flash-lite', 'gemini-1.5-flash', 'gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-2.5-flash-lite-preview-06-17'].includes(modelToUse);
   const isPerplexityModel = modelToUse.startsWith('perplexity-');
 
@@ -194,7 +194,7 @@ export default async function handler(req, res) {
       if (frontendGenerationConfig) {
         requestBody.generationConfig = { ...requestBody.generationConfig, ...frontendGenerationConfig };
       }
-      if (systemPrompt && modelToUse !== 'gemini-2.0-flash-preview-image-generation') {
+      if (systemPrompt && modelToUse !== 'gemini-2.5-flash-image-preview') {
           requestBody.systemInstruction = { parts: [{ text: systemPrompt }] };
       }
       if (supportsFunctionCalling) {
@@ -207,7 +207,7 @@ export default async function handler(req, res) {
     }
 
     // If the model is specifically for image generation, adjust config
-    if (modelToUse === 'gemini-2.0-flash-preview-image-generation') {
+    if (modelToUse === 'gemini-2.5-flash-image-preview') {
       // This model might expect a different request structure or config for image generation.
       // For now, we assume it can take text and might return an image part directly.
       // The Vertex AI SDK handles this more gracefully. With direct REST, it's more manual.
@@ -343,7 +343,7 @@ export default async function handler(req, res) {
             // Handle image generation
             console.log('Generating image with prompt:', imagePrompt);
             
-            const imageModelName = 'gemini-2.0-flash-preview-image-generation';
+            const imageModelName = 'gemini-2.5-flash-image-preview';
             const imageUrl = `https://generativelanguage.googleapis.com/v1beta/models/${imageModelName}:generateContent?key=${geminiApiKey}`;
             
             const imageGenHistory = [{role: "user", parts: [{text: `Generate an image of: ${imagePrompt}`}]}];
