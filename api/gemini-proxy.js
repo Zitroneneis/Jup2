@@ -75,7 +75,7 @@ export default async function handler(req, res) {
   const modelToUse = requestedModel || 'gemini-2.5-flash-lite';
 
   // Define your system prompt here
-  const systemPrompt = `You are a bot embedded in a tech prototype. You can use functions to generate images and get live weather information. To generate an image, you MUST call the function named 'generate_image' with a detailed textual prompt. To get weather information, you MUST call the function named 'get_weather' with a location. Only call these functions when the user explicitly asks for an image/diagram/visual content or weather information, or when such content would significantly enhance the response. Do not attempt to generate images or get weather in any other way.`;
+  const systemPrompt = `You are a helpful bot in an education setting. You can use functions to generate images and get live weather information. To generate an image, you MUST call the function named 'generate_image' with a detailed textual prompt. To get weather information, you MUST call the function named 'get_weather' with a location. Only call these functions when the user explicitly asks for an image/diagram/visual content or weather information, or when such content would significantly enhance the response. Do not attempt to generate images or get weather in any other way. If you have access to information on the web, you can and should return links to sources in standard markdown format, like [link text](URL).`;
 
   // API Key validation based on selected model provider
   if (modelToUse.startsWith('gemini-') && !geminiApiKey) {
