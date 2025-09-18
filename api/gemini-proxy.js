@@ -201,20 +201,15 @@ export default async function handler(req, res) {
       if (systemPrompt && modelToUse !== 'gemini-2.5-flash-image-preview') {
           requestBody.systemInstruction = { parts: [{ text: systemPrompt }] };
       }
-      if (supportsFunctionCalling) {
+      if (modelToUse === 'gemini-2.5-pro') {
+        requestBody.tools = [{ "google_search": {} }];
+        console.log('Added Google Search tool for gemini-2.5-pro');
+      } else if (supportsFunctionCalling) {
         console.log('Adding function calling tools to request for model:', modelToUse);
         console.log('Available tools:', allTools.functionDeclarations.map(tool => tool.name));
         requestBody.tools = [allTools];
       } else {
         console.log('Model does not support function calling:', modelToUse);
-      }
-
-      if (modelToUse === 'gemini-2.5-pro') {
-        if (!requestBody.tools) {
-          requestBody.tools = [];
-        }
-        requestBody.tools.push({ "google_search": {} });
-        console.log('Added Google Search tool for gemini-2.5-pro');
       }
     }
 
