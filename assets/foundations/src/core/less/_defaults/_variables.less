@@ -1,0 +1,95 @@
+:root {
+  --adapt-viewport-height: 100vh;
+  --adapt-navigation-height: calc(@icon-size + (@icon-padding * 2));
+}
+
+// body {
+//  -webkit-tap-highlight-color: rgba(0,0,0,0);
+// }
+// a, button {-webkit-tap-highlight-color: rgba(0,0,0,0.2);}
+// .icon {
+//  // Fix for iOS devices not displaying icons if hidden then shown
+//  -webkit-transform: translateZ(0);
+// }
+
+// Screen sizings
+// --------------------------------------------------
+// html = 16px
+
+// 45rem = 720px
+// 60rem = 960px
+// 80rem = 1280px
+// 90rem = 1440px
+// 120rem = 1920px
+
+@device-width-small: unit(@adapt-device-small, rem);
+@device-width-medium: unit(@adapt-device-medium, rem);
+@device-width-large: unit(@adapt-device-large, rem);
+@device-width-xlarge: unit(@adapt-device-xlarge, rem);
+
+@max-width: 90rem;
+
+@max-content-width: @device-width-large;
+@max-page-width: @max-width;
+
+// Icons
+// --------------------------------------------------
+@icon-size: 1.5rem;
+@icon-padding: 1rem;
+
+// Spacings
+// --------------------------------------------------
+@item-margin: 0.5rem;
+@item-padding: 1rem;
+
+// Button padding
+// --------------------------------------------------
+@btn-padding: 1rem;
+
+// Duration
+// --------------------------------------------------
+@duration: 0.2s;
+
+// Colours
+// --------------------------------------------------
+@white: #fff;
+@black: #000;
+
+@green: #378153;
+@red: #da3510;
+
+@background: @black;
+@background-inverted: @white;
+
+@shadow: @black;
+@shadow-inverted: @white;
+
+@validation-success: @green;
+@validation-success-inverted: @white;
+
+@validation-error: @red;
+@validation-error-inverted: @white;
+
+// Block padding
+// --------------------------------------------------
+@block-padding-ver: 4rem;
+@block-padding-hoz: 0.5rem;
+
+// Component padding
+// --------------------------------------------------
+@component-padding-hoz: 0.5rem;
+
+// Navigation height
+// --------------------------------------------------
+// Deprecated @navigation-height: Navigation height is now set
+// by --adapt-navigation-height and is updated by JS
+@navigation-height: @icon-size + (@icon-padding * 2);
+
+// Focus outline
+// Deprecated - reverting to browser outline
+// --------------------------------------------------
+@focus-outline: 0;
+
+// Drawer width
+// --------------------------------------------------
+@drawer-width: 20rem;

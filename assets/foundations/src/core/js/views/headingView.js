@@ -1,0 +1,45 @@
+import Adapt from 'core/js/adapt';
+
+class HeadingView extends Backbone.View {
+
+  initialize({
+    parentView
+  }) {
+    this.listenTo(parentView, 'preRemove', this.remove);
+    this.listenTo(Adapt.parentView, 'postRemove', this.remove);
+    this.listenTo(this.model, 'change:_isComplete', this.updateAria);
+    this.render();
+  }
+
+  render() {
+    const template = Handlebars.templates[this.constructor.template];
+    const data = this.model.toJSON();
+    const customHeadingType = this.$el.attr('data-a11y-heading-type');
+    const isBackwardCompatible = [...this.$el[0].classList].every(name => !name.includes('-inner'));
+    data._isBackwardCompatible = isBackwardCompatible;
+    if (customHeadingType) data._type = customHeadingType;
+    this.$el.html(template(data));
+    this.checkCompletion();
+  }
+
+  updateAria() {
+    const template = Handlebars.templates[this.constructor.template];
+    const data = this.model.toJSON();
+    const $rendered = $(`<div>${template(data)}</div>`);
+    this.$('.js-a11y-completion-description').html($rendered.find('.js-a11y-completion-description').html());
+    this.checkCompletion();
+  }
+
+  checkCompletion() {
+    const isComplete = this.model.get('_isComplete');
+    if (isComplete === undefined) return;
+    this.$el
+      .toggleClass('is-complete', isComplete)
+      .toggleClass('is-incomplete', !isComplete);
+  }
+
+}
+
+HeadingView.template = 'heading';
+
+export default HeadingView;

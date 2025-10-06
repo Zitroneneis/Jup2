@@ -1,0 +1,123 @@
+// Add top padding equal to the height of the navigation bar
+// --------------------------------------------------
+.html.is-nav-top #wrapper {
+  padding-top: var(--adapt-navigation-height);
+}
+
+.html.is-nav-bottom #wrapper {
+  padding-bottom: var(--adapt-navigation-height);
+}
+
+.nav {
+  position: fixed;
+  width: 100%;
+  z-index: 80;
+
+  .html.is-nav-top & {
+    top: 0;
+  }
+
+  .html.is-nav-bottom & {
+    bottom: 0;
+  }
+
+  &__inner {
+    .l-container-responsive(@max-page-width);
+    display: flex;
+    align-items: stretch;
+  }
+
+  &__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    // Override floats on additional `nav__btn` elements part of plugins
+    // that haven't been updated to work with data-order yet.
+    // Can be removed in time.
+    float: none !important;
+  }
+
+  &.hide-label &__btn:not(.nav__skip-btn) &__btn-label,
+  &__btn.hide-label &__btn-label {
+    display: none;
+  }
+
+  &.show-label {
+    .show-nav-label(small);
+    .show-nav-label(medium);
+    .show-nav-label(large);
+  }
+
+  &.has-label-right &__btn-label {
+    margin-inline-start: @icon-padding / 2;
+  }
+
+  &.has-label-bottom {
+    .nav__btn {
+      flex-direction: column;
+    }
+
+    .nav__btn-label {
+      margin-top: @icon-padding / 2;
+    }
+  }
+
+  &.has-label-top {
+    .nav__btn {
+      flex-direction: column;
+    }
+
+    .nav__btn-label {
+      order: -1;
+      margin-bottom: @icon-padding / 2;
+    }
+  }
+
+  .has-label-left &__btn-label {
+    order: -1;
+  }
+
+  &.has-label-left .icon ~ .nav__btn-label {
+    margin-inline-end: @icon-padding / 2;
+  }
+
+  &.has-label-auto .icon ~ .nav__btn-label {
+    margin-inline-start: @icon-padding / 2;
+  }
+
+  &__spacer {
+    flex-grow: 1;
+  }
+
+  &__skip-btn {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 100;
+
+    .html:not(.has-accessibility) & {
+      .u-display-none;
+    }
+
+    .visually-hidden-focusable()
+  }
+
+  &__back-btn .icon {
+    .icon-controls-small-left;
+  }
+}
+
+// Show nav label at breakpoints
+.show-nav-label(@size) {
+  &.show-label-@{size} {
+    .nav__btn-label { display: none }
+
+    .nav__btn:not(.hide-label) .nav__btn-label {
+      @breakpoint: "device-width-@{size}";
+      @media (min-width: @@breakpoint) {
+        display: initial;
+      }
+    }
+  }
+}

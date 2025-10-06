@@ -1,0 +1,19 @@
+{
+  "include": [
+    "src/core/js/**/*.js",
+    "src/core/js/**/*.jsx",
+    "src/core/templates/**/*.jsx",
+    "src/*/*/js/**/*.js",
+    "src/*/*/js/**/*.jsx",
+    "src/*/*/templates/**/*.jsx"
+  ],
+  "compilerOptions": {
+    "module": "amd",
+    "target": "es2022",
+    "baseUrl": "src/"
+  },
+  "exclude": [
+    "node_modules",
+    "**/node_modules/*"
+  ]
+}

@@ -1,0 +1,446 @@
+{
+  "$anchor": "config",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "_type": {
+      "type": "string",
+      "title": "Type",
+      "default": "config"
+    },
+    "_extensions": {
+      "type": "object",
+      "title": "Extensions",
+      "default": {}
+    },
+    "_enabledPlugins": {
+      "type": "array",
+      "title": "Enabled plugins",
+      "default": []
+    },
+    "_theme": {
+      "type": "string",
+      "title": "Theme",
+      "default": "adapt-contrib-vanilla"
+    },
+    "_menu": {
+      "type": "string",
+      "title": "Menu",
+      "default": "adapt-contrib-boxMenu"
+    },
+    "_courseId": {
+      "type": "string",
+      "isObjectId": true,
+      "title": "Course id"
+    },
+    "_completionCriteria": {
+      "type": "object",
+      "title": "Completion criteria",
+      "default": {},
+      "properties": {
+        "_requireContentCompleted": {
+          "type": "boolean",
+          "title": "Require all course content to be completed",
+          "default": true
+        },
+        "_requireAssessmentCompleted": {
+          "type": "boolean",
+          "title": "Require all assessments to be completed",
+          "default": false
+        },
+        "_submitOnEveryAssessmentAttempt": {
+          "type": "boolean",
+          "title": "Submit completion on every assessment attempt",
+          "description": "If enabled and the course completion criteria is met, the completion status will be reported every time the assessment is completed (regardless of whether the user passes or fails)",
+          "default": false
+        },
+        "_shouldSubmitScore": {
+          "type": "boolean",
+          "title": "Submit score to LMS",
+          "description": "If enabled, the score attained in any assessment attempt will be reported (regardless of whether the user passes or fails)",
+          "default": false
+        }
+      }
+    },
+    "_defaultLanguage": {
+      "type": "string",
+      "title": "Default language code",
+      "default": "en"
+    },
+    "_defaultDirection": {
+      "type": "string",
+      "title": "Default text direction",
+      "default": "ltr",
+      "enum": [
+        "ltr",
+        "rtl"
+      ],
+      "_backboneForms": "Select"
+    },
+    "_accessibility": {
+      "type": "object",
+      "title": "Accessibility",
+      "default": {},
+      "properties": {
+        "_isEnabled": {
+          "type": "boolean",
+          "title": "Enable accessibility support",
+          "default": true
+        },
+        "_isSkipNavigationEnabled": {
+          "type": "boolean",
+          "title": "Add link to skip navigation",
+          "description": "Adds a link to the start of the page to allow assistive technology users to skip over the navigation and straight into to the page content",
+          "default": true
+        },
+        "_ariaLevels": {
+          "type": "object",
+          "title": "Default ARIA levels",
+          "description": "Defines what value to assign to the aria-level attribute for the various elements of Adapt",
+          "default": {},
+          "properties": {
+            "_menu": {
+              "type": "string",
+              "title": "Menu",
+              "default": "1"
+            },
+            "_menuGroup": {
+              "type": "string",
+              "title": "Menu group",
+              "default": "@menu+1"
+            },
+            "_menuItem": {
+              "type": "string",
+              "title": "Menu item",
+              "description": "This will need to be changed to 3 if menu groups are being used and A11Y support is required",
+              "default": "@menu+1"
+            },
+            "_page": {
+              "type": "string",
+              "title": "Page",
+              "default": "1"
+            },
+            "_article": {
+              "type": "string",
+              "title": "Article",
+              "default": "@page+1"
+            },
+            "_block": {
+              "type": "string",
+              "title": "Block",
+              "default": "@article+1"
+            },
+            "_component": {
+              "type": "string",
+              "title": "Component",
+              "default": "@block+1"
+            },
+            "_componentItem": {
+              "type": "string",
+              "title": "Component item",
+              "default": "@component+1"
+            },
+            "_notify": {
+              "type": "string",
+              "title": "Notify popup title",
+              "default": "1"
+            }
+          }
+        },
+        "_options": {
+          "type": "object",
+          "title": "Advanced options",
+          "description": "Optional object that can be used to customize the accessibility behaviour",
+          "default": {},
+          "_backboneForms": {
+            "type": "CodeEditor",
+            "mode": "json"
+          }
+        }
+      }
+    },
+    "_fixes": {
+      "type": "object",
+      "title": "Miscellaneous fixes",
+      "description": "Optional object that can be used to customize the application of fixes",
+      "default": {
+        "_imgLazyLoad": true
+      },
+      "_backboneForms": {
+        "type": "CodeEditor",
+        "mode": "json"
+      }
+    },
+    "screenSize": {
+      "type": "object",
+      "title": "Device breakpoints",
+      "default": {},
+      "properties": {
+        "small": {
+          "type": "number",
+          "title": "Small",
+          "description": "Pixel width for the start of the small breakpoint, e.g. cellphones",
+          "default": 0
+        },
+        "medium": {
+          "type": "number",
+          "title": "Medium",
+          "description": "Pixel width for the start of the medium breakpoint, e.g. tablet devices",
+          "default": 720
+        },
+        "large": {
+          "type": "number",
+          "title": "Large",
+          "description": "Pixel width for the start of the large breakpoint, e.g. laptop/desktop computers",
+          "default": 960
+        },
+        "xlarge": {
+          "type": "number",
+          "title": "Extra Large",
+          "description": "Pixel width for the start of the extra large breakpoint, e.g. hd laptop/desktop computers",
+          "default": 1280
+        }
+      }
+    },
+    "_questionWeight": {
+      "type": "number",
+      "title": "Default question weight",
+      "default": 1,
+      "_adapt": {
+        "isSetting": true
+      }
+    },
+    "_drawer": {
+      "type": "object",
+      "title": "Drawer animation",
+      "default": {},
+      "properties": {
+        "_showEasing": {
+          "type": "string",
+          "title": "Opening easing function",
+          "default": "easeOutQuart",
+          "enum": [
+            "easeInSine",
+            "easeOutSine",
+            "easeInOutSine",
+            "easeInQuad",
+            "easeOutQuad",
+            "easeInOutQuad",
+            "easeInCubic",
+            "easeOutCubic",
+            "easeInOutCubic",
+            "easeInQuart",
+            "easeOutQuart",
+            "easeInOutQuart",
+            "easeInQuint",
+            "easeOutQuint",
+            "easeInOutQuint",
+            "easeInExpo",
+            "easeOutExpo",
+            "easeInOutExpo",
+            "easeInCirc",
+            "easeOutCirc",
+            "easeInOutCirc",
+            "easeInBack",
+            "easeOutBack",
+            "easeInOutBack",
+            "easeInElastic",
+            "easeOutElastic",
+            "easeInOutElastic",
+            "easeInBounce",
+            "easeOutBounce",
+            "easeInOutBounce"
+          ],
+          "_backboneForms": "Select"
+        },
+        "_hideEasing": {
+          "type": "string",
+          "title": "Closing easing function",
+          "default": "easeInQuart",
+          "enum": [
+            "easeInSine",
+            "easeOutSine",
+            "easeInOutSine",
+            "easeInQuad",
+            "easeOutQuad",
+            "easeInOutQuad",
+            "easeInCubic",
+            "easeOutCubic",
+            "easeInOutCubic",
+            "easeInQuart",
+            "easeOutQuart",
+            "easeInOutQuart",
+            "easeInQuint",
+            "easeOutQuint",
+            "easeInOutQuint",
+            "easeInExpo",
+            "easeOutExpo",
+            "easeInOutExpo",
+            "easeInCirc",
+            "easeOutCirc",
+            "easeInOutCirc",
+            "easeInBack",
+            "easeOutBack",
+            "easeInOutBack",
+            "easeInElastic",
+            "easeOutElastic",
+            "easeInOutElastic",
+            "easeInBounce",
+            "easeOutBounce",
+            "easeInOutBounce"
+          ],
+          "_backboneForms": "Select"
+        },
+        "_duration": {
+          "type": "number",
+          "title": "Duration",
+          "default": 400
+        },
+        "_position": {
+          "type": "string",
+          "title": "Position",
+          "default": "auto",
+          "enum": [
+            "auto",
+            "left",
+            "right"
+          ]
+        },
+        "_iconClass": {
+          "type": "string",
+          "title": "Drawer icon class",
+          "description": "CSS class name to be applied to the drawer sidebar icon.",
+          "default": "icon-list"
+        }
+      },
+      "_adapt": {
+        "isSetting": false
+      }
+    },
+    "_notify": {
+      "type": "object",
+      "title": "Notify popup animation",
+      "default": {},
+      "properties": {
+        "_duration": {
+          "type": "number",
+          "title": "Duration",
+          "default": 400
+        }
+      },
+      "_adapt": {
+        "isSetting": false
+      }
+    },
+    "_generateSourcemap": {
+      "type": "boolean",
+      "title": "Generate source maps",
+      "description": "Allows the course JavaScript & CSS to be debugged via the browser's developer tools",
+      "default": false,
+      "_adapt": {
+        "isSetting": true
+      }
+    },
+    "_forceRouteLocking": {
+      "type": "boolean",
+      "title": "Enforce route locking",
+      "description": "If locking is enabled, this setting prevents navigating to locked routes",
+      "default": true,
+      "_adapt": {
+        "isSetting": true
+      }
+    },
+    "_disableAnimationFor": {
+      "type": "array",
+      "title": "Disable animation on selectors",
+      "description": "Allows you to disable some animations (e.g. the drawer close animation) on platform(s) where they are not performing well, using CSS selectors to target the relevant platform(s) via the classes on the HTML element",
+      "default": [],
+      "_adapt": {
+        "isSetting": true
+      },
+      "_backboneForms": "List"
+    },
+    "_logging": {
+      "type": "object",
+      "title": "Logging",
+      "default": {},
+      "properties": {
+        "_isEnabled": {
+          "type": "boolean",
+          "title": "Enable logging",
+          "default": true
+        },
+        "_level": {
+          "type": "string",
+          "title": "Log level",
+          "default": "info",
+          "enum": [
+            "debug",
+            "info",
+            "warn",
+            "error",
+            "fatal"
+          ],
+          "_backboneForms": "Select"
+        },
+        "_console": {
+          "type": "boolean",
+          "title": "Log to browser console",
+          "default": true
+        },
+        "_warnFirstOnly": {
+          "type": "boolean",
+          "title": "Suppress subsequent deprecation warnings",
+          "default": true
+        }
+      }
+    },
+    "_scrollingContainer": {
+      "type": "object",
+      "title": "Inline frame support",
+      "default": {},
+      "properties": {
+        "_isEnabled": {
+          "type": "boolean",
+          "title": "Enable fixes",
+          "default": true
+        },
+        "_limitToSelector": {
+          "type": "string",
+          "title": "Limit to selector",
+          "description": "CSS selector to match against the HTML element when determining whether this should be active or not",
+          "default": ""
+        }
+      }
+    },
+    "themeSettings": {
+      "type": "object",
+      "title": "Theme settings",
+      "default": {}
+    },
+    "_themePreset": {
+      "type": "string",
+      "isObjectId": true,
+      "title": "Theme preset"
+    },
+    "build": {
+      "type": "object",
+      "title": "Support for setting the course build type",
+      "properties" : {
+        "strictMode": {
+          "type": "boolean",
+          "default": true,
+          "inputType": "Checkbox",
+          "title": "Use strict mode?",
+          "description": "Strict mode improves performance by tightly restricting the declaration of variables inside code blocks and closures which may cause some older code to stop working. Please leave this at true unless you are experiencing issue with old plugins or third party libraries."
+        },
+        "targets": {
+          "type": "string",
+          "title": "Supported browsers override",
+          "description": "Set the browsers that are supported. Overwrites the framework defaults if not empty. Current defaults are: 'last 2 chrome versions, last 2 firefox versions, last 2 safari versions, last 2 edge versions, last 2 ios_saf versions, last 2 and_chr versions, firefox esr'",
+          "default": ""
+        }
+      }
+    }
+  }
+}

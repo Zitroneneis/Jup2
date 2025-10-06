@@ -1,0 +1,77 @@
+.drawer {
+  position: fixed;
+  top: 0;
+  // Update JS to set start point
+  // Update animation to be css rather than js
+  height: 100%;
+  width: @drawer-width;
+  overflow: hidden;
+  z-index: 100;
+
+  &.is-position-auto,
+  &.is-position-right {
+    left: inherit;
+    right: -@drawer-width;
+
+    &.anim-show-after {
+      right: 0;
+    }
+
+    &.anim-hide-after {
+      right: -@drawer-width;
+    }
+  }
+
+  .dir-rtl &:not(.is-position-right),
+  &.is-position-left {
+    right: inherit;
+    left: -@drawer-width;
+
+    &.anim-show-after {
+      left: 0;
+    }
+
+    &.anim-hide-after {
+      left: -@drawer-width;
+    }
+  }
+
+  &__inner {
+    position: relative;
+    height: 100%;
+    padding-top: var(--adapt-navigation-height);
+  }
+
+  // Add top padding equal to the height of the navigation bar
+  // --------------------------------------------------
+  &__holder {
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  // Reposition the toolbar to visually sit at the top of the drawer
+  // --------------------------------------------------
+  &__toolbar {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: var(--adapt-navigation-height);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  &__back {
+    margin-inline-end: auto;
+  }
+
+  &__back .icon {
+    .icon-controls-small-left;
+  }
+
+  &__close .icon {
+    .icon-cross;
+  }
+}

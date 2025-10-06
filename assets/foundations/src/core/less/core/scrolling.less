@@ -1,0 +1,22 @@
+.html.adapt-scrolling {
+  height: 100%;
+  // Allow overflow scroll top for refresh on android
+  overflow: auto;
+
+  // Offset the navigation bar width the the body scrollbar
+  .nav {
+    // IE11 is consistant at 18px
+    width: calc(100% - 18px);
+    // Modern browsers change their scroll bar width on zoom
+    width: calc(100% - var(--adapt-scrollbar-width));
+  }
+
+  body {
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+    overflow-y: scroll;
+    // Allow scrolling of the body in an iframe on ios
+    -webkit-overflow-scrolling: touch;
+  }
+}

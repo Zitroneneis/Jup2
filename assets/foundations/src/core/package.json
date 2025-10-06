@@ -1,0 +1,53 @@
+{
+  "name": "adapt-contrib-core",
+  "version": "6.69.1",
+  "framework": ">=5.20.2",
+  "description": "Adapt Framework kernel. Responsible for boot loading, data loading and core APIs.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/adaptlearning/adapt-contrib-core.git"
+  },
+  "keywords": [
+    "adapt-plugin",
+    "adapt-core"
+  ],
+  "license": "GPL-3.0",
+  "bugs": "https://github.com/adaptlearning/adapt-contrib-core/issues",
+  "private": true,
+  "devDependencies": {
+    "@semantic-release/commit-analyzer": "^9.0.2",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^8.0.5",
+    "@semantic-release/npm": "^9.0.1",
+    "@semantic-release/release-notes-generator": "^10.0.3",
+    "conventional-changelog-eslint": "^3.0.9",
+    "semantic-release": "^19.0.3"
+  },
+  "release": {
+    "plugins": [
+      [
+        "@semantic-release/commit-analyzer",
+        {
+          "preset": "eslint"
+        }
+      ],
+      [
+        "@semantic-release/release-notes-generator",
+        {
+          "preset": "eslint"
+        }
+      ],
+      "@semantic-release/npm",
+      "@semantic-release/github",
+      [
+        "@semantic-release/git",
+        {
+          "assets": [
+            "package.json"
+          ],
+          "message": "Chore(release): ${nextRelease.version}\n\n${nextRelease.notes}"
+        }
+      ]
+    ]
+  }
+}

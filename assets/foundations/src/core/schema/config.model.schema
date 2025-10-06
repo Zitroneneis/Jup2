@@ -1,0 +1,505 @@
+{
+  "type": "object",
+  "$schema": "http://json-schema.org/draft-04/schema",
+  "id": "http://jsonschema.net",
+  "properties": {
+    "_extensions": {
+      "type": "object"
+    },
+    "_enabledExtensions": {
+      "type":"object"
+    },
+    "_theme": {
+      "type": "string",
+      "default": "adapt-contrib-vanilla"
+    },
+    "_menu": {
+      "type": "string",
+      "default": "adapt-contrib-boxMenu"
+    },
+    "_courseId": {
+      "type": "objectid",
+      "required": true
+    },
+    "_completionCriteria": {
+      "type": "object",
+      "title": "Completion criteria",
+      "properties": {
+        "_requireContentCompleted": {
+          "type": "boolean",
+          "default": true,
+          "inputType": "Checkbox",
+          "validators": [],
+          "title": "Require content completion",
+          "help": "Specifies that all content on the course must be completed"
+        },
+        "_requireAssessmentCompleted": {
+          "type": "boolean",
+          "default": false,
+          "inputType": "Checkbox",
+          "validators": [],
+          "title": "Require assessment completion",
+          "help": "Specifies that the assessment must be completed"
+        },
+        "_submitOnEveryAssessmentAttempt": {
+          "type": "boolean",
+          "default": false,
+          "inputType": "Checkbox",
+          "validators": [],
+          "title": "Submit completion on every assessment attempt",
+          "help": "Specifies that the completion status will be reported every time the assessment is completed (regardless of whether the user passes or fails), assuming the course completion criteria is met"
+        },
+        "_shouldSubmitScore": {
+          "type": "boolean",
+          "default": false,
+          "inputType": "Checkbox",
+          "validators": [],
+          "title": "Submit score to LMS",
+          "help": "If enabled, the score attained in any assessment attempt will be reported (regardless of whether the user passes or fails)"
+        }
+      }
+    },
+    "_defaultLanguage": {
+      "type": "string",
+      "required": true,
+      "default": "en",
+      "title": "Default Language",
+      "inputType": "Text",
+      "validators": ["required"]
+    },
+    "_defaultDirection": {
+      "type": "string",
+      "required": true,
+      "default": "ltr",
+      "title": "Text Direction",
+      "validators": ["required"],
+      "inputType": {
+        "type": "Select",
+        "options": [
+          "ltr",
+          "rtl"
+        ]
+      }
+    },
+    "_accessibility": {
+      "type": "object",
+      "title": "Accessibility",
+      "properties" : {
+        "_isEnabled": {
+          "type": "boolean",
+          "default": true,
+          "inputType": "Checkbox",
+          "validators": [],
+          "title": "Enabled?"
+        },
+        "_isSkipNavigationEnabled": {
+          "type": "boolean",
+          "default": true,
+          "inputType": "Checkbox",
+          "validators": [],
+          "title": "Enable Skip Navigation link?",
+          "help": "Adds a link to the start of the page to allow assistive technology users to skip over the navigation and straight into to the page content."
+        },
+        "_ariaLevels": {
+          "type": "object",
+          "title": "ARIA Levels",
+          "help": "Defines what value to assign to the aria-level attribute for the various elements of Adapt",
+          "properties" : {
+            "_menu": {
+              "type": "string",
+              "default": "1",
+              "title": "Menu element ARIA level",
+              "inputType": "Text"
+            },
+            "_menuGroup": {
+              "type": "string",
+              "default": "@menu+1",
+              "title": "Menu Group element ARIA level",
+              "inputType": "Text"
+            },
+            "_menuItem": {
+              "type": "string",
+              "default": "@menu+1",
+              "title": "Menu Item element ARIA level",
+              "inputType": "Text",
+              "help": "The Menu Item element ARIA level will need to be changed to 3 if Menu Groups are being used and A11Y support is required."
+            },
+            "_page": {
+              "type": "string",
+              "default": "1",
+              "title": "Page element ARIA level",
+              "inputType": "Text"
+            },
+            "_article": {
+              "type": "string",
+              "default": "@page+1",
+              "title": "Article element ARIA level",
+              "inputType": "Text"
+            },
+            "_block": {
+              "type": "string",
+              "default": "@article+1",
+              "title": "Block element ARIA level",
+              "inputType": "Text"
+            },
+            "_component": {
+              "type": "string",
+              "default": "@block+1",
+              "title": "Component element ARIA level",
+              "inputType": "Text"
+            },
+            "_componentItem": {
+              "type": "string",
+              "default": "@component+1",
+              "title": "Component Item element ARIA level",
+              "inputType": "Text"
+            },
+            "_notify": {
+              "type": "string",
+              "default": "1",
+              "title": "Notify popup title ARIA level",
+              "inputType": "Text"
+            }
+          }
+        },
+        "_options": {
+          "type": "object",
+          "default": {},
+          "title": "Accessibility Extended Options",
+          "inputType": {
+            "type": "CodeEditor",
+            "mode": "json"
+          },
+          "validators": [],
+          "help": "Optional object that can be used to customize the accessibility behaviour"
+        }
+      }
+    },
+    "_fixes": {
+      "type": "object",
+      "default": {
+        "_imgLazyLoad": true
+      },
+      "title": "Fixes Extended Options",
+      "inputType": {
+        "type": "CodeEditor",
+        "mode": "json"
+      },
+      "validators": [],
+      "help": "Optional object that can be used to customize the application of fixes"
+    },
+    "screenSize": {
+      "type": "object",
+      "title": "Screen Size",
+      "properties": {
+        "small": {
+          "type": "number",
+          "required": true,
+          "default": 0,
+          "title": "Small",
+          "inputType": "Number",
+          "validators": ["required", "number"],
+          "help": "Pixel width for the start of the small breakpoint, e.g. cellphones"
+        },
+        "medium": {
+          "type": "number",
+          "required": true,
+          "default": 720,
+          "title": "Medium",
+          "inputType": "Number",
+          "validators": ["required", "number"],
+          "help": "Pixel width for the start of the medium breakpoint, e.g. tablet devices"
+        },
+        "large": {
+          "type": "number",
+          "required": true,
+          "default": 960,
+          "title": "Large",
+          "inputType": "Number",
+          "validators": ["required", "number"],
+          "help": "Pixel width for the start of the large breakpoint, e.g. laptop/desktop computers"
+        },
+        "xlarge": {
+          "type": "number",
+          "required": true,
+          "default": 1280,
+          "title": "Extra Large",
+          "inputType": "Number",
+          "validators": ["required", "number"],
+          "help": "Pixel width for the start of the extra large breakpoint, e.g. hd laptop/desktop computers"
+        }
+      }
+    },
+    "_questionWeight": {
+      "type": "number",
+      "required": true,
+      "default": 1,
+      "isSetting": true,
+      "title": "Question Weight",
+      "inputType": "Number",
+      "validators": ["required", "number"]
+    },
+    "_drawer": {
+      "type": "object",
+      "isSetting": false,
+      "title": "",
+      "properties": {
+        "_showEasing": {
+          "type": "string",
+          "required": true,
+          "default": "easeOutQuart",
+          "title": "Show Easing",
+          "inputType": {
+            "type": "Select",
+            "options": [
+              "easeInSine",
+              "easeOutSine",
+              "easeInOutSine",
+              "easeInQuad",
+              "easeOutQuad",
+              "easeInOutQuad",
+              "easeInCubic",
+              "easeOutCubic",
+              "easeInOutCubic",
+              "easeInQuart",
+              "easeOutQuart",
+              "easeInOutQuart",
+              "easeInQuint",
+              "easeOutQuint",
+              "easeInOutQuint",
+              "easeInExpo",
+              "easeOutExpo",
+              "easeInOutExpo",
+              "easeInCirc",
+              "easeOutCirc",
+              "easeInOutCirc",
+              "easeInBack",
+              "easeOutBack",
+              "easeInOutBack",
+              "easeInElastic",
+              "easeOutElastic",
+              "easeInOutElastic",
+              "easeInBounce",
+              "easeOutBounce",
+              "easeInOutBounce"
+            ]
+          },
+          "validators": ["required"]
+        },
+        "_hideEasing": {
+          "type": "string",
+          "required": true,
+          "default": "easeInQuart",
+          "title": "Hide Easing",
+          "inputType": {
+            "type": "Select",
+            "options": [
+              "easeInSine",
+              "easeOutSine",
+              "easeInOutSine",
+              "easeInQuad",
+              "easeOutQuad",
+              "easeInOutQuad",
+              "easeInCubic",
+              "easeOutCubic",
+              "easeInOutCubic",
+              "easeInQuart",
+              "easeOutQuart",
+              "easeInOutQuart",
+              "easeInQuint",
+              "easeOutQuint",
+              "easeInOutQuint",
+              "easeInExpo",
+              "easeOutExpo",
+              "easeInOutExpo",
+              "easeInCirc",
+              "easeOutCirc",
+              "easeInOutCirc",
+              "easeInBack",
+              "easeOutBack",
+              "easeInOutBack",
+              "easeInElastic",
+              "easeOutElastic",
+              "easeInOutElastic",
+              "easeInBounce",
+              "easeOutBounce",
+              "easeInOutBounce"
+            ]
+          },
+          "validators": ["required"]
+        },
+        "_duration": {
+          "type": "number",
+          "required": true,
+          "default": 400,
+          "title": "Duration",
+          "inputType": "Number",
+          "validators": ["required", "number"]
+        },
+        "_position": {
+          "type": "string",
+          "required": true,
+          "default": "auto",
+          "title": "Position",
+          "inputType": {
+            "type": "Select",
+            "options": [
+              "auto",
+              "left",
+              "right"
+            ]
+          }
+        },
+        "_iconClass": {
+          "type": "string",
+          "required": false,
+          "default": "icon-list",
+          "title": "Drawer icon class",
+          "inputType": "Text",
+          "validators": [],
+          "help": "CSS class name to be applied to the drawer sidebar icon."
+        }
+      }
+    },
+    "_notify": {
+      "type": "object",
+      "isSetting": false,
+      "title": "",
+      "properties": {
+        "_duration": {
+          "type": "number",
+          "required": true,
+          "default": 400,
+          "title": "Duration",
+          "inputType": "Number",
+          "validators": ["required", "number"]
+        }
+      }
+    },
+    "_generateSourcemap": {
+      "type": "boolean",
+      "default": false,
+      "isSetting": true,
+      "inputType": "Checkbox",
+      "validators": [],
+      "title": "Generate sourcemaps?",
+      "help": "Allows the course JavaScript & CSS to be debugged via the browser's developer tools."
+    },
+    "_forceRouteLocking": {
+      "type": "boolean",
+      "default": true,
+      "isSetting": true,
+      "inputType": "Checkbox",
+      "validators": [],
+      "title": "Enforce route locking?",
+      "help": "If locking is enabled, this setting prevents navigating to locked routes"
+    },
+    "_disableAnimationFor": {
+      "type": "array",
+      "default": [],
+      "title": "Disable animation for",
+      "isSetting": true,
+      "inputType": "List",
+      "help": "Allows you to disable some animations (e.g. the drawer close animation) on platform(s) where they are not performing well, using CSS selectors to target the relevant platform(s) via the classes on the HTML element."
+    },
+    "_logging": {
+      "type": "object",
+      "title": "Logging",
+      "properties": {
+        "_isEnabled": {
+          "type": "boolean",
+          "default": true,
+          "required": true,
+          "inputType": "Checkbox",
+          "validators": [],
+          "title": "Enabled?"
+        },
+        "_level": {
+          "type": "string",
+          "required": true,
+          "default" : "info",
+          "title" : "Log Level",
+          "validators": [],
+          "inputType": {
+            "type": "Select",
+            "options": [
+              "debug",
+              "info",
+              "warn",
+              "error",
+              "fatal"
+            ]
+          }
+        },
+        "_console": {
+          "type": "boolean",
+          "default": true,
+          "inputType": "Checkbox",
+          "validators": [],
+          "title": "Log to browser console?"
+        },
+        "_warnFirstOnly": {
+          "type": "boolean",
+          "default": true,
+          "inputType": "Checkbox",
+          "validators": [],
+          "title": "Show only first deprecated and removed warnings?"
+        }
+      }
+    },
+    "_scrollingContainer": {
+      "type": "object",
+      "title": "iFrame and Screen Reader scrolling support",
+      "properties" : {
+        "_isEnabled": {
+          "type": "boolean",
+          "default": false,
+          "required": true,
+          "inputType": "Checkbox",
+          "validators": [],
+          "title": "Enabled?"
+        },
+        "_limitToSelector": {
+          "type": "string",
+          "required": false,
+          "default": "",
+          "title": "Limit to selector",
+          "inputType": "Text",
+          "validators": [],
+          "help": "CSS selector to match against the HTML element when determining whether this should be active or not."
+        }
+      }
+    },
+    "themeSettings": {
+      "type": "object"
+    },
+    "_themePreset": {
+      "type": "objectid",
+      "required": false
+    },
+    "build": {
+      "type": "object",
+      "title": "Support for setting the course build type",
+      "properties" : {
+        "strictMode": {
+          "type": "boolean",
+          "default": true,
+          "required": false,
+          "inputType": "Checkbox",
+          "validators": [],
+          "title": "Use strict mode?",
+          "help": "Strict mode improves performance by tightly restricting the declaration of variables inside code blocks and closures which may cause some older code to stop working. Please leave this at true unless you are experiencing issue with old plugins or third party libraries."
+        },
+        "targets": {
+          "type": "string",
+          "required": false,
+          "default": "",
+          "inputType": "Text",
+          "title": "Supported browsers override",
+          "validators": [],
+          "help": "Set the browsers that are supported. Overwrites the framework defaults if not empty. Current defaults are: 'last 2 chrome versions, last 2 firefox versions, last 2 safari versions, last 2 edge versions, last 2 ios_saf versions, last 2 and_chr versions, firefox esr'"
+        }
+      }
+    }
+  }
+}

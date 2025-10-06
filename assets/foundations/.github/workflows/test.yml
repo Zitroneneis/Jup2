@@ -1,0 +1,29 @@
+name: Test Runner
+on:
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: '30 2 * * 1-5'  # Runs at 2:30am Mon-Fri
+
+jobs:
+  test:
+    name: Build and Launch Course
+    runs-on: ubuntu-latest
+    timeout-minutes: 59
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '16'
+          cache: 'npm'
+
+      - name: Installing Environment
+        run: npm ci &&
+          npm install -g git &&
+          npm install -g adapt-cli &&
+          npm install -g grunt
+
+      - name: Running Tests
+        run: npm run test
