@@ -1,0 +1,455 @@
+{
+  "title": "Foundational Prompting Techniques",
+  "displayTitle": "Foundational Prompting Techniques",
+  "body": "<p><span style=\"background-color:rgb(255,255,255);color:rgb(0,0,0);\"><span style=\"-webkit-text-stroke-width:0px;display:inline !important;float:none;font-family:Merriweather;font-size:16px;font-style:normal;font-variant-caps:normal;font-variant-ligatures:normal;font-weight:400;letter-spacing:normal;orphans:2;text-align:start;text-decoration-color:initial;text-decoration-style:initial;text-decoration-thickness:initial;text-indent:0px;text-transform:none;white-space:normal;widows:2;word-spacing:0px;\">In this lesson, you'll learn some simple, effective ways to write prompts that get the AI to AI to give you the output you want</span></span></p>",
+  "subtitle": "In this lesson, you'll learn some simple, effective ways to write prompts that get the AI to AI to give you the output you want",
+  "description": "In this lesson, you'll learn some simple, effective ways to write prompts that get the AI to AI to give you the output you want",
+  "instruction": "",
+  "_htmlClasses": "",
+  "_isA11yCompletionDescriptionEnabled": true,
+  "_latestTrackingId": 17,
+  "_buttons": {
+    "_submit": {
+      "buttonText": "Submit",
+      "ariaLabel": "Submit"
+    },
+    "_reset": {
+      "buttonText": "Reset",
+      "ariaLabel": "Reset"
+    },
+    "_showCorrectAnswer": {
+      "buttonText": "Show correct answer",
+      "ariaLabel": "Show correct answer"
+    },
+    "_hideCorrectAnswer": {
+      "buttonText": "Show your answer",
+      "ariaLabel": "Show your answer"
+    },
+    "_showFeedback": {
+      "buttonText": "Show feedback",
+      "ariaLabel": "Show feedback"
+    },
+    "remainingAttemptsText": "attempts remaining",
+    "remainingAttemptText": "final attempt",
+    "disabledAriaLabel": "This button is disabled at the moment"
+  },
+  "_classes": "",
+  "_requireCompletionOf": -1,
+  "_lockType": "",
+  "_id": "course",
+  "_start": {
+    "_isEnabled": false,
+    "_startIds": [],
+    "_force": false,
+    "_isMenuDisabled": false
+  },
+  "_globals": {
+    "_accessibility": {
+      "skipNavigationText": "Skip to main content",
+      "_ariaLabels": {
+        "answeredIncorrectly": "You answered incorrectly",
+        "answeredCorrectly": "You answered correctly",
+        "selectedAnswer": "selected",
+        "unselectedAnswer": "not selected",
+        "skipNavigation": "Skip Navigation",
+        "previous": "Back",
+        "navigationDrawer": "Open course resources.",
+        "close": "Close",
+        "closeDrawer": "Close Drawer",
+        "closeResources": "Close resources",
+        "drawer": "Top of side drawer",
+        "closePopup": "Close popup",
+        "next": "Next",
+        "done": "Done",
+        "complete": "Completed",
+        "incomplete": "Incomplete",
+        "incorrect": "Incorrect",
+        "correct": "Correct",
+        "locked": "Locked",
+        "visited": "Visited",
+        "required": "Required",
+        "optional": "Optional",
+        "topOfContentObject": "{{type}} {{displayTitle}}",
+        "course": "Main menu",
+        "menu": "Sub menu",
+        "page": "Page"
+      },
+      "altFeedbackTitle": "Feedback"
+    },
+    "_extensions": {
+      "_trickle": {
+        "incompleteContent": "There is incomplete content above. You must complete this before you can proceed through the course."
+      },
+      "_tutor": {
+        "hideFeedback": "Hide feedback"
+      },
+      "_pageLevelProgress": {
+        "pageLevelProgress": "List of page sections and completion status. Select incomplete sections to jump directly to the content.",
+        "pageLevelProgressIndicatorBar": "Page progress. {{percentageComplete}}%. Open page sections.",
+        "pageLevelProgressMenuBar": "Page completion {{percentageComplete}}%",
+        "optionalContent": "Optional content",
+        "_navOrder": "90",
+        "_navTooltip": {
+          "_isEnabled": true,
+          "text": "Page progress"
+        },
+        "_showLabel": true,
+        "navLabel": "Page progress",
+        "_drawerPosition": "auto"
+      },
+      "_resources": {
+        "ariaRegion": "",
+        "resources": "Additional resources."
+      },
+      "_bookmarking": {
+        "resumeButtonText": "Resume",
+        "resumeButtonAriaLabel": "Navigate to your furthest point of progress."
+      },
+      "_languagePicker": {
+        "languageSelector": "Language selector",
+        "_navOrder": "0",
+        "_navTooltip": {
+          "_isEnabled": true,
+          "text": "Language selector"
+        },
+        "_showLabel": true,
+        "navigationBarLabel": "Select course language",
+        "_drawerPosition": "auto"
+      },
+      "_drawer": {
+        "_navOrder": 100,
+        "_navTooltip": {
+          "_isEnabled": true,
+          "text": "{{ariaLabel}}"
+        }
+      },
+      "_navigation": {
+        "_skipButton": {
+          "_navOrder": -100
+        },
+        "_backButton": {
+          "_navOrder": 0
+        },
+        "_backNavTooltip": {
+          "_isEnabled": true,
+          "text": "{{ariaLabel}}"
+        },
+        "_spacers": [
+          {
+            "_navOrder": 0
+          }
+        ]
+      }
+    },
+    "_components": {
+      "_text": {
+        "ariaRegion": ""
+      },
+      "_narrative": {
+        "ariaRegion": "Slide show. Select the next button to progress.",
+        "previous": "{{#if isAtStart}}{{_globals._accessibility._ariaLabels.previous}}{{else}}{{#if title}}Back to {{{title}}}{{else}}{{_globals._accessibility._ariaLabels.previous}}{{/if}} (item {{itemNumber}} of {{totalItems}}){{/if}}",
+        "next": "{{#if isAtEnd}}{{_globals._accessibility._ariaLabels.next}}{{else}}{{#if title}}Forward to {{{title}}}{{else}}{{_globals._accessibility._ariaLabels.next}}{{/if}} (item {{itemNumber}} of {{totalItems}}){{/if}}",
+        "titleDialog": "Item {{itemNumber}} of {{totalItems}}",
+        "titleStrapline": "Find out more"
+      },
+      "_media": {
+        "ariaRegion": "Media player{{#any _transcript._inlineTranscript _transcript._externalTranscript}} and transcript{{/any}}.",
+        "skipToTranscript": "Skip to transcript",
+        "playText": "Play",
+        "pauseText": "Pause",
+        "stopText": "Stop",
+        "audioPlayerText": "Audio Player",
+        "videoPlayerText": "Video Player",
+        "tracksText": "Captions/Subtitles",
+        "timeSliderText": "Time Slider",
+        "muteText": "Mute Toggle",
+        "unmuteStatusText": "Unmute",
+        "muteStatusText": "Mute",
+        "volumeSliderText": "Volume Slider",
+        "fullscreenText": "Fullscreen",
+        "goFullscreenText": "Go Fullscreen",
+        "turnOffFullscreenText": "Turn off Fullscreen",
+        "noneText": "None",
+        "skipBackText": "Skip back %1 seconds",
+        "allyVolumeControlText": "Use Up/Down Arrow keys to increase or decrease volume.",
+        "progessHelpText": "Use Left/Right Arrow keys to advance one second, Up/Down arrows to advance ten seconds."
+      },
+      "_hotgraphic": {
+        "ariaRegion": "Image with selectable areas. Select each button to show more information.",
+        "item": "Item {{itemNumber}} of {{totalItems}}",
+        "previous": "{{#if title}}Back to {{{title}}} (item {{itemNumber}} of {{totalItems}}){{else}}{{_globals._accessibility._ariaLabels.previous}}{{/if}}",
+        "next": "{{#if title}}Forward to {{{title}}} (item {{itemNumber}} of {{totalItems}}){{else}}{{_globals._accessibility._ariaLabels.next}}{{/if}}",
+        "popupPagination": "{{itemNumber}} / {{totalItems}}"
+      },
+      "_accordion": {
+        "ariaRegion": "List of expandable sections. Select each button to expand the content."
+      },
+      "_graphic": {
+        "ariaRegion": "",
+        "scrollAriaLabel": "Use the scrollbar to pan the image left and right. {{#if _graphic.alt}}{{_graphic.alt}}{{/if}}"
+      },
+      "_matching": {
+        "ariaRegion": "Matching. Select from lists and then submit.",
+        "ariaCorrectAnswer": "The correct answer for {{{itemText}}} is {{{correctAnswer}}}",
+        "ariaUserAnswer": "The answer you chose for {{{itemText}}} was {{{userAnswer}}}",
+        "correctAnswerPrefix": "The correct answer is",
+        "correctAnswersPrefix": "The correct answers are"
+      },
+      "_textinput": {
+        "ariaRegion": "Text input. Type your answer and then submit.",
+        "correctAnswerPrefix": "The correct answer is",
+        "correctAnswersPrefix": "Accepted correct answers include"
+      },
+      "_mcq": {
+        "ariaRegion": "Multiple choice question",
+        "ariaCorrectAnswer": "The correct answer is {{{correctAnswer}}}",
+        "ariaCorrectAnswers": "The correct answers are {{{correctAnswer}}}",
+        "ariaUserAnswer": "The answer you chose was {{{userAnswer}}}",
+        "ariaUserAnswers": "The answers you chose were {{{userAnswer}}}"
+      },
+      "_gmcq": {
+        "ariaRegion": "Multiple choice question",
+        "ariaCorrectAnswer": "The correct answer is {{{correctAnswer}}}",
+        "ariaCorrectAnswers": "The correct answers are {{{correctAnswer}}}",
+        "ariaUserAnswer": "The answer you chose was {{{userAnswer}}}",
+        "ariaUserAnswers": "The answers you chose were {{{userAnswer}}}"
+      },
+      "_assessmentResults": {
+        "ariaRegion": "Assessment results.",
+        "retryText": "Retry"
+      },
+      "_slider": {
+        "ariaRegion": "Slider. Respond to the question by selecting a value on the scale and then submit.",
+        "ariaCorrectAnswer": "The correct answer is {{{correctAnswer}}}",
+        "ariaCorrectAnswerRange": "The correct answer is any value from {{{bottom}}} to {{{top}}}",
+        "ariaUserAnswer": "The answer you chose was {{{userAnswer}}}",
+        "labelStart": "Start of the scale",
+        "labelEnd": "End of the scale"
+      },
+      "_stacklist": {
+        "ariaRegion": "This stacklist component presents a list of items. Select the button to access each item in turn.",
+        "ariaButtonLabel": "Select this button to access the next item in the stacklist."
+      },
+      "_flipper": {
+        "ariaRegion": ""
+      },
+      "_expose": {
+        "ariaRegion": ""
+      },
+      "_youtube": {
+        "ariaRegion": "This is a media component which displays a YouTube video. Select the play / pause button to watch it.",
+        "skipToTranscript": "Skip to transcript"
+      }
+    },
+    "_menu": {
+      "_boxMenu": {
+        "itemCount": "Item {{_nthChild}} of {{_totalChild}}",
+        "durationLabel": "Duration:"
+      }
+    }
+  },
+  "_tooltips": {
+    "_isEnabled": true
+  },
+  "_navigation": {
+    "_isDefaultNavigationDisabled": false,
+    "_navigationAlignment": "top",
+    "_isBottomOnTouchDevices": false,
+    "_showLabel": false,
+    "_showLabelAtWidth": "medium",
+    "_labelPosition": "auto"
+  },
+  "_type": "course",
+  "themeVariables": {
+    "_global": {
+      "font-color": "#26262a",
+      "font-color-inverted": "#eaf5f5",
+      "link": "#2786fa",
+      "link-inverted": "#e9faf5",
+      "link-hover": "#2786fa",
+      "link-inverted-hover": "#e9faf5",
+      "heading-color": "#08c78b",
+      "heading-color-inverted": "#3c3c3f"
+    },
+    "_items": {
+      "item-color": "",
+      "item-color-inverted": "",
+      "item-color-hover": "",
+      "item-color-inverted-hover": "",
+      "item-color-focus": "",
+      "item-color-inverted-focus": "",
+      "item-color-selected": "",
+      "item-color-inverted-selected": "",
+      "visited": "",
+      "visited-inverted": "",
+      "item-color-disabled": "",
+      "item-color-inverted-disabled": ""
+    },
+    "_itemsUi": {
+      "item-ui-color": "",
+      "item-ui-color-inverted": "",
+      "item-ui-color-hover": "",
+      "item-ui-color-inverted-hover": "",
+      "item-ui-color-focus": "",
+      "item-ui-color-inverted-focus": "",
+      "item-ui-color-selected": "",
+      "item-ui-color-inverted-selected": "",
+      "item-ui-color-visited": "",
+      "item-ui-color-inverted-visited": "",
+      "item-ui-color-locked": "",
+      "item-ui-color-inverted-locked": "",
+      "item-ui-color-disabled": "",
+      "item-ui-color-inverted-disabled": ""
+    },
+    "_buttons": {
+      "btn-color": "",
+      "btn-color-inverted": "",
+      "btn-color-hover": "",
+      "btn-color-inverted-hover": "",
+      "btn-color-focus": "",
+      "btn-color-inverted-focus": "",
+      "btn-color-selected": "",
+      "btn-color-inverted-selected": "",
+      "btn-color-locked": "",
+      "btn-color-inverted-locked": "",
+      "disabled": "",
+      "disabled-inverted": "",
+      "btn-icon-color": "",
+      "btn-icon-color-inverted": "",
+      "btn-icon-color-hover": "",
+      "btn-icon-color-inverted-hover": ""
+    },
+    "_globalUi": {
+      "ui-color": "",
+      "ui-color-inverted": ""
+    },
+    "_validation": {
+      "validation-success": "",
+      "validation-success-inverted": "",
+      "validation-error": "",
+      "validation-error-inverted": ""
+    },
+    "_progress": {
+      "progress": "",
+      "progress-inverted": "",
+      "progress-border": ""
+    },
+    "_menu": {
+      "menu-header-background-color": "",
+      "menu-header-title-color": "",
+      "menu-header-subtitle-color": "",
+      "menu-header-body-color": "",
+      "menu-header-instruction-color": "",
+      "menu-item": "",
+      "menu-item-inverted": "",
+      "menu-item-border-color": "",
+      "menu-item-progress": "",
+      "menu-item-progress-inverted": "",
+      "menu-item-progress-border": "",
+      "menu-item-btn-color": "",
+      "menu-item-btn-color-inverted": "",
+      "menu-item-btn-color-hover": "",
+      "menu-item-btn-color-inverted-hover": "",
+      "menu-item-btn-color-focus": "",
+      "menu-item-btn-color-inverted-focus": "",
+      "menu-item-btn-color-locked": "",
+      "menu-item-btn-color-inverted-locked": ""
+    },
+    "_nav": {
+      "nav": "",
+      "nav-inverted": "",
+      "nav-icon": "",
+      "nav-icon-inverted": "",
+      "nav-icon-hover": "",
+      "nav-icon-inverted-hover": "",
+      "nav-icon-focus": "",
+      "nav-icon-inverted-focus": "",
+      "nav-icon-locked": "",
+      "nav-icon-inverted-locked": "",
+      "nav-icon-disabled": "",
+      "nav-icon-inverted-disabled": "",
+      "nav-progress": "",
+      "nav-progress-inverted": "",
+      "nav-progress-border": "",
+      "nav-progress-hover": "",
+      "nav-progress-inverted-hover": "",
+      "nav-progress-border-hover": ""
+    },
+    "_notify": {
+      "notify": "",
+      "notify-inverted": "",
+      "notify-link": "",
+      "notify-link-hover": "",
+      "notify-icon": "",
+      "notify-icon-inverted": "",
+      "notify-icon-hover": "",
+      "notify-icon-inverted-hover": "",
+      "notify-icon-focus": "",
+      "notify-icon-inverted-focus": "",
+      "notify-icon-disabled": "",
+      "notify-icon-inverted-disabled": "",
+      "notify-btn": "",
+      "notify-btn-inverted": "",
+      "notify-btn-hover": "",
+      "notify-btn-inverted-hover": "",
+      "notify-btn-focus": "",
+      "notify-btn-inverted-focus": "",
+      "notify-btn-selected": "",
+      "notify-btn-inverted-selected": "",
+      "notify-btn-locked": "",
+      "notify-btn-inverted-locked": "",
+      "notify-btn-disabled": "",
+      "notify-btn-inverted-disabled": ""
+    },
+    "_drawer": {
+      "drawer": "",
+      "drawer-inverted": "",
+      "drawer-link": "",
+      "drawer-link-hover": "",
+      "drawer-icon": "",
+      "drawer-icon-inverted": "",
+      "drawer-icon-hover": "",
+      "drawer-icon-inverted-hover": "",
+      "drawer-icon-focus": "",
+      "drawer-icon-inverted-focus": "",
+      "drawer-item": "",
+      "drawer-item-inverted": "",
+      "drawer-item-hover": "",
+      "drawer-item-inverted-hover": "",
+      "drawer-item-focus": "",
+      "drawer-item-inverted-focus": "",
+      "drawer-item-selected": "",
+      "drawer-item-inverted-selected": "",
+      "drawer-item-locked": "",
+      "drawer-item-inverted-locked": "",
+      "drawer-progress": "",
+      "drawer-progress-inverted": "",
+      "drawer-progress-border": "",
+      "drawer-progress-hover": "",
+      "drawer-progress-inverted-hover": "",
+      "drawer-progress-border-hover": ""
+    },
+    "_misc": {
+      "background": "",
+      "background-inverted": "",
+      "shadow": "",
+      "shadow-inverted": "",
+      "loading": "",
+      "loading-inverted": ""
+    }
+  },
+  "_assessment": {
+    "_isPercentageBased": true,
+    "_scoreToPass": 60,
+    "_correctToPass": 60
+  },
+  "_tutor": {
+    "_type": "notify",
+    "_classes": "",
+    "_hasNotifyBottomButton": false,
+    "_button": {
+      "text": "{{_globals._extensions._tutor.hideFeedback}}",
+      "ariaLabel": "{{_globals._extensions._tutor.hideFeedback}}"
+    }
+  }
+}

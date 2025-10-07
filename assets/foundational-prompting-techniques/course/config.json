@@ -1,0 +1,75 @@
+{
+  "_defaultLanguage": "en",
+  "_defaultDirection": "ltr",
+  "_fixes": {
+    "_imgLazyLoad": true
+  },
+  "_questionWeight": 1,
+  "_generateSourcemap": false,
+  "_forceRouteLocking": true,
+  "_disableAnimationFor": [],
+  "_id": "68e5334bc176fa000286ea0b",
+  "_courseId": "68e5334bc176fa000286ea0a",
+  "_drawer": {
+    "_showEasing": "easeOutQuart",
+    "_hideEasing": "easeInQuart",
+    "_duration": 400
+  },
+  "_accessibility": {
+    "_isEnabled": false,
+    "_shouldSupportLegacyBrowsers": true,
+    "_isTextProcessorEnabled": false
+  },
+  "__v": 1,
+  "_trickle": {
+    "_isEnabled": true,
+    "_logState": false,
+    "_completionAttribute": "_isComplete"
+  },
+  "_spoor": {
+    "_isEnabled": true,
+    "_tracking": {
+      "_shouldStoreResponses": true,
+      "_shouldStoreAttempts": false,
+      "_shouldRecordInteractions": true,
+      "_shouldRecordObjectives": true,
+      "_shouldCompress": false
+    },
+    "_reporting": {
+      "_onTrackingCriteriaMet": "completed",
+      "_onAssessmentFailure": "incomplete",
+      "_resetStatusOnLanguageChange": false
+    },
+    "_advancedSettings": {
+      "_scormVersion": "1.2",
+      "_showDebugWindow": false,
+      "_commitOnStatusChange": true,
+      "_commitOnAnyChange": false,
+      "_timedCommitFrequency": 10,
+      "_maxCommitRetries": 5,
+      "_commitRetryDelay": 2000,
+      "_suppressErrors": false,
+      "_commitOnVisibilityChangeHidden": true,
+      "_manifestIdentifier": "adapt_manifest",
+      "_exitStateIfIncomplete": "auto",
+      "_exitStateIfComplete": "auto",
+      "_setCompletedWhenFailed": true,
+      "_maxCharLimitOverride": 0,
+      "_connectionTest": {
+        "_isEnabled": true,
+        "_testOnSetValue": true,
+        "_silentRetryLimit": 2,
+        "_silentRetryDelay": 1000
+      },
+      "_uniqueInteractionIds": false
+    },
+    "_showCookieLmsResetButton": false,
+    "_shouldPersistCookieLMSData": true
+  },
+  "screenSize": {
+    "small": 0,
+    "medium": 720,
+    "large": 960,
+    "xlarge": 1280
+  }
+}
