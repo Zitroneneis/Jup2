@@ -216,6 +216,7 @@
             padding: 10px 20px;
             display: flex;
             align-items: center;
+            gap: 10px;
             background-color: #f9f9f9;
             border-bottom: 1px solid #e0e0e0;
         }
@@ -232,6 +233,22 @@
             border: 1px solid #ccc;
             font-size: 0.9em;
             flex-grow: 1;
+        }
+
+        #new-chat-button {
+            padding: 8px 16px;
+            font-size: 0.9em;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            white-space: nowrap;
+        }
+
+        #new-chat-button:hover {
+            background-color: #218838;
         }
 
         @media (max-width: 1024px) {
@@ -260,6 +277,7 @@
                         <option value="gemini-2.5-pro">gemini-2.5-pro</option>
                         <option value="perplexity-sonar">Perplexity Sonar</option>
                     </select>
+                    <button id="new-chat-button">New</button>
                 </div>
                 <div id="chat-panel"></div>
                 <form id="chat-form">
@@ -275,6 +293,7 @@
     const chatForm = document.getElementById('chat-form');
     const chatInput = document.getElementById('chat-input');
     const sendButton = document.getElementById('send-button');
+    const newChatButton = document.getElementById('new-chat-button');
     const RECAPTCHA_SITE_KEY = '6LcQhFMrAAAAAMjWClxXSNDpZrFZj3rUrz5UHhWA';
     const modelSelector = document.getElementById('model-selector');
 
@@ -288,6 +307,44 @@
     let currentStopButtonHandler = null;
     let botMessageSpanForAnimation = null; 
     let combinedTextContentForAnimation = '';
+
+    // New Chat button functionality
+    newChatButton.addEventListener('click', () => {
+        // Clear chat history
+        chatHistory = [];
+        lastUserMessageText = '';
+        isRetryMode = false;
+        
+        // Clear chat panel
+        chatPanel.innerHTML = '';
+        
+        // Clear input
+        chatInput.value = '';
+        
+        // Reset any ongoing animations
+        stopLetterAnimationGlobal = true;
+        letterAnimationTimeouts.forEach(clearTimeout);
+        letterAnimationTimeouts = [];
+        
+        // Abort any ongoing fetch
+        if (fetchAbortController) {
+            fetchAbortController.abort();
+            fetchAbortController = null;
+        }
+        
+        // Reset button state
+        if (currentStopButtonHandler) {
+            sendButton.removeEventListener('click', currentStopButtonHandler);
+            currentStopButtonHandler = null;
+        }
+        sendButton.textContent = 'Send';
+        sendButton.classList.remove('stop-generating');
+        sendButton.disabled = false;
+        chatInput.disabled = false;
+        
+        // Reset flags
+        stopLetterAnimationGlobal = false;
+    });
 
     function formatBotMessage(text) {
       const html = DOMPurify.sanitize(marked.parse(text), {
