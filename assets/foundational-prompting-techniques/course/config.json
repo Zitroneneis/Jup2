@@ -20,7 +20,7 @@
     "_shouldSupportLegacyBrowsers": true,
     "_isTextProcessorEnabled": false
   },
-  "__v": 1,
+  "__v": 2,
   "_trickle": {
     "_isEnabled": true,
     "_logState": false,

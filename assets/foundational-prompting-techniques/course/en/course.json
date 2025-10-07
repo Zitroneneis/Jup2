@@ -7,7 +7,7 @@
   "instruction": "",
   "_htmlClasses": "",
   "_isA11yCompletionDescriptionEnabled": true,
-  "_latestTrackingId": 17,
+  "_latestTrackingId": 25,
   "_buttons": {
     "_submit": {
       "buttonText": "Submit",
@@ -83,39 +83,6 @@
       "_tutor": {
         "hideFeedback": "Hide feedback"
       },
-      "_pageLevelProgress": {
-        "pageLevelProgress": "List of page sections and completion status. Select incomplete sections to jump directly to the content.",
-        "pageLevelProgressIndicatorBar": "Page progress. {{percentageComplete}}%. Open page sections.",
-        "pageLevelProgressMenuBar": "Page completion {{percentageComplete}}%",
-        "optionalContent": "Optional content",
-        "_navOrder": "90",
-        "_navTooltip": {
-          "_isEnabled": true,
-          "text": "Page progress"
-        },
-        "_showLabel": true,
-        "navLabel": "Page progress",
-        "_drawerPosition": "auto"
-      },
-      "_resources": {
-        "ariaRegion": "",
-        "resources": "Additional resources."
-      },
-      "_bookmarking": {
-        "resumeButtonText": "Resume",
-        "resumeButtonAriaLabel": "Navigate to your furthest point of progress."
-      },
-      "_languagePicker": {
-        "languageSelector": "Language selector",
-        "_navOrder": "0",
-        "_navTooltip": {
-          "_isEnabled": true,
-          "text": "Language selector"
-        },
-        "_showLabel": true,
-        "navigationBarLabel": "Select course language",
-        "_drawerPosition": "auto"
-      },
       "_drawer": {
         "_navOrder": 100,
         "_navTooltip": {
@@ -139,6 +106,9 @@
             "_navOrder": 0
           }
         ]
+      },
+      "_hint": {
+        "openButtonText": "Open hint"
       }
     },
     "_components": {
@@ -450,6 +420,55 @@
     "_button": {
       "text": "{{_globals._extensions._tutor.hideFeedback}}",
       "ariaLabel": "{{_globals._extensions._tutor.hideFeedback}}"
+    }
+  },
+  "_spoor": {
+    "_messages": ""
+  },
+  "_boxMenu": {
+    "_graphic": {
+      "_src": "",
+      "alt": ""
+    },
+    "_backgroundImage": {
+      "_xlarge": "",
+      "_large": "",
+      "_medium": "",
+      "_small": ""
+    },
+    "_backgroundStyles": {
+      "_backgroundRepeat": null,
+      "_backgroundSize": null,
+      "_backgroundPosition": null
+    },
+    "_menuHeader": {
+      "_textAlignment": {
+        "_title": "",
+        "_body": "",
+        "_instruction": ""
+      },
+      "_backgroundImage": {
+        "_xlarge": "",
+        "_large": "",
+        "_medium": "",
+        "_small": ""
+      },
+      "_backgroundStyles": {
+        "_backgroundRepeat": null,
+        "_backgroundSize": null,
+        "_backgroundPosition": null
+      },
+      "_minimumHeights": {
+        "_xlarge": null,
+        "_large": null,
+        "_medium": null,
+        "_small": null
+      }
+    }
+  },
+  "_vanilla": {
+    "_favIcon": {
+      "_src": ""
     }
   }
 }
