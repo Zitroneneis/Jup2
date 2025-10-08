@@ -1,331 +1,5 @@
 [
   {
-    "_component": "mcq",
-    "_classes": "",
-    "_isOptional": false,
-    "_isAvailable": true,
-    "_isHidden": false,
-    "_isVisible": true,
-    "_isResetOnRevisit": "false",
-    "_isA11yCompletionDescriptionEnabled": true,
-    "title": "What is few-shot prompting?",
-    "displayTitle": "",
-    "body": "<p>What is few-shot prompting?</p>",
-    "_ariaLevel": 0,
-    "_id": "68e54f17c176fa000286ea43",
-    "_parentId": "68e54ed0c176fa000286ea42",
-    "_type": "component",
-    "_layout": "full",
-    "_onScreen": {
-      "_isEnabled": false,
-      "_classes": "",
-      "_percentInviewVertical": 50
-    },
-    "_tutor": {
-      "_isInherited": true,
-      "_type": "overlay",
-      "_classes": "",
-      "_hasNotifyBottomButton": false,
-      "_button": {
-        "text": "{{_globals._extensions._tutor.hideFeedback}}",
-        "ariaLabel": "{{_globals._extensions._tutor.hideFeedback}}"
-      }
-    },
-    "_hint": {
-      "_isEnabled": false,
-      "title": "",
-      "altTitle": "",
-      "body": "",
-      "_imageAlignment": "right",
-      "_graphic": {
-        "_src": "",
-        "alt": "",
-        "attribution": ""
-      },
-      "_button": {
-        "_iconClass": "",
-        "_alignIconRight": true,
-        "text": "Hint",
-        "ariaLabel": ""
-      }
-    },
-    "_vanilla": {
-      "_textAlignment": {
-        "_title": "",
-        "_body": "",
-        "_instruction": ""
-      }
-    },
-    "instruction": "Choose {{#if _isRadio}}one option{{else}}one or more options{{/if}} then select Submit.",
-    "ariaQuestion": "",
-    "_items": [
-      {
-        "text": "A technique where you ask the AI to explain its reasoning step-by-step before giving an answer",
-        "altText": "",
-        "_shouldBeSelected": false,
-        "_isPartlyCorrect": false,
-        "feedback": "<p>Not quite! Few-shot prompting involves showing the AI a few examples of what you want, so it can follow that pattern when generating a new response.</p>",
-        "_score": 0
-      },
-      {
-        "text": "A technique where you include a few examples in your prompt to guide the AI’s response",
-        "altText": "",
-        "_shouldBeSelected": true,
-        "_isPartlyCorrect": false,
-        "feedback": "<p>That's right! Few-shot prompting involves showing the AI a few examples of what you want, so it can follow that pattern when generating a new response.</p>",
-        "_score": 0
-      },
-      {
-        "text": "A technique where you give the AI a single instruction with no examples",
-        "altText": "",
-        "_shouldBeSelected": false,
-        "_isPartlyCorrect": false,
-        "feedback": "<p>Not quite! Few-shot prompting involves showing the AI a few examples of what you want, so it can follow that pattern when generating a new response.</p>",
-        "_score": 0
-      },
-      {
-        "text": "A technique where you give the AI a detailed list of steps to follow in a specific order",
-        "altText": "",
-        "_shouldBeSelected": false,
-        "_isPartlyCorrect": false,
-        "feedback": "<p>Not quite! Few-shot prompting involves showing the AI a few examples of what you want, so it can follow that pattern when generating a new response.</p>",
-        "_score": 0
-      }
-    ],
-    "_attempts": 3,
-    "_canShowModelAnswer": true,
-    "_canShowCorrectness": true,
-    "_canShowFeedback": true,
-    "_canShowMarking": true,
-    "_shouldDisplayAttempts": false,
-    "_isRandom": true,
-    "_recordInteraction": true,
-    "_hasItemScoring": false,
-    "_questionWeight": 1,
-    "_selectable": 1,
-    "_feedback": {
-      "title": "",
-      "correct": "<p>That's right! Few-shot prompting involves showing the AI a few examples of what you want, so it can follow that pattern when generating a new response.</p>",
-      "_incorrect": {
-        "final": "<p>Not quite! Few-shot prompting involves showing the AI a few examples of what you want, so it can follow that pattern when generating a new response.</p>",
-        "notFinal": ""
-      },
-      "_partlyCorrect": {
-        "final": "",
-        "notFinal": ""
-      }
-    },
-    "_buttons": {
-      "_submit": {
-        "buttonText": "",
-        "ariaLabel": ""
-      },
-      "_reset": {
-        "buttonText": "",
-        "ariaLabel": ""
-      },
-      "_showCorrectAnswer": {
-        "buttonText": "",
-        "ariaLabel": ""
-      },
-      "_hideCorrectAnswer": {
-        "buttonText": "",
-        "ariaLabel": ""
-      },
-      "_showFeedback": {
-        "buttonText": "",
-        "ariaLabel": ""
-      },
-      "remainingAttemptsText": "",
-      "remainingAttemptText": ""
-    }
-  },
-  {
-    "_component": "graphic",
-    "_classes": "",
-    "_isOptional": true,
-    "_isAvailable": true,
-    "_isHidden": false,
-    "_isVisible": true,
-    "_isResetOnRevisit": "false",
-    "_isA11yCompletionDescriptionEnabled": true,
-    "title": "Extension",
-    "displayTitle": "Extension",
-    "body": "<p>Want to keep going? Try changing your prompt by using two new examples and see how the outputs change.</p>",
-    "_ariaLevel": 0,
-    "_id": "68e586a3c176fa000286ea6e",
-    "_parentId": "68e5868bc176fa000286ea6d",
-    "_type": "component",
-    "_layout": "full",
-    "_onScreen": {
-      "_isEnabled": false,
-      "_classes": "",
-      "_percentInviewVertical": 50
-    },
-    "_tutor": {
-      "_isInherited": true,
-      "_type": "notify",
-      "_classes": "",
-      "_hasNotifyBottomButton": false,
-      "_button": {
-        "text": "{{_globals._extensions._tutor.hideFeedback}}",
-        "ariaLabel": "{{_globals._extensions._tutor.hideFeedback}}"
-      }
-    },
-    "_hint": {
-      "_isEnabled": false,
-      "title": "",
-      "altTitle": "",
-      "body": "",
-      "_imageAlignment": "right",
-      "_graphic": {
-        "_src": "",
-        "alt": "",
-        "attribution": ""
-      },
-      "_button": {
-        "_iconClass": "",
-        "_alignIconRight": true,
-        "text": "Hint",
-        "ariaLabel": ""
-      }
-    },
-    "_vanilla": {
-      "_textAlignment": {
-        "_title": "",
-        "_body": "",
-        "_instruction": ""
-      }
-    },
-    "instruction": "",
-    "_graphic": {
-      "alt": "",
-      "longdescription": "",
-      "large": "course/en/assets/36f59c46865aacc0dfad10416976c2961c233097.png",
-      "small": "course/en/assets/36f59c46865aacc0dfad10416976c2961c233097.png",
-      "attribution": "",
-      "_url": "",
-      "_target": "_blank"
-    },
-    "_isScrollable": false,
-    "_defaultScrollPercent": 0
-  },
-  {
-    "_component": "textinput",
-    "_classes": "",
-    "_isOptional": false,
-    "_isAvailable": true,
-    "_isHidden": false,
-    "_isVisible": true,
-    "_isResetOnRevisit": "false",
-    "_isA11yCompletionDescriptionEnabled": true,
-    "title": "Write your reflection here",
-    "displayTitle": "",
-    "body": "",
-    "_ariaLevel": 0,
-    "_id": "68e585e9c176fa000286ea6c",
-    "_parentId": "68e585e6c176fa000286ea6b",
-    "_type": "component",
-    "_layout": "full",
-    "_onScreen": {
-      "_isEnabled": false,
-      "_classes": "",
-      "_percentInviewVertical": 50
-    },
-    "_tutor": {
-      "_isInherited": true,
-      "_type": "notify",
-      "_classes": "",
-      "_hasNotifyBottomButton": false,
-      "_button": {
-        "text": "{{_globals._extensions._tutor.hideFeedback}}",
-        "ariaLabel": "{{_globals._extensions._tutor.hideFeedback}}"
-      }
-    },
-    "_hint": {
-      "_isEnabled": false,
-      "title": "",
-      "altTitle": "",
-      "body": "",
-      "_imageAlignment": "right",
-      "_graphic": {
-        "_src": "",
-        "alt": "",
-        "attribution": ""
-      },
-      "_button": {
-        "_iconClass": "",
-        "_alignIconRight": true,
-        "text": "Hint",
-        "ariaLabel": ""
-      }
-    },
-    "_vanilla": {
-      "_textAlignment": {
-        "_title": "",
-        "_body": "",
-        "_instruction": ""
-      }
-    },
-    "instruction": "Write your reflection here:",
-    "ariaQuestion": "",
-    "_items": [
-      {
-        "_answers": [],
-        "prefix": "",
-        "suffix": "",
-        "placeholder": ""
-      }
-    ],
-    "_attempts": 1,
-    "_canShowModelAnswer": false,
-    "_canShowCorrectness": false,
-    "_canShowFeedback": false,
-    "_canShowMarking": false,
-    "_shouldDisplayAttempts": false,
-    "_isRandom": false,
-    "_recordInteraction": true,
-    "_questionWeight": 1,
-    "_allowsAnyCase": false,
-    "_allowsPunctuation": false,
-    "_feedback": {
-      "title": "",
-      "correct": "",
-      "_incorrect": {
-        "final": "",
-        "notFinal": ""
-      },
-      "_partlyCorrect": {
-        "final": "",
-        "notFinal": ""
-      }
-    },
-    "_buttons": {
-      "_submit": {
-        "buttonText": "",
-        "ariaLabel": ""
-      },
-      "_reset": {
-        "buttonText": "",
-        "ariaLabel": ""
-      },
-      "_showCorrectAnswer": {
-        "buttonText": "",
-        "ariaLabel": ""
-      },
-      "_hideCorrectAnswer": {
-        "buttonText": "",
-        "ariaLabel": ""
-      },
-      "_showFeedback": {
-        "buttonText": "",
-        "ariaLabel": ""
-      },
-      "remainingAttemptsText": "",
-      "remainingAttemptText": ""
-    }
-  },
-  {
     "_component": "text",
     "_classes": "",
     "_isOptional": false,
@@ -334,12 +8,12 @@
     "_isVisible": true,
     "_isResetOnRevisit": "false",
     "_isA11yCompletionDescriptionEnabled": true,
-    "title": "Reflect text",
+    "title": "practice 1 initial text intro",
     "displayTitle": "",
-    "body": "<p><strong>How did your few-shot prompt do?</strong></p><p>&nbsp;</p><ul style=\"list-style-type:disc;\"><li>Did the AI match Marriott’s tone?</li><li>What made it feel on-brand or off-brand?</li><li>Are the outputs clear and helpful?</li><li>What would you change to improve the examples?</li></ul>",
+    "body": "<h2>Scenario</h2><h2>&nbsp;</h2><p>Imagine you’re part of a high school tutoring program that works with your local elementary school. You and other students help younger kids with their writing projects.</p><p>&nbsp;</p><p>Young writers improve when they get clear and specific feedback, but it takes a lot of time to read each writing assignment and give that level of support. To help each student grow as a writer, you decide to use AI to review their writing and provide personalized feedback.</p>",
     "_ariaLevel": 0,
-    "_id": "68e585a3c176fa000286ea6a",
-    "_parentId": "68e5859ec176fa000286ea69",
+    "_id": "68e67cc1c176fa000286ea7f",
+    "_parentId": "68e67cc0c176fa000286ea77",
     "_type": "component",
     "_layout": "full",
     "_onScreen": {
@@ -393,12 +67,12 @@
     "_isVisible": true,
     "_isResetOnRevisit": "false",
     "_isA11yCompletionDescriptionEnabled": true,
-    "title": "test your prompt text block",
+    "title": "practice 1 initial text intro",
     "displayTitle": "",
-    "body": "<p>Now, test your few-shot prompt on the following customer messages:</p><p>&nbsp;</p><ul style=\"list-style-type:circle;\"><li>“Does the hotel have an airport shuttle?”</li><li>“I was charged twice for my stay—can someone help? Thanks, Bruce”</li><li>“I left my headphones in the room—can I get them back?”</li><li>“Can I check in early? - Sara”</li><li>“My room was really noisy—I barely slept.”</li></ul>",
+    "body": "<h2>Scenario</h2><h2>&nbsp;</h2><p>Imagine that you've just joined the Guest Experience team at Marriott Hotels. It's your job to respond to customer messages—whether that's helping with a reservation, fixing a billing issue, answering a question about hotel services, or responding to a complaint.</p><p>&nbsp;</p><p>You choose to use AI to help you reply to customer messages more efficiently and with a consistent tone. To guide the AI in generating responses that match Marriott Hotels’ brand voice, you create a few-shot prompt. This prompt includes examples of the kind of replies you want the AI to model.</p>",
     "_ariaLevel": 0,
-    "_id": "68e5845ec176fa000286ea68",
-    "_parentId": "68e58444c176fa000286ea67",
+    "_id": "68e57b58c176fa000286ea5a",
+    "_parentId": "68e57afcc176fa000286ea59",
     "_type": "component",
     "_layout": "full",
     "_onScreen": {
@@ -444,20 +118,20 @@
     "instruction": ""
   },
   {
-    "_component": "accordion",
+    "_component": "text",
     "_classes": "",
-    "_isOptional": true,
+    "_isOptional": false,
     "_isAvailable": true,
     "_isHidden": false,
     "_isVisible": true,
     "_isResetOnRevisit": "false",
     "_isA11yCompletionDescriptionEnabled": true,
-    "title": "hint accordion",
+    "title": "Step 1: Write a Few-Shot Prompt text block",
     "displayTitle": "",
-    "body": "",
+    "body": "<h2>Step 1: Write a Few-Shot Prompt</h2><p>&nbsp;</p><p>Use the Marriott Hotels brand guidelines below to create a few-shot prompt. Your goal is to help an AI respond to a variety of customer messages in a way that reflects the company’s voice and values.</p><p>&nbsp;</p><h2>Mariott Hotels Brand Guidelines:</h2><p>&nbsp;</p><figure class=\"table\"><table style=\"border-collapse:collapse;\"><tbody><tr><td style=\"background-color:hsl(120, 75%, 60%);border:1px solid black;\"><strong>Industry</strong></td><td style=\"border:1px solid black;\">Hospitality and tourism</td></tr><tr><td style=\"background-color:hsl(120, 75%, 60%);border:1px solid black;\"><strong>Customers</strong></td><td style=\"border:1px solid black;\">Business and leisure travelers, families, international guests</td></tr><tr><td style=\"background-color:hsl(120, 75%, 60%);border:1px solid black;\"><strong>Tone</strong></td><td style=\"border:1px solid black;\"><ul><li>Polished, warm, and respectful</li><li>Professional without being cold</li><li>Service-minded and guest-centered</li></ul></td></tr><tr><td style=\"background-color:hsl(120, 75%, 60%);border:1px solid black;\"><strong>Core Values</strong></td><td style=\"border:1px solid black;\">Comfort, trust, exceptional service</td></tr><tr><td style=\"background-color:hsl(120, 75%, 60%);border:1px solid black;\"><strong>Style Notes</strong></td><td style=\"border:1px solid black;\"><ul><li>Use formal greetings (“Thank you for reaching out,” “We sincerely apologize…”)</li><li>Always offer a helpful next step</li><li>Sound sincere, not scripted</li><li>Don't use emojis or slang</li><li>When possible, personalize the response (e.g., “your upcoming stay”)</li></ul></td></tr></tbody></table></figure><p>Remember, a good few-shot prompt includes a clear task and two or three examples to show what kind of response you want. In this case, the task is replying to customer messages, so your examples should be made-up replies to a couple of customer messages.</p>",
     "_ariaLevel": 0,
-    "_id": "68e58195c176fa000286ea66",
-    "_parentId": "68e5818cc176fa000286ea65",
+    "_id": "68e57ceec176fa000286ea5e",
+    "_parentId": "68e57c77c176fa000286ea5c",
     "_type": "component",
     "_layout": "full",
     "_onScreen": {
@@ -500,25 +174,7 @@
         "_instruction": ""
       }
     },
-    "instruction": "",
-    "_setCompletionOn": "allItems",
-    "_items": [
-      {
-        "title": "Need Help Getting Started? Here's a Hint!",
-        "body": "<p>Use this format for your prompt:</p><p>&nbsp;</p><blockquote><p style=\"margin-left:40px;\"><span style=\"background-color:hsl(0, 0%, 90%);\">Based on the following examples, [add your task/scenario instructions here].&nbsp;</span></p><p style=\"margin-left:40px;\"><span style=\"background-color:hsl(0, 0%, 90%);\">Example 1: “[Add your example output here]”</span></p><p style=\"margin-left:40px;\"><span style=\"background-color:hsl(0, 0%, 90%);\">Example 2: “[Add your example output here]”</span></p></blockquote><p>&nbsp;</p><p>If you like, try this for one of your examples:</p><p>&nbsp;</p><blockquote><p style=\"margin-left:40px;\"><span style=\"background-color:hsl(0, 0%, 90%);\">Example 1:</span><br><span style=\"background-color:hsl(0, 0%, 90%);\">Customer message: \"Could I upgrade my room?\"</span><br><span style=\"background-color:hsl(0, 0%, 90%);\">Response: “Thank you for reaching out, Marc. We’d be happy to assist with a room upgrade for your upcoming stay. Availability can vary, so we recommend contacting our reservations team directly or visiting the front desk upon arrival for the most up-to-date options. If you’d prefer, we can also note your request in your reservation and follow up shortly. Please let us know how you’d like to proceed—we’re here to make your visit as comfortable as possible.”</span></p></blockquote>",
-        "_titleIcon": "",
-        "_imageAlignment": "full",
-        "_graphic": {
-          "alt": "",
-          "src": "",
-          "attribution": ""
-        },
-        "_classes": ""
-      }
-    ],
-    "_shouldCollapseItems": true,
-    "_shouldExpandFirstItem": false,
-    "_isCenterAligned": false
+    "instruction": ""
   },
   {
     "_component": "textinput",
@@ -636,6 +292,83 @@
     }
   },
   {
+    "_component": "accordion",
+    "_classes": "",
+    "_isOptional": true,
+    "_isAvailable": true,
+    "_isHidden": false,
+    "_isVisible": true,
+    "_isResetOnRevisit": "false",
+    "_isA11yCompletionDescriptionEnabled": true,
+    "title": "hint accordion",
+    "displayTitle": "",
+    "body": "",
+    "_ariaLevel": 0,
+    "_id": "68e58195c176fa000286ea66",
+    "_parentId": "68e5818cc176fa000286ea65",
+    "_type": "component",
+    "_layout": "full",
+    "_onScreen": {
+      "_isEnabled": false,
+      "_classes": "",
+      "_percentInviewVertical": 50
+    },
+    "_tutor": {
+      "_isInherited": true,
+      "_type": "notify",
+      "_classes": "",
+      "_hasNotifyBottomButton": false,
+      "_button": {
+        "text": "{{_globals._extensions._tutor.hideFeedback}}",
+        "ariaLabel": "{{_globals._extensions._tutor.hideFeedback}}"
+      }
+    },
+    "_hint": {
+      "_isEnabled": false,
+      "title": "",
+      "altTitle": "",
+      "body": "",
+      "_imageAlignment": "right",
+      "_graphic": {
+        "_src": "",
+        "alt": "",
+        "attribution": ""
+      },
+      "_button": {
+        "_iconClass": "",
+        "_alignIconRight": true,
+        "text": "Hint",
+        "ariaLabel": ""
+      }
+    },
+    "_vanilla": {
+      "_textAlignment": {
+        "_title": "",
+        "_body": "",
+        "_instruction": ""
+      }
+    },
+    "instruction": "",
+    "_setCompletionOn": "allItems",
+    "_items": [
+      {
+        "title": "Need Help Getting Started? Here's a Hint!",
+        "body": "<p>Use this format for your prompt:</p><p>&nbsp;</p><blockquote><p style=\"margin-left:40px;\"><span style=\"background-color:hsl(0, 0%, 90%);\">Based on the following examples, [add your task/scenario instructions here].&nbsp;</span></p><p style=\"margin-left:40px;\"><span style=\"background-color:hsl(0, 0%, 90%);\">Example 1: “[Add your example output here]”</span></p><p style=\"margin-left:40px;\"><span style=\"background-color:hsl(0, 0%, 90%);\">Example 2: “[Add your example output here]”</span></p></blockquote><p>&nbsp;</p><p>If you like, try this for one of your examples:</p><p>&nbsp;</p><blockquote><p style=\"margin-left:40px;\"><span style=\"background-color:hsl(0, 0%, 90%);\">Example 1:</span><br><span style=\"background-color:hsl(0, 0%, 90%);\">Customer message: \"Could I upgrade my room?\"</span><br><span style=\"background-color:hsl(0, 0%, 90%);\">Response: “Thank you for reaching out, Marc. We’d be happy to assist with a room upgrade for your upcoming stay. Availability can vary, so we recommend contacting our reservations team directly or visiting the front desk upon arrival for the most up-to-date options. If you’d prefer, we can also note your request in your reservation and follow up shortly. Please let us know how you’d like to proceed—we’re here to make your visit as comfortable as possible.”</span></p></blockquote>",
+        "_titleIcon": "",
+        "_imageAlignment": "full",
+        "_graphic": {
+          "alt": "",
+          "src": "",
+          "attribution": ""
+        },
+        "_classes": ""
+      }
+    ],
+    "_shouldCollapseItems": true,
+    "_shouldExpandFirstItem": false,
+    "_isCenterAligned": false
+  },
+  {
     "_component": "text",
     "_classes": "",
     "_isOptional": false,
@@ -644,12 +377,12 @@
     "_isVisible": true,
     "_isResetOnRevisit": "false",
     "_isA11yCompletionDescriptionEnabled": true,
-    "title": "Step 1: Write a Few-Shot Prompt text block",
+    "title": "test your prompt text block",
     "displayTitle": "",
-    "body": "<h2>Step 1: Write a Few-Shot Prompt</h2><p>&nbsp;</p><p>Use the Marriott Hotels brand guidelines below to create a few-shot prompt. Your goal is to help an AI respond to a variety of customer messages in a way that reflects the company’s voice and values.</p><p>&nbsp;</p><h2>Mariott Hotels Brand Guidelines:</h2><p>&nbsp;</p><figure class=\"table\"><table style=\"border-collapse:collapse;\"><tbody><tr><td style=\"background-color:hsl(120, 75%, 60%);border:1px solid black;\"><strong>Industry</strong></td><td style=\"border:1px solid black;\">Hospitality and tourism</td></tr><tr><td style=\"background-color:hsl(120, 75%, 60%);border:1px solid black;\"><strong>Customers</strong></td><td style=\"border:1px solid black;\">Business and leisure travelers, families, international guests</td></tr><tr><td style=\"background-color:hsl(120, 75%, 60%);border:1px solid black;\"><strong>Tone</strong></td><td style=\"border:1px solid black;\"><ul><li>Polished, warm, and respectful</li><li>Professional without being cold</li><li>Service-minded and guest-centered</li></ul></td></tr><tr><td style=\"background-color:hsl(120, 75%, 60%);border:1px solid black;\"><strong>Core Values</strong></td><td style=\"border:1px solid black;\">Comfort, trust, exceptional service</td></tr><tr><td style=\"background-color:hsl(120, 75%, 60%);border:1px solid black;\"><strong>Style Notes</strong></td><td style=\"border:1px solid black;\"><ul><li>Use formal greetings (“Thank you for reaching out,” “We sincerely apologize…”)</li><li>Always offer a helpful next step</li><li>Sound sincere, not scripted</li><li>Don't use emojis or slang</li><li>When possible, personalize the response (e.g., “your upcoming stay”)</li></ul></td></tr></tbody></table></figure><p>Remember, a good few-shot prompt includes a clear task and two or three examples to show what kind of response you want. In this case, the task is replying to customer messages, so your examples should be made-up replies to a couple of customer messages.</p>",
+    "body": "<p>Now, test your few-shot prompt on the following customer messages:</p><p>&nbsp;</p><ul style=\"list-style-type:circle;\"><li>“Does the hotel have an airport shuttle?”</li><li>“I was charged twice for my stay—can someone help? Thanks, Bruce”</li><li>“I left my headphones in the room—can I get them back?”</li><li>“Can I check in early? - Sara”</li><li>“My room was really noisy—I barely slept.”</li></ul>",
     "_ariaLevel": 0,
-    "_id": "68e57ceec176fa000286ea5e",
-    "_parentId": "68e57c77c176fa000286ea5c",
+    "_id": "68e5845ec176fa000286ea68",
+    "_parentId": "68e58444c176fa000286ea67",
     "_type": "component",
     "_layout": "full",
     "_onScreen": {
@@ -703,12 +436,12 @@
     "_isVisible": true,
     "_isResetOnRevisit": "false",
     "_isA11yCompletionDescriptionEnabled": true,
-    "title": "practice 1 initial text intro",
+    "title": "Reflect text",
     "displayTitle": "",
-    "body": "<h2>Scenario</h2><h2>&nbsp;</h2><p>Imagine that you've just joined the Guest Experience team at Marriott Hotels. It's your job to respond to customer messages—whether that's helping with a reservation, fixing a billing issue, answering a question about hotel services, or responding to a complaint.</p><p>&nbsp;</p><p>You choose to use AI to help you reply to customer messages more efficiently and with a consistent tone. To guide the AI in generating responses that match Marriott Hotels’ brand voice, you create a few-shot prompt. This prompt includes examples of the kind of replies you want the AI to model.</p>",
+    "body": "<p><strong>How did your few-shot prompt do?</strong></p><p>&nbsp;</p><ul style=\"list-style-type:disc;\"><li>Did the AI match Marriott’s tone?</li><li>What made it feel on-brand or off-brand?</li><li>Are the outputs clear and helpful?</li><li>What would you change to improve the examples?</li></ul>",
     "_ariaLevel": 0,
-    "_id": "68e57b58c176fa000286ea5a",
-    "_parentId": "68e57afcc176fa000286ea59",
+    "_id": "68e585a3c176fa000286ea6a",
+    "_parentId": "68e5859ec176fa000286ea69",
     "_type": "component",
     "_layout": "full",
     "_onScreen": {
@@ -752,6 +485,191 @@
       }
     },
     "instruction": ""
+  },
+  {
+    "_component": "textinput",
+    "_classes": "",
+    "_isOptional": false,
+    "_isAvailable": true,
+    "_isHidden": false,
+    "_isVisible": true,
+    "_isResetOnRevisit": "false",
+    "_isA11yCompletionDescriptionEnabled": true,
+    "title": "Write your reflection here",
+    "displayTitle": "",
+    "body": "",
+    "_ariaLevel": 0,
+    "_id": "68e585e9c176fa000286ea6c",
+    "_parentId": "68e585e6c176fa000286ea6b",
+    "_type": "component",
+    "_layout": "full",
+    "_onScreen": {
+      "_isEnabled": false,
+      "_classes": "",
+      "_percentInviewVertical": 50
+    },
+    "_tutor": {
+      "_isInherited": true,
+      "_type": "notify",
+      "_classes": "",
+      "_hasNotifyBottomButton": false,
+      "_button": {
+        "text": "{{_globals._extensions._tutor.hideFeedback}}",
+        "ariaLabel": "{{_globals._extensions._tutor.hideFeedback}}"
+      }
+    },
+    "_hint": {
+      "_isEnabled": false,
+      "title": "",
+      "altTitle": "",
+      "body": "",
+      "_imageAlignment": "right",
+      "_graphic": {
+        "_src": "",
+        "alt": "",
+        "attribution": ""
+      },
+      "_button": {
+        "_iconClass": "",
+        "_alignIconRight": true,
+        "text": "Hint",
+        "ariaLabel": ""
+      }
+    },
+    "_vanilla": {
+      "_textAlignment": {
+        "_title": "",
+        "_body": "",
+        "_instruction": ""
+      }
+    },
+    "instruction": "Write your reflection here:",
+    "ariaQuestion": "",
+    "_items": [
+      {
+        "_answers": [],
+        "prefix": "",
+        "suffix": "",
+        "placeholder": ""
+      }
+    ],
+    "_attempts": 1,
+    "_canShowModelAnswer": false,
+    "_canShowCorrectness": false,
+    "_canShowFeedback": false,
+    "_canShowMarking": false,
+    "_shouldDisplayAttempts": false,
+    "_isRandom": false,
+    "_recordInteraction": true,
+    "_questionWeight": 1,
+    "_allowsAnyCase": false,
+    "_allowsPunctuation": false,
+    "_feedback": {
+      "title": "",
+      "correct": "",
+      "_incorrect": {
+        "final": "",
+        "notFinal": ""
+      },
+      "_partlyCorrect": {
+        "final": "",
+        "notFinal": ""
+      }
+    },
+    "_buttons": {
+      "_submit": {
+        "buttonText": "",
+        "ariaLabel": ""
+      },
+      "_reset": {
+        "buttonText": "",
+        "ariaLabel": ""
+      },
+      "_showCorrectAnswer": {
+        "buttonText": "",
+        "ariaLabel": ""
+      },
+      "_hideCorrectAnswer": {
+        "buttonText": "",
+        "ariaLabel": ""
+      },
+      "_showFeedback": {
+        "buttonText": "",
+        "ariaLabel": ""
+      },
+      "remainingAttemptsText": "",
+      "remainingAttemptText": ""
+    }
+  },
+  {
+    "_component": "graphic",
+    "_classes": "",
+    "_isOptional": true,
+    "_isAvailable": true,
+    "_isHidden": false,
+    "_isVisible": true,
+    "_isResetOnRevisit": "false",
+    "_isA11yCompletionDescriptionEnabled": true,
+    "title": "Extension",
+    "displayTitle": "Extension",
+    "body": "<p>Want to keep going? Try changing your prompt by using two new examples and see how the outputs change.</p>",
+    "_ariaLevel": 0,
+    "_id": "68e586a3c176fa000286ea6e",
+    "_parentId": "68e5868bc176fa000286ea6d",
+    "_type": "component",
+    "_layout": "full",
+    "_onScreen": {
+      "_isEnabled": false,
+      "_classes": "",
+      "_percentInviewVertical": 50
+    },
+    "_tutor": {
+      "_isInherited": true,
+      "_type": "notify",
+      "_classes": "",
+      "_hasNotifyBottomButton": false,
+      "_button": {
+        "text": "{{_globals._extensions._tutor.hideFeedback}}",
+        "ariaLabel": "{{_globals._extensions._tutor.hideFeedback}}"
+      }
+    },
+    "_hint": {
+      "_isEnabled": false,
+      "title": "",
+      "altTitle": "",
+      "body": "",
+      "_imageAlignment": "right",
+      "_graphic": {
+        "_src": "",
+        "alt": "",
+        "attribution": ""
+      },
+      "_button": {
+        "_iconClass": "",
+        "_alignIconRight": true,
+        "text": "Hint",
+        "ariaLabel": ""
+      }
+    },
+    "_vanilla": {
+      "_textAlignment": {
+        "_title": "",
+        "_body": "",
+        "_instruction": ""
+      }
+    },
+    "instruction": "",
+    "_graphic": {
+      "alt": "",
+      "longdescription": "",
+      "large": "course/en/assets/36f59c46865aacc0dfad10416976c2961c233097.png",
+      "small": "course/en/assets/36f59c46865aacc0dfad10416976c2961c233097.png",
+      "attribution": "",
+      "_url": "",
+      "_target": "_blank"
+    },
+    "_isScrollable": false,
+    "_defaultScrollPercent": 0
   },
   {
     "_component": "graphic",
@@ -822,6 +740,619 @@
     },
     "_isScrollable": false,
     "_defaultScrollPercent": 0
+  },
+  {
+    "_component": "text",
+    "_classes": "",
+    "_isOptional": false,
+    "_isAvailable": true,
+    "_isHidden": false,
+    "_isVisible": true,
+    "_isResetOnRevisit": "false",
+    "_isA11yCompletionDescriptionEnabled": true,
+    "title": "Step 1: Write a Few-Shot Prompt text block",
+    "displayTitle": "",
+    "body": "<h2>Step 1: Write a Few-Shot Prompt</h2><p>&nbsp;</p><p>Use the feedback guidelines below to create a few-shot prompt. Your goal is to provide feedback that is kind, clear, and easy to follow—something that builds confidence and supports learning.</p><p>&nbsp;</p><h2>Feedback Guidelines</h2><p>&nbsp;</p><figure class=\"table\"><table style=\"border-collapse:collapse;\"><tbody><tr><td style=\"background-color:hsl(120, 75%, 60%);border:1px solid black;\"><strong>Audience</strong></td><td style=\"border:1px solid black;\">3rd–5th grade students</td></tr><tr><td style=\"background-color:hsl(120, 75%, 60%);border:1px solid black;\"><strong>Purpose</strong></td><td style=\"border:1px solid black;\">Encourage, guide, and celebrate effort</td></tr><tr><td style=\"background-color:hsl(120, 75%, 60%);border:1px solid black;\"><strong>Tone</strong></td><td style=\"border:1px solid black;\"><ul><li>Positive, clear, and gentle</li><li>Age-appropriate and confidence-boosting</li><li>Supportive, not formal</li></ul></td></tr><tr><td style=\"background-color:hsl(120, 75%, 60%);border:1px solid black;\"><strong>Core Values</strong></td><td style=\"border:1px solid black;\">Curiosity, effort, growth</td></tr><tr><td style=\"background-color:hsl(120, 75%, 60%);border:1px solid black;\"><strong>Style Notes</strong></td><td style=\"border:1px solid black;\"><ul><li>Use the student’s name if known</li><li>Start with something they did well</li><li>Use simple language (e.g., “Great job explaining your idea!”)</li><li>End with a tip or next step</li><li>Avoid complicated words or negative phrasing</li></ul></td></tr></tbody></table></figure><p>Remember, a good few-shot prompt includes a clear task and two or three examples to show the kind of response you’re aiming for. In this case, the task is giving feedback on elementary students’ writing, so your examples should be made-up feedback to sample writing assignments.</p>",
+    "_ariaLevel": 0,
+    "_id": "68e67cc1c176fa000286ea80",
+    "_parentId": "68e67cc0c176fa000286ea78",
+    "_type": "component",
+    "_layout": "full",
+    "_onScreen": {
+      "_isEnabled": false,
+      "_classes": "",
+      "_percentInviewVertical": 50
+    },
+    "_tutor": {
+      "_isInherited": true,
+      "_type": "notify",
+      "_classes": "",
+      "_hasNotifyBottomButton": false,
+      "_button": {
+        "text": "{{_globals._extensions._tutor.hideFeedback}}",
+        "ariaLabel": "{{_globals._extensions._tutor.hideFeedback}}"
+      }
+    },
+    "_hint": {
+      "_isEnabled": false,
+      "title": "",
+      "altTitle": "",
+      "body": "",
+      "_imageAlignment": "right",
+      "_graphic": {
+        "_src": "",
+        "alt": "",
+        "attribution": ""
+      },
+      "_button": {
+        "_iconClass": "",
+        "_alignIconRight": true,
+        "text": "Hint",
+        "ariaLabel": ""
+      }
+    },
+    "_vanilla": {
+      "_textAlignment": {
+        "_title": "",
+        "_body": "",
+        "_instruction": ""
+      }
+    },
+    "instruction": ""
+  },
+  {
+    "_component": "textinput",
+    "_classes": "",
+    "_isOptional": false,
+    "_isAvailable": true,
+    "_isHidden": false,
+    "_isVisible": true,
+    "_isResetOnRevisit": "false",
+    "_isA11yCompletionDescriptionEnabled": true,
+    "title": "Step 1 text input",
+    "displayTitle": "",
+    "body": "",
+    "_ariaLevel": 0,
+    "_id": "68e67cc1c176fa000286ea81",
+    "_parentId": "68e67cc0c176fa000286ea79",
+    "_type": "component",
+    "_layout": "full",
+    "_onScreen": {
+      "_isEnabled": false,
+      "_classes": "",
+      "_percentInviewVertical": 50
+    },
+    "_tutor": {
+      "_isInherited": true,
+      "_type": "notify",
+      "_classes": "",
+      "_hasNotifyBottomButton": false,
+      "_button": {
+        "text": "{{_globals._extensions._tutor.hideFeedback}}",
+        "ariaLabel": "{{_globals._extensions._tutor.hideFeedback}}"
+      }
+    },
+    "_hint": {
+      "_isEnabled": false,
+      "title": "Need Help Getting Started? Here's a Hint!",
+      "altTitle": "",
+      "body": "Use this format for your prompt:  Based on the following examples, [add your task/scenario instructions here].  Example 1: “[Add your example output here]”  Example 2: “[Add your example output here]”  If you like, try this for one of your examples:  Example 1: Customer message: \"Could I upgrade my room?\" Response: “Thank you for reaching out, Marc. We’d be happy to assist with a room upgrade for your upcoming stay. Availability can vary, so we recommend contacting our reservations team directly or visiting the front desk upon arrival for the most up-to-date options. If you’d prefer, we can also note your request in your reservation and follow up shortly. Please let us know how you’d like to proceed—we’re here to make your visit as comfortable as possible.”",
+      "_imageAlignment": "right",
+      "_graphic": {
+        "_src": "course/en/assets/f56f1f2f12f77c372ee1bbf171d4f5306d8e7715.png",
+        "alt": "",
+        "attribution": ""
+      },
+      "_button": {
+        "_iconClass": "",
+        "_alignIconRight": true,
+        "text": "Hint",
+        "ariaLabel": ""
+      }
+    },
+    "_vanilla": {
+      "_textAlignment": {
+        "_title": "",
+        "_body": "",
+        "_instruction": ""
+      }
+    },
+    "instruction": "Paste your few-shot prompt and press Submit",
+    "ariaQuestion": "",
+    "_items": [
+      {
+        "_answers": [],
+        "prefix": "",
+        "suffix": "",
+        "placeholder": ""
+      }
+    ],
+    "_attempts": 1,
+    "_canShowModelAnswer": false,
+    "_canShowCorrectness": false,
+    "_canShowFeedback": false,
+    "_canShowMarking": false,
+    "_shouldDisplayAttempts": false,
+    "_isRandom": false,
+    "_recordInteraction": true,
+    "_questionWeight": 1,
+    "_allowsAnyCase": false,
+    "_allowsPunctuation": false,
+    "_feedback": {
+      "title": "",
+      "correct": "",
+      "_incorrect": {
+        "final": "",
+        "notFinal": ""
+      },
+      "_partlyCorrect": {
+        "final": "",
+        "notFinal": ""
+      }
+    },
+    "_buttons": {
+      "_submit": {
+        "buttonText": "",
+        "ariaLabel": ""
+      },
+      "_reset": {
+        "buttonText": "",
+        "ariaLabel": ""
+      },
+      "_showCorrectAnswer": {
+        "buttonText": "",
+        "ariaLabel": ""
+      },
+      "_hideCorrectAnswer": {
+        "buttonText": "",
+        "ariaLabel": ""
+      },
+      "_showFeedback": {
+        "buttonText": "",
+        "ariaLabel": ""
+      },
+      "remainingAttemptsText": "",
+      "remainingAttemptText": ""
+    }
+  },
+  {
+    "_component": "accordion",
+    "_classes": "",
+    "_isOptional": true,
+    "_isAvailable": true,
+    "_isHidden": false,
+    "_isVisible": true,
+    "_isResetOnRevisit": "false",
+    "_isA11yCompletionDescriptionEnabled": true,
+    "title": "hint accordion",
+    "displayTitle": "",
+    "body": "",
+    "_ariaLevel": 0,
+    "_id": "68e67cc1c176fa000286ea83",
+    "_parentId": "68e67cc0c176fa000286ea7a",
+    "_type": "component",
+    "_layout": "full",
+    "_onScreen": {
+      "_isEnabled": false,
+      "_classes": "",
+      "_percentInviewVertical": 50
+    },
+    "_tutor": {
+      "_isInherited": true,
+      "_type": "notify",
+      "_classes": "",
+      "_hasNotifyBottomButton": false,
+      "_button": {
+        "text": "{{_globals._extensions._tutor.hideFeedback}}",
+        "ariaLabel": "{{_globals._extensions._tutor.hideFeedback}}"
+      }
+    },
+    "_hint": {
+      "_isEnabled": false,
+      "title": "",
+      "altTitle": "",
+      "body": "",
+      "_imageAlignment": "right",
+      "_graphic": {
+        "_src": "",
+        "alt": "",
+        "attribution": ""
+      },
+      "_button": {
+        "_iconClass": "",
+        "_alignIconRight": true,
+        "text": "Hint",
+        "ariaLabel": ""
+      }
+    },
+    "_vanilla": {
+      "_textAlignment": {
+        "_title": "",
+        "_body": "",
+        "_instruction": ""
+      }
+    },
+    "instruction": "",
+    "_setCompletionOn": "allItems",
+    "_items": [
+      {
+        "title": "Need Help Getting Started? Here's a Hint!",
+        "body": "<p>Use this format for your prompt:</p><p>&nbsp;</p><blockquote><p style=\"margin-left:40px;\"><span style=\"background-color:hsl(0,0%,90%);\">Based on the following examples, [add your task/scenario instructions here].&nbsp;</span></p><p style=\"margin-left:40px;\"><span style=\"background-color:hsl(0,0%,90%);\">Example 1: “[Add your example output here]”</span></p><p style=\"margin-left:40px;\"><span style=\"background-color:hsl(0,0%,90%);\">Example 2: “[Add your example output here]”</span></p></blockquote><p>&nbsp;</p><p>If you like, try this for one of your examples:</p><p>&nbsp;</p><blockquote><p style=\"margin-left:40px;\"><span style=\"background-color:hsl(0,0%,90%);\">Example 1:</span><br><span style=\"background-color:hsl(0,0%,90%);\">“Hi Maya! Great job describing the dragon in your story — I could really picture its shiny scales and big wings! You also did a nice job organizing your ideas from beginning to end. Next time, you might try adding more about how your character felt during the adventure. That would help your readers feel even more connected to the story. Keep up the great writing!”</span></p></blockquote>",
+        "_titleIcon": "",
+        "_imageAlignment": "full",
+        "_graphic": {
+          "alt": "",
+          "src": "",
+          "attribution": ""
+        },
+        "_classes": ""
+      }
+    ],
+    "_shouldCollapseItems": true,
+    "_shouldExpandFirstItem": false,
+    "_isCenterAligned": false
+  },
+  {
+    "_component": "text",
+    "_classes": "",
+    "_isOptional": false,
+    "_isAvailable": true,
+    "_isHidden": false,
+    "_isVisible": true,
+    "_isResetOnRevisit": "false",
+    "_isA11yCompletionDescriptionEnabled": true,
+    "title": "test your prompt text block",
+    "displayTitle": "",
+    "body": "<p>Now, test your few-shot prompt on the following &nbsp;writing samples:</p><p>&nbsp;</p><ul style=\"list-style-type:circle;\"><li>“My Favorite Animal – by Aiden | My favorite animal is a dog. I like dogs. They are fun. I like to play with dogs. Dogs are nice. My dog is brown. He like to run. I run with my dog. He is fun. I like my dog. He is nice.”</li><li>“My Weekend – by Zoe | On Saturday I went to the park. I played with my brother. We went on the swings. Then we got ice cream. It was fun. On Sunday we stayed home. I played video games. I also helped my mom with cooking. Then I watched a movie. I had a good weekend.”</li><li>“By Marcus | One time I felt proud was when I learned how to ride my bike. At first, I was scared because I kept falling. My dad helped me by holding the seat while I tried. After a few tries, I was able to ride all by myself! I felt happy and proud because I didn’t give up. Now I ride my bike all the time. It reminds me that I can do hard things if I keep practicing.”</li><li>“If I Had a Superpower – by Priya | If I had a superpower, I would choose to fly. I could fly over cities and mountains and see everything from the sky. I would use my power to help people who are lost or stuck in traffic. I’d also fly to school so I wouldn’t be late! Flying would feel like being free, like a bird in the wind. I’d wear a bright blue cape and goggles to keep the bugs out of my eyes. It would be the best superpower ever.”</li><li>“By Leo | My best friend is Tyler. We met in second grade. He is funny and nice. We like to play soccer and ride bikes. He is good at drawing. One time we made a comic book together. It had superheroes and robots. We also like to eat pizza. Sometimes we have sleepovers and stay up late. I like being his friend because he listens to me and makes me laugh. We sometimes fight but we always say sorry. He is my best friend because we have fun and help each other.”</li></ul>",
+    "_ariaLevel": 0,
+    "_id": "68e67cc1c176fa000286ea84",
+    "_parentId": "68e67cc1c176fa000286ea7b",
+    "_type": "component",
+    "_layout": "full",
+    "_onScreen": {
+      "_isEnabled": false,
+      "_classes": "",
+      "_percentInviewVertical": 50
+    },
+    "_tutor": {
+      "_isInherited": true,
+      "_type": "notify",
+      "_classes": "",
+      "_hasNotifyBottomButton": false,
+      "_button": {
+        "text": "{{_globals._extensions._tutor.hideFeedback}}",
+        "ariaLabel": "{{_globals._extensions._tutor.hideFeedback}}"
+      }
+    },
+    "_hint": {
+      "_isEnabled": false,
+      "title": "",
+      "altTitle": "",
+      "body": "",
+      "_imageAlignment": "right",
+      "_graphic": {
+        "_src": "",
+        "alt": "",
+        "attribution": ""
+      },
+      "_button": {
+        "_iconClass": "",
+        "_alignIconRight": true,
+        "text": "Hint",
+        "ariaLabel": ""
+      }
+    },
+    "_vanilla": {
+      "_textAlignment": {
+        "_title": "",
+        "_body": "",
+        "_instruction": ""
+      }
+    },
+    "instruction": ""
+  },
+  {
+    "_component": "text",
+    "_classes": "",
+    "_isOptional": false,
+    "_isAvailable": true,
+    "_isHidden": false,
+    "_isVisible": true,
+    "_isResetOnRevisit": "false",
+    "_isA11yCompletionDescriptionEnabled": true,
+    "title": "Reflect text",
+    "displayTitle": "",
+    "body": "<p><strong>How did your few-shot prompt do?</strong></p><p>&nbsp;</p><ul><li>Did the AI sound like a supportive tutor or mentor?</li><li>Would an elementary student feel proud or confused?</li><li>What changes might improve the tone, word choice, or next steps?</li><li>How did your examples help shape the AI’s voice?</li></ul>",
+    "_ariaLevel": 0,
+    "_id": "68e67cc1c176fa000286ea85",
+    "_parentId": "68e67cc1c176fa000286ea7c",
+    "_type": "component",
+    "_layout": "full",
+    "_onScreen": {
+      "_isEnabled": false,
+      "_classes": "",
+      "_percentInviewVertical": 50
+    },
+    "_tutor": {
+      "_isInherited": true,
+      "_type": "notify",
+      "_classes": "",
+      "_hasNotifyBottomButton": false,
+      "_button": {
+        "text": "{{_globals._extensions._tutor.hideFeedback}}",
+        "ariaLabel": "{{_globals._extensions._tutor.hideFeedback}}"
+      }
+    },
+    "_hint": {
+      "_isEnabled": false,
+      "title": "",
+      "altTitle": "",
+      "body": "",
+      "_imageAlignment": "right",
+      "_graphic": {
+        "_src": "",
+        "alt": "",
+        "attribution": ""
+      },
+      "_button": {
+        "_iconClass": "",
+        "_alignIconRight": true,
+        "text": "Hint",
+        "ariaLabel": ""
+      }
+    },
+    "_vanilla": {
+      "_textAlignment": {
+        "_title": "",
+        "_body": "",
+        "_instruction": ""
+      }
+    },
+    "instruction": ""
+  },
+  {
+    "_component": "textinput",
+    "_classes": "",
+    "_isOptional": false,
+    "_isAvailable": true,
+    "_isHidden": false,
+    "_isVisible": true,
+    "_isResetOnRevisit": "false",
+    "_isA11yCompletionDescriptionEnabled": true,
+    "title": "Write your reflection here",
+    "displayTitle": "",
+    "body": "",
+    "_ariaLevel": 0,
+    "_id": "68e67cc1c176fa000286ea86",
+    "_parentId": "68e67cc1c176fa000286ea7d",
+    "_type": "component",
+    "_layout": "full",
+    "_onScreen": {
+      "_isEnabled": false,
+      "_classes": "",
+      "_percentInviewVertical": 50
+    },
+    "_tutor": {
+      "_isInherited": true,
+      "_type": "notify",
+      "_classes": "",
+      "_hasNotifyBottomButton": false,
+      "_button": {
+        "text": "{{_globals._extensions._tutor.hideFeedback}}",
+        "ariaLabel": "{{_globals._extensions._tutor.hideFeedback}}"
+      }
+    },
+    "_hint": {
+      "_isEnabled": false,
+      "title": "",
+      "altTitle": "",
+      "body": "",
+      "_imageAlignment": "right",
+      "_graphic": {
+        "_src": "",
+        "alt": "",
+        "attribution": ""
+      },
+      "_button": {
+        "_iconClass": "",
+        "_alignIconRight": true,
+        "text": "Hint",
+        "ariaLabel": ""
+      }
+    },
+    "_vanilla": {
+      "_textAlignment": {
+        "_title": "",
+        "_body": "",
+        "_instruction": ""
+      }
+    },
+    "instruction": "Write your reflection here:",
+    "ariaQuestion": "",
+    "_items": [
+      {
+        "_answers": [],
+        "prefix": "",
+        "suffix": "",
+        "placeholder": ""
+      }
+    ],
+    "_attempts": 1,
+    "_canShowModelAnswer": false,
+    "_canShowCorrectness": false,
+    "_canShowFeedback": false,
+    "_canShowMarking": false,
+    "_shouldDisplayAttempts": false,
+    "_isRandom": false,
+    "_recordInteraction": true,
+    "_questionWeight": 1,
+    "_allowsAnyCase": false,
+    "_allowsPunctuation": false,
+    "_feedback": {
+      "title": "",
+      "correct": "",
+      "_incorrect": {
+        "final": "",
+        "notFinal": ""
+      },
+      "_partlyCorrect": {
+        "final": "",
+        "notFinal": ""
+      }
+    },
+    "_buttons": {
+      "_submit": {
+        "buttonText": "",
+        "ariaLabel": ""
+      },
+      "_reset": {
+        "buttonText": "",
+        "ariaLabel": ""
+      },
+      "_showCorrectAnswer": {
+        "buttonText": "",
+        "ariaLabel": ""
+      },
+      "_hideCorrectAnswer": {
+        "buttonText": "",
+        "ariaLabel": ""
+      },
+      "_showFeedback": {
+        "buttonText": "",
+        "ariaLabel": ""
+      },
+      "remainingAttemptsText": "",
+      "remainingAttemptText": ""
+    }
+  },
+  {
+    "_component": "graphic",
+    "_classes": "",
+    "_isOptional": true,
+    "_isAvailable": true,
+    "_isHidden": false,
+    "_isVisible": true,
+    "_isResetOnRevisit": "false",
+    "_isA11yCompletionDescriptionEnabled": true,
+    "title": "Extension",
+    "displayTitle": "Extension",
+    "body": "<p>Want to keep going? Try adjusting your prompt examples so that the tone is more effective for high school or university students and see how the outputs change.</p>",
+    "_ariaLevel": 0,
+    "_id": "68e67cc1c176fa000286ea87",
+    "_parentId": "68e67cc1c176fa000286ea7e",
+    "_type": "component",
+    "_layout": "full",
+    "_onScreen": {
+      "_isEnabled": false,
+      "_classes": "",
+      "_percentInviewVertical": 50
+    },
+    "_tutor": {
+      "_isInherited": true,
+      "_type": "notify",
+      "_classes": "",
+      "_hasNotifyBottomButton": false,
+      "_button": {
+        "text": "{{_globals._extensions._tutor.hideFeedback}}",
+        "ariaLabel": "{{_globals._extensions._tutor.hideFeedback}}"
+      }
+    },
+    "_hint": {
+      "_isEnabled": false,
+      "title": "",
+      "altTitle": "",
+      "body": "",
+      "_imageAlignment": "right",
+      "_graphic": {
+        "_src": "",
+        "alt": "",
+        "attribution": ""
+      },
+      "_button": {
+        "_iconClass": "",
+        "_alignIconRight": true,
+        "text": "Hint",
+        "ariaLabel": ""
+      }
+    },
+    "_vanilla": {
+      "_textAlignment": {
+        "_title": "",
+        "_body": "",
+        "_instruction": ""
+      }
+    },
+    "instruction": "",
+    "_graphic": {
+      "alt": "",
+      "longdescription": "",
+      "large": "course/en/assets/36f59c46865aacc0dfad10416976c2961c233097.png",
+      "small": "course/en/assets/36f59c46865aacc0dfad10416976c2961c233097.png",
+      "attribution": "",
+      "_url": "",
+      "_target": "_blank"
+    },
+    "_isScrollable": false,
+    "_defaultScrollPercent": 0
+  },
+  {
+    "_component": "text",
+    "_classes": "",
+    "_isOptional": false,
+    "_isAvailable": true,
+    "_isHidden": false,
+    "_isVisible": true,
+    "_isResetOnRevisit": "false",
+    "_isA11yCompletionDescriptionEnabled": true,
+    "title": "What is Few Shot Prompting Text Block",
+    "displayTitle": "What Is Few Shot Prompting?",
+    "body": "<p>Want your AI outputs to sound more like you? Few-shot prompting is a simple way to guide the AI by showing it a few examples of what you're looking for—not just telling it. In this quick video, you’ll see how just two or three examples can help the AI match your tone, style, or format—whether you're writing captions, emails, or anything else. Check it out!</p>",
+    "_ariaLevel": 0,
+    "_id": "68e53361c176fa000286ea0f",
+    "_parentId": "68e53361c176fa000286ea0e",
+    "_type": "component",
+    "_layout": "full",
+    "_onScreen": {
+      "_isEnabled": false,
+      "_classes": "",
+      "_percentInviewVertical": 50
+    },
+    "_tutor": {
+      "_isInherited": true,
+      "_type": "notify",
+      "_classes": "",
+      "_hasNotifyBottomButton": false,
+      "_button": {
+        "text": "{{_globals._extensions._tutor.hideFeedback}}",
+        "ariaLabel": "{{_globals._extensions._tutor.hideFeedback}}"
+      }
+    },
+    "_hint": {
+      "_isEnabled": false,
+      "title": "",
+      "altTitle": "",
+      "body": "",
+      "_imageAlignment": "right",
+      "_graphic": {
+        "_src": "",
+        "alt": "",
+        "attribution": ""
+      },
+      "_button": {
+        "_iconClass": "",
+        "_alignIconRight": true,
+        "text": "Hint",
+        "ariaLabel": ""
+      }
+    },
+    "_vanilla": {
+      "_textAlignment": {
+        "_title": "",
+        "_body": "",
+        "_instruction": ""
+      }
+    },
+    "instruction": ""
   },
   {
     "_component": "mcq",
@@ -1247,7 +1778,7 @@
     }
   },
   {
-    "_component": "text",
+    "_component": "mcq",
     "_classes": "",
     "_isOptional": false,
     "_isAvailable": true,
@@ -1255,12 +1786,12 @@
     "_isVisible": true,
     "_isResetOnRevisit": "false",
     "_isA11yCompletionDescriptionEnabled": true,
-    "title": "What is Few Shot Prompting Text Block",
-    "displayTitle": "What Is Few Shot Prompting?",
-    "body": "<p>Want your AI outputs to sound more like you? Few-shot prompting is a simple way to guide the AI by showing it a few examples of what you're looking for—not just telling it. In this quick video, you’ll see how just two or three examples can help the AI match your tone, style, or format—whether you're writing captions, emails, or anything else. Check it out!</p>",
+    "title": "What is few-shot prompting?",
+    "displayTitle": "",
+    "body": "<p>What is few-shot prompting?</p>",
     "_ariaLevel": 0,
-    "_id": "68e53361c176fa000286ea0f",
-    "_parentId": "68e53361c176fa000286ea0e",
+    "_id": "68e54f17c176fa000286ea43",
+    "_parentId": "68e54ed0c176fa000286ea42",
     "_type": "component",
     "_layout": "full",
     "_onScreen": {
@@ -1270,7 +1801,7 @@
     },
     "_tutor": {
       "_isInherited": true,
-      "_type": "notify",
+      "_type": "overlay",
       "_classes": "",
       "_hasNotifyBottomButton": false,
       "_button": {
@@ -1303,7 +1834,89 @@
         "_instruction": ""
       }
     },
-    "instruction": ""
+    "instruction": "Choose {{#if _isRadio}}one option{{else}}one or more options{{/if}} then select Submit.",
+    "ariaQuestion": "",
+    "_items": [
+      {
+        "text": "A technique where you ask the AI to explain its reasoning step-by-step before giving an answer",
+        "altText": "",
+        "_shouldBeSelected": false,
+        "_isPartlyCorrect": false,
+        "feedback": "<p>Not quite! Few-shot prompting involves showing the AI a few examples of what you want, so it can follow that pattern when generating a new response.</p>",
+        "_score": 0
+      },
+      {
+        "text": "A technique where you include a few examples in your prompt to guide the AI’s response",
+        "altText": "",
+        "_shouldBeSelected": true,
+        "_isPartlyCorrect": false,
+        "feedback": "<p>That's right! Few-shot prompting involves showing the AI a few examples of what you want, so it can follow that pattern when generating a new response.</p>",
+        "_score": 0
+      },
+      {
+        "text": "A technique where you give the AI a single instruction with no examples",
+        "altText": "",
+        "_shouldBeSelected": false,
+        "_isPartlyCorrect": false,
+        "feedback": "<p>Not quite! Few-shot prompting involves showing the AI a few examples of what you want, so it can follow that pattern when generating a new response.</p>",
+        "_score": 0
+      },
+      {
+        "text": "A technique where you give the AI a detailed list of steps to follow in a specific order",
+        "altText": "",
+        "_shouldBeSelected": false,
+        "_isPartlyCorrect": false,
+        "feedback": "<p>Not quite! Few-shot prompting involves showing the AI a few examples of what you want, so it can follow that pattern when generating a new response.</p>",
+        "_score": 0
+      }
+    ],
+    "_attempts": 3,
+    "_canShowModelAnswer": true,
+    "_canShowCorrectness": true,
+    "_canShowFeedback": true,
+    "_canShowMarking": true,
+    "_shouldDisplayAttempts": false,
+    "_isRandom": true,
+    "_recordInteraction": true,
+    "_hasItemScoring": false,
+    "_questionWeight": 1,
+    "_selectable": 1,
+    "_feedback": {
+      "title": "",
+      "correct": "<p>That's right! Few-shot prompting involves showing the AI a few examples of what you want, so it can follow that pattern when generating a new response.</p>",
+      "_incorrect": {
+        "final": "<p>Not quite! Few-shot prompting involves showing the AI a few examples of what you want, so it can follow that pattern when generating a new response.</p>",
+        "notFinal": ""
+      },
+      "_partlyCorrect": {
+        "final": "",
+        "notFinal": ""
+      }
+    },
+    "_buttons": {
+      "_submit": {
+        "buttonText": "",
+        "ariaLabel": ""
+      },
+      "_reset": {
+        "buttonText": "",
+        "ariaLabel": ""
+      },
+      "_showCorrectAnswer": {
+        "buttonText": "",
+        "ariaLabel": ""
+      },
+      "_hideCorrectAnswer": {
+        "buttonText": "",
+        "ariaLabel": ""
+      },
+      "_showFeedback": {
+        "buttonText": "",
+        "ariaLabel": ""
+      },
+      "remainingAttemptsText": "",
+      "remainingAttemptText": ""
+    }
   },
   {
     "_component": "text",
