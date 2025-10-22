@@ -288,6 +288,26 @@ Send
     toggleChatBtn.addEventListener('click', toggleChatPanel);
     closeChatBtn.addEventListener('click', toggleChatPanel);
 
+    // Continue button functionality
+    const continueBtn = document.querySelector('.bg-green-600');
+    if (continueBtn) {
+        continueBtn.addEventListener('click', () => {
+            try {
+                // Execute the Adapt completion function
+                if (typeof require !== 'undefined') {
+                    require(['core/js/data'], function(data) {
+                        data.get('c49').set('_isComplete', true);
+                    });
+                    console.log('Adapt completion function executed successfully');
+                } else {
+                    console.warn('Require.js not available - cannot execute Adapt completion function');
+                }
+            } catch (error) {
+                console.error('Error executing continue function:', error);
+            }
+        });
+    }
+
     let chatHistory = [];
     let lastUserMessageText = '';
     let isRetryMode = false;
