@@ -7,7 +7,7 @@
   "instruction": "",
   "_htmlClasses": "",
   "_isA11yCompletionDescriptionEnabled": true,
-  "_latestTrackingId": 42,
+  "_latestTrackingId": 43,
   "_buttons": {
     "_submit": {
       "buttonText": "Submit",
@@ -208,6 +208,10 @@
       },
       "_youtube": {
         "ariaRegion": "This is a media component which displays a YouTube video. Select the play / pause button to watch it.",
+        "skipToTranscript": "Skip to transcript"
+      },
+      "_vimeo": {
+        "ariaRegion": "This is a media component which displays a Vimeo video. Select the play / pause button to watch it.",
         "skipToTranscript": "Skip to transcript"
       }
     },

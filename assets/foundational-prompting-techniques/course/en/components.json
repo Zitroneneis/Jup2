@@ -1470,7 +1470,7 @@
     "_isA11yCompletionDescriptionEnabled": true,
     "title": "Video Lesson",
     "displayTitle": "Video Lesson",
-    "body": "",
+    "body": "<p><i>Note: This is the default native video block</i></p>",
     "_ariaLevel": 0,
     "_id": "68f7c287c176fa000286ebbf",
     "_parentId": "68e534f4c176fa000286ea11",
@@ -1525,10 +1525,15 @@
       "source": "",
       "type": "",
       "poster": "course/en/assets/1544b5dad648d8c19cffff7c218f4ba59ee314ee.jpg",
-      "cc": []
+      "cc": [
+        {
+          "srclang": "en",
+          "src": "course/en/assets/0359dd6d5d88dd34bfe770c43e7d15e398a93ac4.scc"
+        }
+      ]
     },
     "_setCompletionOn": "play",
-    "_useClosedCaptions": false,
+    "_useClosedCaptions": true,
     "_startLanguage": "en",
     "_showVolumeControl": true,
     "_startVolume": "80%",
@@ -1608,6 +1613,82 @@
       }
     },
     "instruction": "Click the \"Continue\" button in the header to go enable the next block"
+  },
+  {
+    "_component": "vimeo",
+    "_classes": "",
+    "_isOptional": false,
+    "_isAvailable": true,
+    "_isHidden": false,
+    "_isVisible": true,
+    "_isResetOnRevisit": "false",
+    "_isA11yCompletionDescriptionEnabled": true,
+    "title": "New Component Title",
+    "displayTitle": "",
+    "body": "<p><i>This is a vimeo block, different embed/ui from the native media block below</i></p>",
+    "_ariaLevel": 0,
+    "_id": "68f94221c176fa000286ebcd",
+    "_parentId": "68f9421cc176fa000286ebcc",
+    "_type": "component",
+    "_layout": "full",
+    "_onScreen": {
+      "_isEnabled": false,
+      "_classes": "",
+      "_percentInviewVertical": 50
+    },
+    "_tutor": {
+      "_isInherited": true,
+      "_type": "notify",
+      "_classes": "",
+      "_hasNotifyBottomButton": false,
+      "_button": {
+        "text": "{{_globals._extensions._tutor.hideFeedback}}",
+        "ariaLabel": "{{_globals._extensions._tutor.hideFeedback}}"
+      }
+    },
+    "_hint": {
+      "_isEnabled": false,
+      "title": "",
+      "altTitle": "",
+      "body": "",
+      "_imageAlignment": "right",
+      "_graphic": {
+        "_src": "",
+        "alt": "",
+        "attribution": ""
+      },
+      "_button": {
+        "_iconClass": "",
+        "_alignIconRight": true,
+        "text": "Hint",
+        "ariaLabel": ""
+      }
+    },
+    "_vanilla": {
+      "_textAlignment": {
+        "_title": "",
+        "_body": "",
+        "_instruction": ""
+      }
+    },
+    "instruction": "Select the play button to start the video.",
+    "_setCompletionOn": "play",
+    "_media": {
+      "_source": "https://vimeo.com/258564437?fl=wc",
+      "_autoplay": false,
+      "_loop": false,
+      "_pauseWhenOffScreen": true
+    },
+    "_transcript": {
+      "_setCompletionOnView": true,
+      "_inlineTranscript": true,
+      "_externalTranscript": false,
+      "inlineTranscriptButton": "Show inline transcript",
+      "inlineTranscriptCloseButton": "close inline transcript",
+      "inlineTranscriptBody": "<p><strong>Nullam vehicula magna sit amet magna ullamcorper</strong>, at dictum est gravida. Morbi nec magna at quam malesuada accumsan. Suspendisse potenti. Vivamus feugiat massa ut tortor scelerisque, non dapibus nulla consectetur. Aliquam erat volutpat.</p><p>&nbsp;</p><p>Sed at risus vel nulla consequat fermentum. Donec et orci mauris. Nullam tempor velit id mi luctus, a scelerisque libero accumsan. In hac habitasse platea dictumst. <i>Cras ac nunc nec massa tristique fringilla.</i></p><p><i>Suspendisse potenti. Vivamus non arcu tincidunt, congue massa at,</i> porttitor velit. Curabitur lacinia nisl ut turpis convallis, at dictum urna aliquet. Nullam non urna eget felis interdum feugiat. Morbi vel neque elit. Nullam a luctus leo. Integer maximus sapien in bibendum scelerisque.</p><p>&nbsp;</p><p>Nullam nec turpis et arcu egestas commodo. Integer sit amet metus non tortor tincidunt interdum. Donec et metus mollis, ultricies est at, ultricies nulla. Morbi non libero magna. Praesent imperdiet magna ac ipsum cursus, ut fermentum turpis tincidunt.</p><p>&nbsp;</p><p>Fusce at nisi arcu. Quisque sed dolor nec dui <strong>scelerisque dapibus.</strong> Sed at purus at sem aliquet luctus. Sed non massa sit amet sapien porttitor ornare. Vivamus pretium, tortor at tempus ullamcorper, diam ligula lobortis quam, at scelerisque libero lectus ut risus.</p>",
+      "transcriptLinkButton": "",
+      "transcriptLink": ""
+    }
   },
   {
     "_component": "mcq",
