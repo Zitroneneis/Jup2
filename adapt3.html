@@ -290,18 +290,57 @@ Send
 
     // Continue button functionality
     const continueBtn = document.querySelector('.bg-green-600');
-    if (continueBtn) {
+    const adaptFrame = document.getElementById('adapt-frame');
+    
+    if (continueBtn && adaptFrame) {
         continueBtn.addEventListener('click', () => {
             try {
-                // Execute the Adapt completion function
-                if (typeof require !== 'undefined') {
-                    require(['core/js/data'], function(data) {
-                        data.get('c49').set('_isComplete', true);
-                    });
-                    console.log('Adapt completion function executed successfully');
-                } else {
-                    console.warn('Require.js not available - cannot execute Adapt completion function');
+                // Method 1: Try to execute directly in iframe context
+                try {
+                    const iframeWindow = adaptFrame.contentWindow;
+                    if (iframeWindow && typeof iframeWindow.require !== 'undefined') {
+                        iframeWindow.require(['core/js/data'], function(data) {
+                            data.get('c49').set('_isComplete', true);
+                            console.log('Adapt completion function executed directly in iframe');
+                        });
+                        return;
+                    }
+                } catch (e) {
+                    console.log('Direct iframe access failed, trying postMessage...');
                 }
+                
+                // Method 2: Send message to iframe
+                const message = {
+                    type: 'executeAdaptFunction',
+                    action: 'setComplete',
+                    componentId: 'c49',
+                    code: `
+                        if (typeof require !== 'undefined') {
+                            require(['core/js/data'], function(data) {
+                                data.get('c49').set('_isComplete', true);
+                                console.log('Adapt completion function executed via postMessage');
+                            });
+                        } else {
+                            console.warn('Require.js not available in iframe');
+                        }
+                    `
+                };
+                
+                adaptFrame.contentWindow.postMessage(message, '*');
+                console.log('Continue button clicked - message sent to Adapt iframe');
+                
+                // Method 3: Try global Adapt object if available
+                setTimeout(() => {
+                    try {
+                        if (adaptFrame.contentWindow.Adapt) {
+                            adaptFrame.contentWindow.Adapt.data.get('c49').set('_isComplete', true);
+                            console.log('Adapt completion set via global Adapt object');
+                        }
+                    } catch (e) {
+                        console.log('Global Adapt object method failed');
+                    }
+                }, 100);
+                
             } catch (error) {
                 console.error('Error executing continue function:', error);
             }
