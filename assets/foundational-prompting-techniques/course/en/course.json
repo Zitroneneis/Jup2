@@ -1,13 +1,13 @@
 {
-  "title": "Foundational Prompting Techniques",
-  "displayTitle": "Foundational Prompting Techniques",
+  "title": "Foundational Prompting Techniques Multi-Activity Prototype",
+  "displayTitle": "Foundational Prompting Techniques Multi-Activity Prototype",
   "body": "<p><span style=\"background-color:rgb(255,255,255);color:rgb(0,0,0);\"><span style=\"-webkit-text-stroke-width:0px;display:inline !important;float:none;font-family:Merriweather;font-size:16px;font-style:normal;font-variant-caps:normal;font-variant-ligatures:normal;font-weight:400;letter-spacing:normal;orphans:2;text-align:start;text-decoration-color:initial;text-decoration-style:initial;text-decoration-thickness:initial;text-indent:0px;text-transform:none;white-space:normal;widows:2;word-spacing:0px;\">In this lesson, you'll learn some simple, effective ways to write prompts that get the AI to AI to give you the output you want</span></span></p>",
   "subtitle": "In this lesson, you'll learn some simple, effective ways to write prompts that get the AI to AI to give you the output you want",
   "description": "In this lesson, you'll learn some simple, effective ways to write prompts that get the AI to AI to give you the output you want",
   "instruction": "",
   "_htmlClasses": "",
   "_isA11yCompletionDescriptionEnabled": true,
-  "_latestTrackingId": 33,
+  "_latestTrackingId": 42,
   "_buttons": {
     "_submit": {
       "buttonText": "Submit",

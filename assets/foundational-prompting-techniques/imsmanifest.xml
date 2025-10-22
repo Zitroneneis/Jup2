@@ -6,7 +6,7 @@
     <lom xmlns="http://www.imsglobal.org/xsd/imsmd_rootv1p2p1" xsi:schemaLocation="http://www.imsglobal.org/xsd/imsmd_rootv1p2p1 imsmd_rootv1p2p1.xsd">
       <general>
         <title>
-          <langstring xml:lang="x-none"><![CDATA[Foundational Prompting Techniques]]></langstring>
+          <langstring xml:lang="x-none"><![CDATA[Foundational Prompting Techniques Multi-Activity Prototype]]></langstring>
         </title>
         <description>
           <langstring xml:lang="x-none"><![CDATA[In this lesson, you'll learn some simple, effective ways to write prompts that get the AI to AI to give you the output you want]]></langstring>
@@ -16,9 +16,9 @@
   </metadata>
   <organizations default="adapt_scorm">
     <organization identifier="adapt_scorm">
-      <title><![CDATA[Foundational Prompting Techniques]]></title>
+      <title><![CDATA[Foundational Prompting Techniques Multi-Activity Prototype]]></title>
       <item identifier="item_1" isvisible="true" identifierref="res1">
-        <title><![CDATA[Foundational Prompting Techniques]]></title>
+        <title><![CDATA[Foundational Prompting Techniques Multi-Activity Prototype]]></title>
       </item>
     </organization>
   </organizations>
