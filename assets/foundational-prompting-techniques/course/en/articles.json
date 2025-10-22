@@ -292,8 +292,8 @@
     }
   },
   {
-    "title": "New Article Title",
-    "displayTitle": "",
+    "title": "Initial block",
+    "displayTitle": "Initial block",
     "body": "",
     "_classes": "",
     "instruction": "",
